@@ -1,0 +1,11 @@
+.container {
+    height : 70em;
+}
+
+.b-calendar {
+    height : 100%;
+}
+
+.b-float-root {
+    z-index: 100;
+}

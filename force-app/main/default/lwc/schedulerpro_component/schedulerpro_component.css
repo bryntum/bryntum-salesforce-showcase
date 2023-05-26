@@ -1,0 +1,11 @@
+.container {
+    height : 45em;
+}
+
+.container .b-schedulerpro {
+    height: calc(100% - 13em);
+}
+
+.b-float-root {
+    z-index: 100;
+}
