@@ -45,8 +45,3 @@ $RECYCLE.BIN/
 **/__pycache__/
 **/.venv/
 **/venv/
-
-force-app/main/default/staticresources/**
-!force-app/main/default/staticresources/*.xml
-!force-app/main/default/staticresources/*.resource
-!force-app/main/default/staticresources/**/component.css

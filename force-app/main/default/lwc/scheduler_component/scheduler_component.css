@@ -1,7 +1,85 @@
 .container {
-    height : 40em;
+  height: 40em;
 }
 
 .b-float-root {
-    z-index: 100;
+  z-index: 100;
+}
+
+.b-sch-event-wrap .b-sch-event {
+  border-radius: 3px;
+  font-weight: 300;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.25);
+}
+.b-sch-event-wrap .b-sch-event.lubrication {
+  background: repeating-linear-gradient(
+    -45deg,
+    #01baef,
+    #01baef 7px,
+    white 7px,
+    white 14px
+  );
+  border-color: #01baef;
+}
+
+.b-sch-line-start,
+.b-sch-line {
+  border-color: #f33;
+}
+.b-sch-line-start.special,
+.b-sch-line.special {
+  border-color: #000;
+}
+
+.b-sch-event-wrap.b-milestone-wrap
+  .b-sch-event.b-sch-event-withicon
+  .b-sch-event-content {
+  border-radius: 100%;
+  font-size: 50%;
+  width: 2em;
+  height: 2em;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.25);
+}
+.b-sch-event-wrap.b-milestone-wrap
+  .b-sch-event.b-sch-event-withicon
+  .b-sch-event-content
+  .b-fa,
+.b-sch-event-wrap.b-milestone-wrap
+  .b-sch-event.b-sch-event-withicon
+  .b-sch-event-content
+  .b-icon {
+  color: inherit;
+}
+.b-sch-event-wrap.b-milestone-wrap label {
+  color: #777;
+}
+
+.b-sch-dependency.special-dependency {
+  stroke-dasharray: 5, 5;
+  stroke-width: 2;
+}
+.b-sch-dependency.extra-special-dependency {
+  stroke-dasharray: 6;
+}
+
+.marker-thin .b-sch-dependency-arrow {
+  fill: transparent;
+  stroke: #bbb;
+}
+
+@keyframes draw {
+  50% {
+    stroke-dashoffset: 0;
+  }
+}
+.b-click-area {
+  transition: stroke 0.5s;
+}
+
+.b-highlight-click-area .b-click-area {
+  stroke: rgba(85, 85, 85, 0.1333333333);
+}
+
+.b-theme-classic-dark .b-highlight-click-area .b-click-area {
+  stroke: rgba(153, 153, 153, 0.1333333333);
 }

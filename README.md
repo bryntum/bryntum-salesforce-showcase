@@ -52,7 +52,7 @@ Setup is divided into two steps:
 6. Assign the bryntum-demo permission set to the default user:
 
     ```
-    sfdx force:user:permset:assign -n bryntum-demo
+    sfdx force:user:permset:assign -n bryntumdemo
     ```
 
 7. Open the scratch org:
@@ -75,18 +75,16 @@ To create a Grid static resource follow these steps:
 
     You can get it from customer zone, NPM or trial version from [site](https://bryntum.com/download/)
 
-2. Remove old resource - `staticresources/bryntum_grid.resource`
+2. Update static resource
 
-3. Create new resource
-
-    Create directory `staticresources/bryntum_grid` and copy contents from the distributable to static resource:
+    Locate `staticresources/bryntum_grid` directory and copy contents from the distributable to static resource:
         
         - fonts/
         - locales/
         - grid.stockholm.css - This is a default theme and it is imported by LWC
         - grid.lwc.module.js
 
-4. Upload static resource
+3. Upload static resource
 
     ```
     sfdx force:source:deploy --sourcepath force-app/main/default/staticresources/bryntum_grid.resource-meta.xml
