@@ -28,6 +28,14 @@
         <tab>BryntumTaskBoard</tab>
         <visibility>Visible</visibility>
     </tabSettings>
+    <tabSettings>
+        <tab>GridTempDemo</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+    <tabSettings>
+        <tab>SchedulerProTempDemo</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
     <hasActivationRequired>false</hasActivationRequired>
     <label>bryntumdemo</label>
 </PermissionSet>

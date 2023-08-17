@@ -45,3 +45,7 @@ $RECYCLE.BIN/
 **/__pycache__/
 **/.venv/
 **/venv/
+
+force-app/main/default/staticresources/**/locales/*
+force-app/main/default/staticresources/**/fonts/*
+force-app/main/default/staticresources/**/*.css.map
