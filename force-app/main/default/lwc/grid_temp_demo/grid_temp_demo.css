@@ -1,0 +1,75 @@
+.container {
+    height : 40em;
+}
+
+.b-float-root {
+    z-index: 100;
+}
+
+.toolbar-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid #DDD;
+    border-radius: 0.3em;
+    padding: 0.5em;
+    gap: 0.5em;
+    height: 9.5em;
+    min-width: 8em;
+  }
+  .toolbar-group.selection-info {
+    grid-template-columns: 1fr;
+    border: 0;
+    background: linear-gradient(268deg, rgba(0, 0, 0, 0.1215686275), transparent);
+    justify-items: end;
+    align-content: start;
+    min-width: 11em;
+    user-select: none;
+  }
+  .toolbar-group.selection-info .subheader {
+    text-transform: unset;
+    font-size: 0.9em;
+  }
+  .toolbar-group.selection-info .line {
+    font-size: 0.7em;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: end;
+    width: 100%;
+  }
+  .toolbar-group .b-button {
+    font-size: 0.9em;
+    padding: 0 1em;
+    border: 0;
+    text-transform: unset;
+    justify-content: unset;
+  }
+  .toolbar-group .header {
+    text-align: center;
+    user-select: none;
+  }
+  
+  .b-button.log-button {
+    height: 35px;
+    align-self: end;
+    border-radius: 50%;
+    background-color: rgba(120, 120, 131, 0.8);
+    color: white;
+    border: 0;
+    font-size: 0.8em;
+  }
+  
+  .b-theme-stockholm .toolbar-group .header {
+    text-transform: uppercase;
+  }
+  
+  .b-theme-classic-dark .toolbar-group {
+    border-color: #666;
+  }
+  
+  .b-popup.b-text-popup {
+    max-width: 30em;
+    max-width: 30em;
+  }
+
+  

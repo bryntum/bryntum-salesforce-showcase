@@ -59,5 +59,7 @@
     <tabs>BryntumGantt</tabs>
     <tabs>BryntumCalendar</tabs>
     <tabs>BryntumTaskBoard</tabs>
+    <tabs>GridTempDemo</tabs>
+    <tabs>SchedulerProTempDemo</tabs>
     <uiType>Lightning</uiType>
 </CustomApplication>
