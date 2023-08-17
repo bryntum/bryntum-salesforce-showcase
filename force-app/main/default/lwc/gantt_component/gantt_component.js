@@ -44,9 +44,11 @@ export default class Gantt_component extends LightningElement {
             calendarsData: data.calendars.rows
         });
 
+        const appendTo = this.template.querySelector(".container");
+
         const gantt = new bryntum.gantt.Gantt({
             project,
-            appendTo: this.template.querySelector(".container"),
+            appendTo,
             startDate: "2019-01-12",
             endDate: "2019-03-24",
 
@@ -129,9 +131,10 @@ export default class Gantt_component extends LightningElement {
             // let's track scheduling conflicts happened
             project.on("schedulingconflict", context => {
                 // show notification to user
-                bryntum.gantt.Toast.show(
-                    "Scheduling conflict has happened ..recent changes were reverted"
-                );
+                bryntum.gantt.Toast.show({
+                    html: "Scheduling conflict has happened ..recent changes were reverted",
+                    rootElement: bryntum.gantt.DomHelper.getRootElement(appendTo)
+                });
                 // as the conflict resolution approach let's simply cancel the changes
                 context.continueWithResolutionResult(
                     bryntum.gantt.EffectResolutionResult.Cancel
