@@ -22,6 +22,7 @@ export default class Schedulerpro_temp_demo extends LightningElement {
       loadStyle(this, SCHEDULERPRO + "/schedulerpro.stockholm.css")
     ])
       .then(() => {
+        console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
         this.createSchedulerPro();
       })
       .catch((error) => {

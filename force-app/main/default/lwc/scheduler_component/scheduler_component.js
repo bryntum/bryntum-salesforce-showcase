@@ -17,6 +17,7 @@ export default class Scheduler_component extends LightningElement {
             loadStyle(this, SCHEDULER + "/scheduler.stockholm.css")
         ])
         .then(() => {
+            console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
             this.createScheduler();
         })
         .catch(error => {

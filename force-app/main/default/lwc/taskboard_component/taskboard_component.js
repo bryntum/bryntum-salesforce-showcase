@@ -17,6 +17,7 @@ export default class Taskboard_component extends LightningElement {
             loadStyle(this, TASKBOARD + '/taskboard.stockholm.css')
         ])
             .then(() => {
+                console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
                 this.createTaskBoard();
             })
             .catch(error => {

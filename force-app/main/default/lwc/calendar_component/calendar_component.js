@@ -17,6 +17,7 @@ export default class Calendar_component extends LightningElement {
             loadStyle(this, CALENDAR + "/calendar.stockholm.css")
         ])
             .then(() => {
+                console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
                 this.createCalendar();
             })
             .catch(error => {
