@@ -18,6 +18,7 @@ export default class Gantt_component extends LightningElement {
             loadStyle(this, GANTT + "/gantt.stockholm.css")
         ])
             .then(() => {
+                console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
                 this.createGantt();
             })
             .catch(error => {
