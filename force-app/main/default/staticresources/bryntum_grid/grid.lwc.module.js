@@ -1,6 +1,10 @@
 this.bryntum = {
     ...(this.bryntum || {}),
     
+    getVersion : function() {
+        return 'stub';
+    },
+    
     grid : {
         Grid : class Grid {
             constructor({ appendTo }) {
