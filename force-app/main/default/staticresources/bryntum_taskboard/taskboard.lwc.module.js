@@ -1,5 +1,9 @@
 this.bryntum = {
     ...(this.bryntum || {}),
+
+    getVersion : function() {
+        return 'stub';
+    },
     
     taskboard : {
         TaskBoard : class TaskBoard {

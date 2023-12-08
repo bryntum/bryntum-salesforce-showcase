@@ -1,5 +1,9 @@
 this.bryntum = {
     ...(this.bryntum || {}),
+
+    getVersion : function() {
+        return 'stub';
+    },
     
     calendar : {
         Calendar : function({ appendTo }) {

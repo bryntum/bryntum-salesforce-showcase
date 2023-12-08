@@ -1,5 +1,9 @@
 this.bryntum = {
     ...(this.bryntum || {}),
+
+    getVersion : function() {
+        return 'stub';
+    },
     
     schedulerpro : {
         SchedulerPro : class SchedulerPro {
