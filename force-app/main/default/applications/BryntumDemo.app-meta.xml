@@ -55,6 +55,7 @@
     <!-- <tabs>standard-home</tabs> -->
     <tabs>BryntumGrid</tabs>
     <tabs>BryntumScheduler</tabs>
+    <tabs>BryntumSchedulerDragFromGrid</tabs>
     <tabs>BryntumSchedulerPro</tabs>
     <tabs>BryntumGantt</tabs>
     <tabs>BryntumCalendar</tabs>
