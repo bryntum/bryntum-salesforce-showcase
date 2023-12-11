@@ -1,5 +1,4 @@
 export default (SchedulerProClass) => {
-  const { DateHelper, Toast } = window.bryntum.scheduler;
 
   return class Schedule extends SchedulerProClass {
     // Customized scheduler displaying hospital appointments

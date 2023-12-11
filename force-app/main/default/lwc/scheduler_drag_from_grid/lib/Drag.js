@@ -1,5 +1,5 @@
 export default (base) => {
-    const { DateHelper, DomHelper, Tooltip } = window.bryntum.scheduler;
+    const { DateHelper, DomHelper, Tooltip, Toast } = window.bryntum.scheduler;
 
     return class Drag extends base {
         static get configurable() {
@@ -138,7 +138,10 @@ export default (base) => {
     
                 // Dropped on a scheduled event, display toast
                 if (targetEventRecord) {
-                    Toast.show(`Dropped on ${targetEventRecord.name}`);
+                    Toast.show({
+                        html: `Dropped on ${targetEventRecord.name}`,
+                        rootElement: DomHelper.getRootElement(schedule.element)
+                    });
                 }
             }
     
