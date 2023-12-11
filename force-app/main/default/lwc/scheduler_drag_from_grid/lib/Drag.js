@@ -66,6 +66,7 @@ export default (base) => {
                 me.tip = new Tooltip({
                     align      : 'b-t',
                     forElement : context.element,
+                    rootElement  : window.appendTo,
                     cls        : 'b-popup b-sch-event-tooltip'
                 });
             }

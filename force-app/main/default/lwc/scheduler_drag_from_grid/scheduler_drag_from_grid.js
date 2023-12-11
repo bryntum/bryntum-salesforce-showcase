@@ -13,250 +13,183 @@ import { projectData } from "./projectData";
 import { unplannedData } from "./unplannedData";
 
 export default class SchedulerDragFromGirdDemo extends LightningElement {
-  renderedCallback() {
-    if (this.bryntumInitialized) {
-      return;
+    renderedCallback() {
+        if (this.bryntumInitialized) {
+            return;
+        }
+        this.bryntumInitialized = true;
+
+        Promise.all([
+            loadScript(this, SCHEDULER + "/scheduler.lwc.module.js"),
+            loadStyle(this, SCHEDULER + "/scheduler.stockholm.css")
+        ])
+        .then(() => {
+            console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
+            this.createScheduler();
+        })
+        .catch((error) => {
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: "Error loading Bryntum Scheduler",
+                    message: error,
+                    variant: "error"
+                })
+            );
+        });
     }
-    this.bryntumInitialized = true;
 
-    Promise.all([
-      loadScript(this, SCHEDULER + "/scheduler.lwc.module.js"),
-      loadStyle(this, SCHEDULER + "/scheduler.stockholm.css")
-    ])
-      .then(() => {
-        console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
-        this.createScheduler();
-      })
-      .catch((error) => {
-        this.dispatchEvent(
-          new ShowToastEvent({
-            title: "Error loading Bryntum Scheduler",
-            message: error,
-            variant: "error"
-          })
-        );
-      });
-  }
+    createScheduler() {
+        const {
+            Grid,
+            Scheduler,
+            EventModel,
+            EventStore,
+            ResourceModel,
+            Splitter,
+            Combo,
+            DragHelper
+        } = bryntum.scheduler;
 
-  createScheduler() {
-    const {
-      Grid,
-      Scheduler,
-      EventModel,
-      EventStore,
-      ResourceModel,
-      Splitter,
-      Combo,
-      DateHelper,
-      DragHelper
-    } = bryntum.scheduler;
+        window.appendTo = this.template.querySelector(".container");
 
-    const appendTo = this.template.querySelector(".container");
-
-    class CustomResourceModel extends ResourceModel {
-        static get $name() {
-            return 'CustomResourceModel';
-        }
-    
-        static get fields() {
-            return [
-                // Do not persist `cls` field because we change its value on dragging unplanned resources to highlight the row
-                { name : 'cls', persist : false }
-            ];
-        }
-    }
-    
-
-    const Task = TaskMixin(EventModel);
-    const TaskStore = TaskStoreMixin(EventStore, Task);
-    const IconCombo = IconComboMixin(Combo);
-    const Schedule = ScheduleMixin(Scheduler);
-    const UnplannedGrid = UnplannedGridMixin(Grid);
-    const Drag = DragMixin(DragHelper);
-
-    const schedule = window.schedule = new Schedule({
-      ref: "schedule",
-      appendTo: appendTo,
-      // startDate: new Date(2022, 2, 1, 7),
-      // endDate: new Date(2022, 2, 1, 19),
-      // flex: 1,
-
-      // // Some variables used in this demo
-      // startHour: 7,
-      // endHour: 20,
-
-      // project: {
-      //   autoLoad: true,
-      //   eventModelClass: Appointment,
-      //   resourceModelClass: Doctor,
-      //   resourceStore: {
-      //     sorters: [{ field: "name", ascending: true }]
-      //   },
-      //   eventStore: {
-      //     // Unassigned events should remain in store
-      //     removeUnassignedEvent: false
-      //   },
-
-      //   listeners: {
-      //     change() {
-      //       schedule.widgetMap.saveButton.disabled = !this.eventStore.changes;
-      //     }
-      //   }
-      // },
-      // listeners: {
-      //   selectionChange() {
-      //     const { selectedRecords } = this,
-      //       { calendarHighlight } = schedule.features;
-
-      //     if (selectedRecords.length > 0) {
-      //       calendarHighlight.highlightResourceCalendars(selectedRecords);
-      //     } else {
-      //       calendarHighlight.unhighlightCalendars();
-      //     }
-      //   }
-      // }
-
-      ref         : 'schedule',
-    // insertFirst : 'main',
-    startDate   : new Date(2025, 11, 1, 8),
-    endDate     : new Date(2025, 11, 1, 18),
-    flex        : 4,
-    crudManager : {
-        autoLoad         : true,
-        // This config enables response validation and dumping of found errors to the browser console.
-        // It's meant to be used as a development stage helper only so please set it to false for production systems.
-        validateResponse : true,
-        eventStore       : {
-            storeClass : TaskStore
-        },
-        resourceStore : {
-            modelClass : CustomResourceModel
-        }
-    },
-
-    tbar : [
-        'Schedule view',
-        '->',
-        { type : 'viewpresetcombo' },
-        {
-            type        : 'button',
-            toggleable  : true,
-            icon        : 'b-fa-calendar',
-            pressedIcon : 'b-fa-calendar-check',
-            text        : 'Automatic rescheduling',
-            tooltip     : 'Toggles whether to automatically reschedule overlapping tasks',
-            cls         : 'reschedule-button',
-            onToggle({ pressed }) {
-                schedule.autoRescheduleTasks = pressed;
+        class CustomResourceModel extends ResourceModel {
+            static get $name() {
+                return 'CustomResourceModel';
             }
-        },
-        {
-            type        : 'buttonGroup',
-            toggleGroup : true,
-            items       : [
+        
+            static get fields() {
+                return [
+                    // Do not persist `cls` field because we change its value on dragging unplanned resources to highlight the row
+                    { name : 'cls', persist : false }
+                ];
+            }
+        }
+        
+
+        const Task = TaskMixin(EventModel);
+        const TaskStore = TaskStoreMixin(EventStore, Task);
+        const IconCombo = IconComboMixin(Combo);
+        const Schedule = ScheduleMixin(Scheduler);
+        const UnplannedGrid = UnplannedGridMixin(Grid);
+        const Drag = DragMixin(DragHelper);
+
+        const schedule = window.schedule = new Schedule({
+            ref         : "schedule",
+            appendTo    : appendTo,
+            startDate   : new Date(2025, 11, 1, 8),
+            endDate     : new Date(2025, 11, 1, 18),
+            flex        : 4,
+            crudManager : {
+                autoLoad         : true,
+                // This config enables response validation and dumping of found errors to the browser console.
+                // It's meant to be used as a development stage helper only so please set it to false for production systems.
+                validateResponse : true,
+                eventStore       : {
+                    storeClass : TaskStore
+                },
+                resourceStore : {
+                    modelClass : CustomResourceModel
+                }
+            },
+
+            tbar : [
+                'Schedule view',
+                '->',
+                { type : 'viewpresetcombo' },
                 {
-                    icon            : 'b-fa-fw b-fa-arrows-alt-v',
-                    pressed         : 'up.isVertical',
-                    tooltip         : 'Vertical mode',
-                    schedulerConfig : {
-                        mode           : 'vertical',
-                        subGridConfigs : {
-                            locked : {
-                                minWidth : 100,
-                                flex     : null
-                            }
-                        }
+                    type        : 'button',
+                    toggleable  : true,
+                    icon        : 'b-fa-calendar',
+                    pressedIcon : 'b-fa-calendar-check',
+                    text        : 'Automatic rescheduling',
+                    tooltip     : 'Toggles whether to automatically reschedule overlapping tasks',
+                    cls         : 'reschedule-button',
+                    onToggle({ pressed }) {
+                        schedule.autoRescheduleTasks = pressed;
                     }
                 },
                 {
-                    icon            : 'b-fa-fw b-fa-arrows-alt-h',
-                    pressed         : 'up.isHorizontal',
-                    tooltip         : 'Horizontal mode',
-                    schedulerConfig : {
-                        mode : 'horizontal'
+                    type        : 'buttonGroup',
+                    toggleGroup : true,
+                    items       : [
+                        {
+                            icon            : 'b-fa-fw b-fa-arrows-alt-v',
+                            pressed         : 'up.isVertical',
+                            tooltip         : 'Vertical mode',
+                            schedulerConfig : {
+                                mode           : 'vertical',
+                                subGridConfigs : {
+                                    locked : {
+                                        minWidth : 100,
+                                        flex     : null
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            icon            : 'b-fa-fw b-fa-arrows-alt-h',
+                            pressed         : 'up.isHorizontal',
+                            tooltip         : 'Horizontal mode',
+                            schedulerConfig : {
+                                mode : 'horizontal'
+                            }
+                        }
+                    ],
+                    onAction({ source : button }) {
+                        const newConfig = { ...schedule.initialConfig, ...button.schedulerConfig };
+
+                        // Recreate the scheduler to switch orientation
+                        schedule.destroy();
+                        schedule = new Schedule(newConfig);
+
+                        // Provide drag helper a reference to the new instance
+                        drag.schedule = schedule;
                     }
                 }
-            ],
-            onAction({ source : button }) {
-                const newConfig = { ...schedule.initialConfig, ...button.schedulerConfig };
+            ]
+        });
 
-                // Recreate the scheduler to switch orientation
-                schedule.destroy();
-                schedule = new Schedule(newConfig);
+        window.splitter = new Splitter({
+        appendTo
+        });
 
-                // Provide drag helper a reference to the new instance
-                drag.schedule = schedule;
+        const unplannedGrid = window.unplannedGrid = new UnplannedGrid({
+            ref: "unplanned",
+            flex: "0 1 400px",
+            appendTo: appendTo,
+            title       : 'Unplanned Tasks',
+            collapsible : true,
+            flex        : '0 0 300px',
+            ui          : 'toolbar',
+
+            // Schedulers stores are contained by a project, pass it to the grid to allow it to access them
+            project : schedule.project,
+            store   : {
+                modelClass : Task
             }
-        }
-    ]
-    });
+        });
 
-    window.splitter = new Splitter({
-      appendTo
-    });
+        // Handles dragging
+        window.drag = new Drag({
+            grid: unplannedGrid,
+            schedule,
+            constrain: false,
+            outerElement: unplannedGrid.element
+        });
 
-    const unplannedGrid = window.unplannedGrid = new UnplannedGrid({
-      ref: "unplanned",
-      flex: "0 1 400px",
-      appendTo: appendTo,
-    //   project: schedule.project,
-    //   listeners: {
-    //     selectionChange() {
-    //       const { selectedRecords } = this,
-    //         { calendarHighlight } = schedule.features,
-    //         requiredRoles = {};
+        schedule.project.loadInlineData(projectData);
+        unplannedGrid.store.loadData(unplannedData);
 
-    //       selectedRecords.forEach((task) => {
-    //         requiredRoles[task.requiredRole] = 1;
-    //       });
+        schedule.assignmentStore.on({
+            // When a task is unassigned move it back to the unplanned tasks grid
+            remove({ records }) {
+                records.forEach(({ event }) => {
+                    schedule.eventStore.remove(event);
+                    unplannedGrid.store.add(event);
+                });
+            },
+            thisObj : this
+        });
 
-    //       if (Object.keys(requiredRoles).length === 1) {
-    //         const appointment = selectedRecords[0],
-    //           availableResources = schedule.resourceStore.query(
-    //             (resourceRecord) =>
-    //               resourceRecord.role === appointment.requiredRole ||
-    //               !appointment.requiredRole
-    //           );
-
-    //         calendarHighlight.highlightResourceCalendars(availableResources);
-    //       } else {
-    //         calendarHighlight.unhighlightCalendars();
-    //       }
-    //     }
-    //   }
-        title       : 'Unplanned Tasks',
-        collapsible : true,
-        flex        : '0 0 300px',
-        ui          : 'toolbar',
-
-        // Schedulers stores are contained by a project, pass it to the grid to allow it to access them
-        project : schedule.project,
-        store   : {
-            modelClass : Task
-        }
-    });
-
-    // Handles dragging
-    window.drag = new Drag({
-      grid: unplannedGrid,
-      schedule,
-      constrain: false,
-      outerElement: unplannedGrid.element
-    });
-
-    schedule.project.loadInlineData(projectData);
-    unplannedGrid.store.loadData(unplannedData);
-
-    schedule.assignmentStore.on({
-        // When a task is unassigned move it back to the unplanned tasks grid
-        remove({ records }) {
-            records.forEach(({ event }) => {
-                schedule.eventStore.remove(event);
-                unplannedGrid.store.add(event);
-            });
-        },
-        thisObj : this
-    });
-
-  }
+    }
 }
