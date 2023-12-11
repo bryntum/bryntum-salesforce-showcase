@@ -29,6 +29,10 @@
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>
+        <tab>MyModalDemo</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+    <tabSettings>
         <tab>GridTempDemo</tab>
         <visibility>Visible</visibility>
     </tabSettings>
