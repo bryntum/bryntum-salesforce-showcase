@@ -36,6 +36,10 @@
         <tab>SchedulerProTempDemo</tab>
         <visibility>Visible</visibility>
     </tabSettings>
+    <tabSettings>
+        <tab>BryntumSchedulerDragFromGrid</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
     <hasActivationRequired>false</hasActivationRequired>
     <label>bryntumdemo</label>
 </PermissionSet>
