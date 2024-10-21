@@ -65,7 +65,11 @@ export default (base) => {
       const parser = new DOMParser();
       const node = parser.parseFromString(innerHTML, 'text/html').body.firstChild;
 
-      proxy.appendChild(node);
+      try {
+        proxy.appendChild(node);
+      } catch (e) {
+        console.warn('LockerService doesn\'t support appendChild and won\'t be fixed since LockerService support is stopped by Salesforce. See: https://github.com/salesforce/lwc/issues/2420')
+      }
 
       let totalDuration = 0;
 
