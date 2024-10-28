@@ -62,9 +62,7 @@ export default (base) => {
             </div>
         `;
 
-      const parser = new DOMParser();
-      const node = parser.parseFromString(innerHTML, 'text/html').body.firstChild;
-
+      const node = window.bryntum.schedulerpro.DomHelper.createElementFromTemplate(innerHTML);
       proxy.appendChild(node);
 
       let totalDuration = 0;
