@@ -62,14 +62,8 @@ export default (base) => {
             </div>
         `;
 
-      const parser = new DOMParser();
-      const node = parser.parseFromString(innerHTML, 'text/html').body.firstChild;
-
-      try {
-        proxy.appendChild(node);
-      } catch (e) {
-        console.warn('LockerService doesn\'t support appendChild and won\'t be fixed since LockerService support is stopped by Salesforce. See: https://github.com/salesforce/lwc/issues/2420')
-      }
+      const node = window.bryntum.schedulerpro.DomHelper.createElementFromTemplate(innerHTML);
+      proxy.appendChild(node);
 
       let totalDuration = 0;
 
