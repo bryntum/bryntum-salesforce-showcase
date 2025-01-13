@@ -4,6 +4,7 @@ import { ShowToastEvent } from "lightning/platformShowToastEvent";
 import { loadScript, loadStyle } from "lightning/platformResourceLoader";
 import GANTT from "@salesforce/resourceUrl/bryntum_gantt";
 import GanttToolbarMixin from "./lib/GanttToolbar";
+import TaskModelMixin from "./lib/Task";
 import data from './data/launch-saas'
 
 export default class Gantt_component extends LightningElement {
@@ -36,6 +37,7 @@ export default class Gantt_component extends LightningElement {
         const GanttToolbar = GanttToolbarMixin(bryntum.gantt.Toolbar);
 
         const project = new bryntum.gantt.ProjectModel({
+            taskModelClass : TaskModelMixin(bryntum.gantt.TaskModel),
             calendar: data.project.calendar,
             startDate: data.project.startDate,
             tasksData: data.tasks.rows,
