@@ -5,3 +5,23 @@
 .b-float-root {
     z-index: 100;
 }
+
+.b-gantt-critical-paths .b-grid-subgrid-locked .b-grid-row.b-critical {
+    .b-grid-cell {
+        background-color: #ffcccc;
+    }
+
+    &.b-selected {
+        background-color: #ff9999;
+    }
+
+    .b-theme-classic-dark & {
+        .b-grid-cell {
+            background-color: #663333;
+        }
+
+        &.b-selected {
+            background-color: #330000;
+        }
+    }
+}
