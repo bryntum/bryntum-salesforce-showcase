@@ -37,7 +37,7 @@ export default class Gantt_component extends LightningElement {
         const GanttToolbar = GanttToolbarMixin(bryntum.gantt.Toolbar);
 
         const project = new bryntum.gantt.ProjectModel({
-            taskModelClass : TaskModelMixin(bryntum.gantt.TaskModel),
+            taskModelClass: TaskModelMixin(bryntum.gantt.TaskModel),
             calendar: data.project.calendar,
             startDate: data.project.startDate,
             tasksData: data.tasks.rows,
