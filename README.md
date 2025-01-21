@@ -1,30 +1,32 @@
 # Bryntum Salesforce showcase
 
-This application demonstrates Bryntum components in Salesforce environment.
+This application demonstrates how Bryntum components can be used in a Salesforce environment.
 
-## Design
+## Application structure
 
-This app creates 6 static resources, 6 Lightning Web Components and a Lightning `Bryntum` App. There is an LWC
-for every Bryntum product: Grid, Scheduler, SchedulerPro, Gantt, Taskboard and Calendar. Each LWC uses
-bundle-specific static resource. By default app uses dummy resource, to enable LWC you need to create
-proper resource (see below for instructions)
+The Bryntum Salesforce showcase application creates six static resources, six Lightning Web Components (LWCs), and a Lightning `Bryntum` app.
 
-## Setup
+An LWC is provided for each Bryntum product: Grid, Scheduler, Scheduler Pro, Gantt, Task Board, and Calendar. Each LWC uses a bundle-specific static resource.
 
-Setup is divided into two steps:
-1. [Uploading](https://github.com/bryntum/bryntum-salesforce-showcase#setup-using-scratch-org) application skeleton to Salesforce.
-2. [Creating](https://github.com/bryntum/bryntum-salesforce-showcase#setup-static-resource) proper static resources to enable LWC.
+By default, the app uses dummy resources. To enable the LWCs, follow the instructions below to configure the correct resources.
 
-## Setup using Scratch org
+## Setting up the Bryntum Salesforce showcase application
+
+Setting up the application involves two steps:
+
+1. [Deploying the application skeleton to Salesforce](https://github.com/bryntum/bryntum-salesforce-showcase#setting-up-and-deploying-to-a-scratch-org).
+2. [Configuring the correct static resource](https://github.com/bryntum/bryntum-salesforce-showcase#configuring-the-static-resource) to enable the LWC.
+
+### Setting up and deploying to a scratch org
 
 1. Set up your environment:
 
-    - Enable Dev Hub in your Salesforce Org
-    - Install Salesforce CLI
+    - Enable **Dev Hub** in your Salesforce org
+    - Install the Salesforce CLI
     - Install Visual Studio Code
     - Install the Visual Studio Code Salesforce extensions, including the Lightning Web Components extension
 
-2. If you haven't already done so, authorize your hub org and provide it with an alias (myorg in the command below):
+2. Authorize your hub org and assign it an alias (for example, `myorg`) if you haven't already:
 
     ```
     sfdx auth:web:login -d -a myorg
@@ -37,7 +39,7 @@ Setup is divided into two steps:
     cd bryntum-salesforce-showcase
     ```
 
-4. Create a scratch org and provide it with an alias (bryntum-demo in the command below):
+4. Create a scratch org and assign it an alias (for example, `bryntum-demo`) using the following command:
 
     ```
     sfdx force:org:create -s -f config/project-scratch-def.json -a bryntum-demo
@@ -49,7 +51,7 @@ Setup is divided into two steps:
     sfdx force:source:push
     ```
 
-6. Assign the bryntum-demo permission set to the default user:
+6. Assign the `bryntum-demo` permission set to the default user:
 
     ```
     sfdx force:user:permset:assign -n bryntumdemo
@@ -61,30 +63,31 @@ Setup is divided into two steps:
     sfdx force:org:open
     ```
 
-8. In App Launcher, select the Bryntum app.
+8. In the **App Launcher**, select the Bryntum app.
 
-## Setup static resource
+### Configuring the static resource
 
-By default this app uses mocked resources. Lightning Web Components could be loaded but will not be
-functional. To enable them you need to create a proper static resource. Either from trial or licensed
-source code.
+The Bryntum Salesforce showcase app uses mocked resources by default. While Lightning Web Components (LWCs) can be loaded, they will not function properly. 
 
-To create a Grid static resource follow these steps:
+To enable LWCs, create the correct static resource using the trial or licensed source code.
 
-1. Download source code.
+The following steps explain how to create the static resource for a Bryntum Grid LWC. Adjust these steps as needed to create the static resource for the Bryntum component you're working with.
 
-    You can get it from customer zone, NPM or trial version from [site](https://bryntum.com/download/)
+1. Download the source code.
 
-2. Update static resource
+- **Licensed customers:** Download the source code from the Bryntum Customer Zone or via npm.
+- **Trial customers:** Access the trial version from the [Bryntum website](https://bryntum.com/download/).
 
-    Locate `staticresources/bryntum_grid` directory and copy contents from the distributable to static resource:
+3. Update the static resource.
+
+    Navigate to `staticresources/bryntum_grid` and copy the following directories and files to the static resource:
         
-        - fonts/
-        - locales/
-        - grid.stockholm.css - This is a default theme and it is imported by LWC
-        - grid.lwc.module.js
+        - `fonts/`
+        - `locales/`
+        - `grid.stockholm.css`: The default theme, imported by LWC.
+        - `grid.lwc.module.js`
 
-3. Upload static resource
+4. Upload the static resource.
 
     ```
     sfdx force:source:deploy --sourcepath force-app/main/default/staticresources/bryntum_grid.resource-meta.xml
