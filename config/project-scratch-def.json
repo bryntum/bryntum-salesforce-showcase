@@ -1,6 +1,8 @@
 {
-  "orgName": "Demo company",
+  "orgName": "Bryntum Salesforce Showcase",
   "edition": "Developer",
+  "country": "US",
+  "language": "en_US",
   "features": ["EnableSetPasswordInApi"],
   "settings": {
     "lightningExperienceSettings": {

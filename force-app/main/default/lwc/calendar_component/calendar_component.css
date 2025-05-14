@@ -1,5 +1,6 @@
 .container {
-    height : 70em;
+    min-height: 70em;
+    height: 100%;
 }
 
 .b-calendar {
