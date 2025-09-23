@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Scheduler",
+  "contentBody" : {
+    "activeViewId" : "Scheduler",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-scheduler",
+    "urlPrefix" : "scheduler"
+  },
+  "urlName" : "scheduler"
+}

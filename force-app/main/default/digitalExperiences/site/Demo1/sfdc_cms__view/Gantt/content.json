@@ -1,0 +1,67 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "Gantt",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"9f017c6c-140b-46e9-99ce-eb40c068168a\",\"columns\":[{\"UUID\":\"8cc845dd-15f7-4503-b415-6bc679e1319c\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : { },
+              "definition" : "c:gantt_component",
+              "id" : "9b446f17-79d3-44a5-8875-64280d421cb9",
+              "type" : "component"
+            } ],
+            "id" : "8cc845dd-15f7-4503-b415-6bc679e1319c",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "9f017c6c-140b-46e9-99ce-eb40c068168a",
+          "type" : "component"
+        } ],
+        "id" : "e7713e80-c103-4627-90da-d2ad20ede1f1",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "Gantt",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "6769ac26-8a3f-40a3-934b-9903f8b5fcc5",
+          "type" : "component"
+        } ],
+        "id" : "bf3b181f-1114-421b-9afd-576ff02c29c1",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "2addd1ac-0b2f-4048-b336-d233e27857c3",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "Inner",
+    "viewType" : "custom-gantt"
+  },
+  "urlName" : "gantt"
+}

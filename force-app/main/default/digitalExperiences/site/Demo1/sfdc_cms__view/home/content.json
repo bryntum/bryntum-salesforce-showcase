@@ -1,0 +1,70 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "Home",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"75496f9e-39e3-453a-8c28-70e84d5012f5\",\"columns\":[{\"UUID\":\"cd4a7bbc-f481-481e-acfd-ef474d0c253f\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":null}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : {
+                "imageInfos" : "",
+                "richTextValue" : "<div\n        style=\"display: flex; justify-content: center; align-items: center; margin: 50px 0; flex-direction: column; text-align: center;\">\n        <h1 class=\"slds-text-heading_medium slds-p-bottom_x-small\">Welcome to Bryntum Salesforce Showcase Demo</h1>\n        <div>This demo works on Salesforce Digital Experiences. To see components in action, use navigation bar at the top.</div>\n    </div>"
+              },
+              "definition" : "community_builder:htmlEditor",
+              "id" : "65e9b418-60cb-4b1e-b2fa-1d7b24ca08b5",
+              "type" : "component"
+            } ],
+            "id" : "cd4a7bbc-f481-481e-acfd-ef474d0c253f",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "75496f9e-39e3-453a-8c28-70e84d5012f5",
+          "type" : "component"
+        } ],
+        "id" : "b409d3ea-bff8-498b-ada1-0c5ff22cab08",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "Home",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "91301fc3-9cd0-49be-b9cd-144f3594ad5d",
+          "type" : "component"
+        } ],
+        "id" : "2185279c-cf3e-492f-8515-6f00f5d07661",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "9de40e82-7875-4828-b347-165fa1d5580b",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "Inner",
+    "viewType" : "home"
+  },
+  "urlName" : "home"
+}

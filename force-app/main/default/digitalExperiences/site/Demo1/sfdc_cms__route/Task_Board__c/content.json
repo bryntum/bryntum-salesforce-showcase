@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Task Board",
+  "contentBody" : {
+    "activeViewId" : "Task_Board",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-taskboard",
+    "urlPrefix" : "taskboard"
+  },
+  "urlName" : "task-board"
+}
