@@ -4,11 +4,14 @@ This application demonstrates how Bryntum components can be used in a Salesforce
 
 ## Application structure
 
-The Bryntum Salesforce showcase application creates six static resources, six Lightning Web Components (LWCs), and a Lightning `Bryntum` app.
+The Bryntum Salesforce showcase application creates 6 static resources, 6 Lightning Web Components (LWCs), a
+Lightning `Bryntum` app and a community page called "Demo".
 
-An LWC is provided for each Bryntum product: Grid, Scheduler, Scheduler Pro, Gantt, Task Board, and Calendar. Each LWC uses a bundle-specific static resource.
+An LWC is provided for each Bryntum product: Grid, Scheduler, Scheduler Pro, Gantt, Task Board, and Calendar. Each LWC
+uses a bundle-specific static resource.
 
-By default, the app uses dummy resources. To enable the LWCs, follow the instructions below to configure the correct resources.
+By default, the app uses dummy resources. To enable the LWCs, follow the instructions below to configure the correct
+resources.
 
 ## Setting up the Bryntum Salesforce showcase application
 
@@ -29,7 +32,7 @@ Setting up the application involves two steps:
 2. Authorize your hub org and assign it an alias (for example, `myorg`) if you haven't already:
 
     ```
-    sfdx auth:web:login -d -a myorg
+    sf org login web -d -a myorg
     ```
 
 3. Clone this repository:
@@ -42,28 +45,35 @@ Setting up the application involves two steps:
 4. Create a scratch org and assign it an alias (for example, `bryntum-demo`) using the following command:
 
     ```
-    sfdx force:org:create -s -f config/project-scratch-def.json -a bryntum-demo
+    sf org create scratch -d -f config/project-scratch-def.json -a bryntum-demo
     ```
+5. Enable Digital Experience in the scratch org:
 
-5. Push the app to your scratch org:
+   ```shell
+   sf org open
+   ```
 
-    ```
-    sfdx force:source:push
-    ```
+Go to settings, search for 'Digital Experience', enable it and save
 
-6. Assign the `bryntum-demo` permission set to the default user:
-
-    ```
-    sfdx force:user:permset:assign -n bryntumdemo
-    ```
-
-7. Open the scratch org:
+6. Push the app to your scratch org:
 
     ```
-    sfdx force:org:open
+    sf project deploy start
     ```
 
-8. In the **App Launcher**, select the Bryntum app.
+7. Assign the `bryntum-demo` permission set to the default user:
+
+    ```
+    sf org permset assign -n bryntumdemo
+    ```
+
+8. Open the scratch org:
+
+    ```
+    sf org open
+    ```
+
+9. In the **App Launcher**, select the Bryntum app.
 
 ### Configuring the static resource
 
