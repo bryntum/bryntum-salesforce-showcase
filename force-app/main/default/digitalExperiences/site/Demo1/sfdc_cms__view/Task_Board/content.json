@@ -1,0 +1,67 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "Task Board",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"f2f95aae-ddcf-4cb3-80b6-f3d075263e9c\",\"columns\":[{\"UUID\":\"0e2bbf26-4e95-4457-9bb3-9c288a9a0f53\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : { },
+              "definition" : "c:taskboard_component",
+              "id" : "083d44ea-96dd-4681-ae6c-b83afc878050",
+              "type" : "component"
+            } ],
+            "id" : "0e2bbf26-4e95-4457-9bb3-9c288a9a0f53",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "f2f95aae-ddcf-4cb3-80b6-f3d075263e9c",
+          "type" : "component"
+        } ],
+        "id" : "abedc52a-4252-48d1-8d65-f59c37dd13e1",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "Task Board",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "a9b4ea40-748b-4c99-846a-fc11ac2fc94c",
+          "type" : "component"
+        } ],
+        "id" : "d15ba3d2-d233-4db8-a75f-4f6600f69a19",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "37675431-8330-4882-ac21-859ee43b1043",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "Inner",
+    "viewType" : "custom-taskboard"
+  },
+  "urlName" : "task-board"
+}

@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Calendar",
+  "contentBody" : {
+    "activeViewId" : "Calendar",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-calendar",
+    "urlPrefix" : "calendar"
+  },
+  "urlName" : "calendar"
+}

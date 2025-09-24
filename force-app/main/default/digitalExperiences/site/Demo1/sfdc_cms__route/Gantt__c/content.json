@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Gantt",
+  "contentBody" : {
+    "activeViewId" : "Gantt",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-gantt",
+    "urlPrefix" : "gantt"
+  },
+  "urlName" : "gantt"
+}

@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Scheduler Pro",
+  "contentBody" : {
+    "activeViewId" : "Scheduler_Pro",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-schedulerpro",
+    "urlPrefix" : "schedulerpro"
+  },
+  "urlName" : "scheduler-pro"
+}

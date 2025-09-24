@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Grid",
+  "contentBody" : {
+    "activeViewId" : "Grid",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-grid",
+    "urlPrefix" : "grid"
+  },
+  "urlName" : "grid"
+}
