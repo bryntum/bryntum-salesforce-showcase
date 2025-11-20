@@ -34,17 +34,17 @@ export default class Gantt_component extends LightningElement {
     }
 
     createGantt() {
-        const GanttToolbar = GanttToolbarMixin(bryntum.gantt.Toolbar);
+        GanttToolbarMixin(bryntum.gantt.Toolbar);
 
         const project = new bryntum.gantt.ProjectModel({
             taskModelClass: TaskModelMixin(bryntum.gantt.TaskModel),
             calendar: data.project.calendar,
             startDate: data.project.startDate,
-            tasksData: data.tasks.rows,
-            resourcesData: data.resources.rows,
-            assignmentsData: data.assignments.rows,
-            dependenciesData: data.dependencies.rows,
-            calendarsData: data.calendars.rows
+            tasks: data.tasks.rows,
+            resources: data.resources.rows,
+            assignments: data.assignments.rows,
+            dependencies: data.dependencies.rows,
+            calendars: data.calendars.rows
         });
 
         const appendTo = this.template.querySelector(".container");
@@ -55,7 +55,7 @@ export default class Gantt_component extends LightningElement {
             startDate: "2019-01-12",
             endDate: "2019-03-24",
 
-            tbar: new GanttToolbar(),
+            tbar: { type : "gantttoolbar" },
 
             dependencyIdField: "sequenceNumber",
             columns: [

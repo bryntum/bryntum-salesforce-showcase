@@ -7,6 +7,21 @@
     z-index: 100;
 }
 
+.b-gantt > .b-toolbar{
+  border-bottom:1px solid;
+}
+.b-gantt > .b-toolbar > .b-content-element > .b-widget:not(.b-last-visible-child){
+  margin-inline-end:1em;
+}
+.b-gantt > .b-toolbar > .b-content-element .b-button{
+  min-width:3.5em;
+}
+
+.filter-by-name label{
+  display:none;
+}
+
+
 .b-gantt-critical-paths .b-grid-subgrid-locked .b-grid-row.b-critical {
     .b-grid-cell {
         background-color: #ffcccc;
