@@ -14,7 +14,8 @@ export default class Taskboard_component extends LightningElement {
 
         Promise.all([
             loadScript(this, TASKBOARD + '/taskboard.lwc.module.js'),
-            loadStyle(this, TASKBOARD + '/taskboard.stockholm.css')
+            loadStyle(this, TASKBOARD + '/taskboard.css'),
+            loadStyle(this, TASKBOARD + '/svalbard-light.css')
         ])
             .then(() => {
                 console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);

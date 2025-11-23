@@ -16,7 +16,8 @@ export default class Gantt_component extends LightningElement {
 
         Promise.all([
             loadScript(this, GANTT + "/gantt.lwc.module.js"),
-            loadStyle(this, GANTT + "/gantt.stockholm.css")
+            loadStyle(this, GANTT + "/gantt.css"),
+            loadStyle(this, GANTT + "/svalbard-light.css")
         ])
             .then(() => {
                 console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);

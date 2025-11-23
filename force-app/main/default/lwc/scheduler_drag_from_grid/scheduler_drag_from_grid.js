@@ -21,7 +21,8 @@ export default class SchedulerDragFromGirdDemo extends LightningElement {
 
         Promise.all([
             loadScript(this, SCHEDULER + "/scheduler.lwc.module.js"),
-            loadStyle(this, SCHEDULER + "/scheduler.stockholm.css")
+            loadStyle(this, SCHEDULER + "/scheduler.css"),
+            loadStyle(this, SCHEDULER + "/svalbard-light.css")
         ])
         .then(() => {
             console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);

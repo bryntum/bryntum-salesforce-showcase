@@ -14,7 +14,8 @@ export default class Grid_component extends LightningElement {
 
         Promise.all([
             loadScript(this, GRID + '/grid.lwc.module.js'),
-            loadStyle(this, GRID + '/grid.stockholm.css')
+            loadStyle(this, GRID + '/grid.css'),
+            loadStyle(this, GRID + '/svalbard-light.css')
         ]).then(() => {
             console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
             this.createGrid();
