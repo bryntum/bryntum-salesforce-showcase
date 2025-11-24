@@ -1,9 +1,9 @@
 /* globals bryntum: true */
 import { LightningElement } from 'lwc';
-import { ShowToastEvent } from "lightning/platformShowToastEvent";
-import { loadScript, loadStyle } from "lightning/platformResourceLoader";
-import CALENDAR from "@salesforce/resourceUrl/bryntum_calendar";
-import { RESOURCES, EVENTS } from "./data/data";
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
+import CALENDAR from '@salesforce/resourceUrl/bryntum_calendar';
+import { RESOURCES, EVENTS } from './data/data';
 
 export default class Calendar_component extends LightningElement {
     renderedCallback() {
@@ -13,9 +13,11 @@ export default class Calendar_component extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-            loadScript(this, CALENDAR + "/calendar.lwc.module.js"),
-            loadStyle(this, CALENDAR + "/calendar.css"),
-            loadStyle(this, CALENDAR + "/svalbard-light.css")
+            loadScript(this, CALENDAR + '/calendar.lwc.module.js'),
+            loadStyle(this, CALENDAR + '/calendar.css'),
+            loadStyle(this, CALENDAR + '/svalbard-light.css'),
+            loadStyle(this, CALENDAR + '/fontawesome/css/fontawesome.css'),
+            loadStyle(this, CALENDAR + '/fontawesome/css/solid.css')
         ])
             .then(() => {
                 console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
@@ -24,9 +26,9 @@ export default class Calendar_component extends LightningElement {
             .catch(error => {
                 this.dispatchEvent(
                     new ShowToastEvent({
-                        title: "Error loading Bryntum Calendar",
+                        title: 'Error loading Bryntum Calendar',
                         message: error,
-                        variant: "error"
+                        variant: 'error'
                     })
                 );
             });

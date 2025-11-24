@@ -1,14 +1,14 @@
 /* globals bryntum : true */
-import { LightningElement } from "lwc";
-import { ShowToastEvent } from "lightning/platformShowToastEvent";
-import { loadScript, loadStyle } from "lightning/platformResourceLoader";
-import SCHEDULERPRO from "@salesforce/resourceUrl/bryntum_schedulerpro";
-import ScheduleMixin from "./lib/Schedule";
-import UnplannedGridMixin from "./lib/UnplannedGrid";
-import AppointmentMixin from "./lib/Appointment";
-import DoctorMixin from "./lib/Doctor";
-import DragMixin from "./lib/Drag";
-import { data } from "./data";
+import { LightningElement } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
+import SCHEDULERPRO from '@salesforce/resourceUrl/bryntum_schedulerpro';
+import ScheduleMixin from './lib/Schedule';
+import UnplannedGridMixin from './lib/UnplannedGrid';
+import AppointmentMixin from './lib/Appointment';
+import DoctorMixin from './lib/Doctor';
+import DragMixin from './lib/Drag';
+import { data } from './data';
 
 export default class Schedulerpro_temp_demo extends LightningElement {
   renderedCallback() {
@@ -18,9 +18,11 @@ export default class Schedulerpro_temp_demo extends LightningElement {
     this.bryntumInitialized = true;
 
     Promise.all([
-      loadScript(this, SCHEDULERPRO + "/schedulerpro.lwc.module.js"),
-      loadStyle(this, SCHEDULERPRO + "/schedulerpro.css"),
-      loadStyle(this, SCHEDULERPRO + "/svalbard-light.css")
+      loadScript(this, SCHEDULERPRO + '/schedulerpro.lwc.module.js'),
+      loadStyle(this, SCHEDULERPRO + '/schedulerpro.css'),
+      loadStyle(this, SCHEDULERPRO + '/svalbard-light.css'),
+      loadStyle(this, SCHEDULERPRO + '/fontawesome/css/fontawesome.css'),
+      loadStyle(this, SCHEDULERPRO + '/fontawesome/css/solid.css')
     ])
       .then(() => {
         console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
@@ -29,9 +31,9 @@ export default class Schedulerpro_temp_demo extends LightningElement {
       .catch((error) => {
         this.dispatchEvent(
           new ShowToastEvent({
-            title: "Error loading Bryntum Scheduler Pro",
+            title: 'Error loading Bryntum Scheduler Pro',
             message: error,
-            variant: "error"
+            variant: 'error'
           })
         );
       });
@@ -47,7 +49,7 @@ export default class Schedulerpro_temp_demo extends LightningElement {
       DragHelper
     } = bryntum.schedulerpro;
 
-    const appendTo = this.template.querySelector(".container");
+    const appendTo = this.template.querySelector('.container');
 
     const Schedule = ScheduleMixin(SchedulerPro);
     const UnplannedGrid = UnplannedGridMixin(Grid);
@@ -56,7 +58,7 @@ export default class Schedulerpro_temp_demo extends LightningElement {
     const Drag = DragMixin(DragHelper);
 
     const schedule = window.schedule = new Schedule({
-      ref: "schedule",
+      ref: 'schedule',
       appendTo: appendTo,
       startDate: new Date(2022, 2, 1, 7),
       endDate: new Date(2022, 2, 1, 19),
@@ -71,7 +73,7 @@ export default class Schedulerpro_temp_demo extends LightningElement {
         eventModelClass: Appointment,
         resourceModelClass: Doctor,
         resourceStore: {
-          sorters: [{ field: "name", ascending: true }]
+          sorters: [{ field: 'name', ascending: true }]
         },
         eventStore: {
           // Unassigned events should remain in store
@@ -103,8 +105,8 @@ export default class Schedulerpro_temp_demo extends LightningElement {
     });
 
     const unplannedGrid = window.unplannedGrid = new UnplannedGrid({
-      ref: "unplanned",
-      flex: "0 1 400px",
+      ref: 'unplanned',
+      flex: '0 1 400px',
       appendTo: appendTo,
       project: schedule.project,
       listeners: {

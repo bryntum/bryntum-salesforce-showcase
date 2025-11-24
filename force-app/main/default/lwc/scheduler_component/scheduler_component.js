@@ -1,8 +1,8 @@
 /* globals bryntum : true */
-import { LightningElement } from "lwc";
-import { ShowToastEvent } from "lightning/platformShowToastEvent";
-import { loadScript, loadStyle } from "lightning/platformResourceLoader";
-import SCHEDULER from "@salesforce/resourceUrl/bryntum_scheduler";
+import { LightningElement } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
+import SCHEDULER from '@salesforce/resourceUrl/bryntum_scheduler';
 import {dependencies, events, resources} from './data';
 
 export default class Scheduler_component extends LightningElement {
@@ -13,9 +13,11 @@ export default class Scheduler_component extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-            loadScript(this, SCHEDULER + "/scheduler.lwc.module.js"),
-            loadStyle(this, SCHEDULER + "/scheduler.css"),
-            loadStyle(this, SCHEDULER + "/svalbard-light.css")
+            loadScript(this, SCHEDULER + '/scheduler.lwc.module.js'),
+            loadStyle(this, SCHEDULER + '/scheduler.css'),
+            loadStyle(this, SCHEDULER + '/svalbard-light.css'),
+            loadStyle(this, SCHEDULER + '/fontawesome/css/fontawesome.css'),
+            loadStyle(this, SCHEDULER + '/fontawesome/css/solid.css')
         ])
         .then(() => {
             console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
@@ -24,9 +26,9 @@ export default class Scheduler_component extends LightningElement {
         .catch(error => {
             this.dispatchEvent(
                 new ShowToastEvent({
-                    title   : "Error loading Bryntum Scheduler",
+                    title   : 'Error loading Bryntum Scheduler',
                     message : error,
-                    variant : "error"
+                    variant : 'error'
                 })
             );
         });

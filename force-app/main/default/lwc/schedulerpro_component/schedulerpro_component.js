@@ -1,9 +1,9 @@
 /* globals bryntum : true */
-import { LightningElement } from "lwc";
-import { ShowToastEvent } from "lightning/platformShowToastEvent";
-import { loadScript, loadStyle } from "lightning/platformResourceLoader";
-import SCHEDULERPRO from "@salesforce/resourceUrl/bryntum_schedulerpro";
-import { CALENDARS, EVENTS, RESOURCES, ASSIGNMENTS } from "./data.js";
+import { LightningElement } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
+import SCHEDULERPRO from '@salesforce/resourceUrl/bryntum_schedulerpro';
+import { CALENDARS, EVENTS, RESOURCES, ASSIGNMENTS } from './data.js';
 
 export default class Schedulerpro_component extends LightningElement {
     renderedCallback() {
@@ -13,9 +13,11 @@ export default class Schedulerpro_component extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-            loadScript(this, SCHEDULERPRO + "/schedulerpro.lwc.module.js"),
-            loadStyle(this, SCHEDULERPRO + "/schedulerpro.css"),
-            loadStyle(this, SCHEDULERPRO + "/svalbard-light.css")
+            loadScript(this, SCHEDULERPRO + '/schedulerpro.lwc.module.js'),
+            loadStyle(this, SCHEDULERPRO + '/schedulerpro.css'),
+            loadStyle(this, SCHEDULERPRO + '/svalbard-light.css'),
+            loadStyle(this, SCHEDULERPRO + '/fontawesome/css/fontawesome.css'),
+            loadStyle(this, SCHEDULERPRO + '/fontawesome/css/solid.css')
         ])
             .then(() => {
                 console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
@@ -24,24 +26,24 @@ export default class Schedulerpro_component extends LightningElement {
             .catch(error => {
                 this.dispatchEvent(
                     new ShowToastEvent({
-                        title: "Error loading Bryntum Scheduler Pro",
+                        title: 'Error loading Bryntum Scheduler Pro',
                         message: error,
-                        variant: "error"
+                        variant: 'error'
                     })
                 );
             });
     }
 
     createScheduler() {
-        const container = this.template.querySelector(".container");
+        const container = this.template.querySelector('.container');
 
         const scheduler = window.schedulerpro = new bryntum.schedulerpro.SchedulerPro({
             project: {
-                calendar: "weekends",
-                eventsData: EVENTS,
-                resourcesData: RESOURCES,
-                assignmentsData: ASSIGNMENTS,
-                calendarsData: CALENDARS
+                calendar: 'weekends',
+                events: EVENTS,
+                resources: RESOURCES,
+                assignments: ASSIGNMENTS,
+                calendars: CALENDARS
             },
 
             startDate: new Date(2020, 10, 29),
@@ -49,12 +51,12 @@ export default class Schedulerpro_component extends LightningElement {
             rowHeight: 50,
             barMargin: 2,
 
-            viewPreset: "weekAndDay",
+            viewPreset: 'weekAndDay',
 
             columns: [
                 {
-                    text: "Resource",
-                    field: "name",
+                    text: 'Resource',
+                    field: 'name',
                     width: 200
                 }
             ],
@@ -68,12 +70,12 @@ export default class Schedulerpro_component extends LightningElement {
                             items: {
                                 // field name
                                 showInTimelineField: {
-                                    type: "checkbox",
-                                    name: "showInTimeline",
+                                    type: 'checkbox',
+                                    name: 'showInTimeline',
                                     // Text is shown to the right of the checkbox
-                                    text: "Show in timeline",
+                                    text: 'Show in timeline',
                                     // use empty label to align checkbox with other fields
-                                    label: "&nbsp;"
+                                    label: '&nbsp;'
                                 }
                             }
                         }
@@ -83,9 +85,9 @@ export default class Schedulerpro_component extends LightningElement {
 
             eventRenderer({ eventRecord: task, renderData }) {
                 if (task.showInTimeline) {
-                    renderData.eventColor = "red";
+                    renderData.eventColor = 'red';
                 } else {
-                    renderData.eventColor = "green";
+                    renderData.eventColor = 'green';
                 }
 
                 return task.name;

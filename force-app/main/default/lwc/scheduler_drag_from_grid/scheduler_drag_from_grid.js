@@ -1,16 +1,16 @@
 /* globals bryntum : true */
-import { LightningElement } from "lwc";
-import { ShowToastEvent } from "lightning/platformShowToastEvent";
-import { loadScript, loadStyle } from "lightning/platformResourceLoader";
-import SCHEDULER from "@salesforce/resourceUrl/bryntum_scheduler";
-import ScheduleMixin from "./lib/Schedule";
-import UnplannedGridMixin from "./lib/UnplannedGrid";
-import TaskMixin from "./lib/Task";
-import TaskStoreMixin from "./lib/TaskStore";
-import IconComboMixin from "./lib/IconCombo";
-import DragMixin from "./lib/Drag";
-import { projectData } from "./projectData";
-import { unplannedData } from "./unplannedData";
+import { LightningElement } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
+import SCHEDULER from '@salesforce/resourceUrl/bryntum_scheduler';
+import ScheduleMixin from './lib/Schedule';
+import UnplannedGridMixin from './lib/UnplannedGrid';
+import TaskMixin from './lib/Task';
+import TaskStoreMixin from './lib/TaskStore';
+import IconComboMixin from './lib/IconCombo';
+import DragMixin from './lib/Drag';
+import { projectData } from './projectData';
+import { unplannedData } from './unplannedData';
 
 export default class SchedulerDragFromGirdDemo extends LightningElement {
     renderedCallback() {
@@ -20,22 +20,20 @@ export default class SchedulerDragFromGirdDemo extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-            loadScript(this, SCHEDULER + "/scheduler.lwc.module.js"),
-            loadStyle(this, SCHEDULER + "/scheduler.css"),
-            loadStyle(this, SCHEDULER + "/svalbard-light.css")
-        ])
-        .then(() => {
+            loadScript(this, SCHEDULER + '/scheduler.lwc.module.js'),
+            loadStyle(this, SCHEDULER + '/scheduler.css'),
+            loadStyle(this, SCHEDULER + '/svalbard-light.css'),
+            loadStyle(this, SCHEDULER + '/fontawesome/css/fontawesome.css'),
+            loadStyle(this, SCHEDULER + '/fontawesome/css/solid.css')
+        ]).then(() => {
             console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
             this.createScheduler();
-        })
-        .catch((error) => {
-            this.dispatchEvent(
-                new ShowToastEvent({
-                    title: "Error loading Bryntum Scheduler",
-                    message: error,
-                    variant: "error"
-                })
-            );
+        }).catch((error) => {
+            this.dispatchEvent(new ShowToastEvent({
+                title   : 'Error loading Bryntum Scheduler',
+                message : error,
+                variant : 'error'
+            }));
         });
     }
 
@@ -51,21 +49,24 @@ export default class SchedulerDragFromGirdDemo extends LightningElement {
             DragHelper
         } = bryntum.scheduler;
 
-        window.appendTo = this.template.querySelector(".container");
+        window.appendTo = this.template.querySelector('.container');
 
         class CustomResourceModel extends ResourceModel {
             static get $name() {
                 return 'CustomResourceModel';
             }
-        
+
             static get fields() {
                 return [
-                    // Do not persist `cls` field because we change its value on dragging unplanned resources to highlight the row
-                    { name : 'cls', persist : false }
+                    // Do not persist `cls` field because we change its value on dragging unplanned resources to
+                    // highlight the row
+                    {
+                        name    : 'cls',
+                        persist : false
+                    }
                 ];
             }
         }
-        
 
         const Task = TaskMixin(EventModel);
         const TaskStore = TaskStoreMixin(EventStore, Task);
@@ -74,21 +75,22 @@ export default class SchedulerDragFromGirdDemo extends LightningElement {
         const UnplannedGrid = UnplannedGridMixin(Grid);
         const Drag = DragMixin(DragHelper);
 
-        const schedule = window.schedule = new Schedule({
-            ref         : "schedule",
+        let schedule = window.schedule = new Schedule({
+            ref         : 'schedule',
             appendTo    : appendTo,
             startDate   : new Date(2025, 11, 1, 8),
             endDate     : new Date(2025, 11, 1, 18),
             flex        : 4,
             crudManager : {
-                autoLoad         : true,
+                autoLoad : true,
                 // This config enables response validation and dumping of found errors to the browser console.
-                // It's meant to be used as a development stage helper only so please set it to false for production systems.
+                // It's meant to be used as a development stage helper only so please set it to false for production
+                // systems.
                 validateResponse : true,
                 eventStore       : {
                     storeClass : TaskStore
                 },
-                resourceStore : {
+                resourceStore    : {
                     modelClass : CustomResourceModel
                 }
             },
@@ -151,16 +153,15 @@ export default class SchedulerDragFromGirdDemo extends LightningElement {
         });
 
         window.splitter = new Splitter({
-        appendTo
+            appendTo
         });
 
         const unplannedGrid = window.unplannedGrid = new UnplannedGrid({
-            ref: "unplanned",
-            flex: "0 1 400px",
-            appendTo: appendTo,
+            appendTo,
+            ref         : 'unplanned',
+            flex        : '0 1 400px',
             title       : 'Unplanned Tasks',
             collapsible : true,
-            flex        : '0 0 300px',
             ui          : 'toolbar',
 
             // Schedulers stores are contained by a project, pass it to the grid to allow it to access them
@@ -172,10 +173,10 @@ export default class SchedulerDragFromGirdDemo extends LightningElement {
 
         // Handles dragging
         window.drag = new Drag({
-            grid: unplannedGrid,
             schedule,
-            constrain: false,
-            outerElement: unplannedGrid.element
+            grid         : unplannedGrid,
+            constrain    : false,
+            outerElement : unplannedGrid.element
         });
 
         schedule.project.loadInlineData(projectData);
@@ -191,6 +192,5 @@ export default class SchedulerDragFromGirdDemo extends LightningElement {
             },
             thisObj : this
         });
-
     }
 }

@@ -15,7 +15,9 @@ export default class Taskboard_component extends LightningElement {
         Promise.all([
             loadScript(this, TASKBOARD + '/taskboard.lwc.module.js'),
             loadStyle(this, TASKBOARD + '/taskboard.css'),
-            loadStyle(this, TASKBOARD + '/svalbard-light.css')
+            loadStyle(this, TASKBOARD + '/svalbard-light.css'),
+            loadStyle(this, TASKBOARD + '/fontawesome/css/fontawesome.css'),
+            loadStyle(this, TASKBOARD + '/fontawesome/css/solid.css')
         ])
             .then(() => {
                 console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
@@ -34,7 +36,7 @@ export default class Taskboard_component extends LightningElement {
 
     createTaskBoard() {
         const project = new bryntum.taskboard.ProjectModel({
-            tasksData : data.tasks.rows
+            tasks : data.tasks.rows
         });
 
         const availableLabels = [
@@ -197,6 +199,9 @@ export default class Taskboard_component extends LightningElement {
                     }
                 }
             },
+
+            // True to enable taskfilterfield in the toolbar
+            chainFilters : true,
 
             tbar : [
                 // Field for filtering tasks
