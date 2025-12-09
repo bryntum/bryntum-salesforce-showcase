@@ -7,37 +7,34 @@
     z-index: 100;
 }
 
-.b-gantt > .b-toolbar{
-  border-bottom:1px solid;
-}
-.b-gantt > .b-toolbar > .b-content-element > .b-widget:not(.b-last-visible-child){
-  margin-inline-end:1em;
-}
-.b-gantt > .b-toolbar > .b-content-element .b-button{
-  min-width:3.5em;
+.b-status-column-cell, .b-complexity-column-cell {
+    font-size : 0.8em;
 }
 
-.filter-by-name label{
-  display:none;
+.b-status-column-cell i::before, .b-complexity-column-cell i::before {
+    margin-inline-end : .5em;
 }
 
+.Started {
+    color : #bbb;
+}
 
-.b-gantt-critical-paths .b-grid-subgrid-locked .b-grid-row.b-critical {
-    .b-grid-cell {
-        background-color: #ffcccc;
-    }
+.Late {
+    color : #ff5722;
+}
 
-    &.b-selected {
-        background-color: #ff9999;
-    }
+.Completed {
+    color : #34d844;
+}
 
-    .b-theme-classic-dark & {
-        .b-grid-cell {
-            background-color: #663333;
-        }
+.Easy {
+    color : #69db7c;
+}
 
-        &.b-selected {
-            background-color: #330000;
-        }
-    }
+.Normal {
+    color : #fdd835;
+}
+
+.Hard {
+    color : #ffa94d;
 }

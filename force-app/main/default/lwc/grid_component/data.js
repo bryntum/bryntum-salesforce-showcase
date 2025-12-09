@@ -9,22 +9,24 @@ export const columns = [
     },
     { text: 'Percent', field: 'percent', flex: 1, type: 'percent' },
     {
-        text: 'Widget',
-        field: 'age',
-        width: 100,
-        type: 'widget',
-        widgets: [
+        text    : 'Widget',
+        width   : 90,
+        type    : 'widget',
+        align   : 'center',
+        widgets : [
             {
-                type: 'button',
-                tooltip: 'Add',
-                flex: 1,
-                icon: 'b-fa b-fa-plus',
-                cls: 'b-blue b-raised',
-                onAction: ({ source: btn }) => {
+                type      : 'button',
+                icon      : 'fa fa-plus',
+                height    : '2.3em',
+                width     : '2.3em',
+                minHeight : 0,
+                rendition : 'filled',
+                color     : 'b-blue',
+                onAction  : ({ source : btn }) => {
                     btn.cellInfo.record.percent++;
-                },
-            },
-        ],
+                }
+            }
+        ]
     },
     {
         text: 'Date',
@@ -50,28 +52,30 @@ export const columns = [
         field: 'rating',
     },
     {
-        type: 'action',
-        field: 'rating',
-        actions: [
+        type    : 'action',
+        field   : 'rating',
+        width   : 90,
+        text    : 'Actions',
+        align   : 'center',
+        actions : [
             {
-                cls: 'b-fa b-fa-minus-circle',
-                tooltip: 'Decrease rating',
-                onClick: ({ record }) => {
+                cls     : 'fa fa-minus',
+                tooltip : 'Decrease rating',
+                onClick : ({ record }) => {
                     if (record.rating > 1) {
                         record.rating--;
                     }
-                },
-            },
-            {
-                cls: 'b-fa b-fa-plus-circle',
-                tooltip: 'Increase rating',
-                onClick: ({ record }) => {
+                }
+            }, {
+                cls     : 'fa fa-plus',
+                tooltip : 'Increase rating',
+                onClick : ({ record }) => {
                     if (record.rating < 5) {
                         record.rating++;
                     }
-                },
-            },
-        ],
+                }
+            }
+        ]
     },
 ];
 

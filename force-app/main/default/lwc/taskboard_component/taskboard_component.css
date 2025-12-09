@@ -7,83 +7,36 @@
     z-index: 100;
 }
 
-.b-taskboardbase {
-    --taskboard-background: #fff;
-    --taskboard-body-padding: 0 0.5em 0.5em;
-    --taskboard-column-gap: 0;
-    --taskboard-column-padding: 0 0.5em 0.5em;
-    --taskboard-column-header-text-align: center;
-    --taskboard-column-header-padding: 0 0.5em;
-    --taskboard-column-header-sticky-height: 4em;
-    --taskboard-column-headers-sticky-background: var(--taskboard-background);
-    --taskboard-tag-color: #666;
-    --gradient-from: #ffffffbb;
-    --gradient-to: #ffffffdd;
-    --taskboard-card-background: linear-gradient(170deg, var(--gradient-from), var(--gradient-to)), currentColor;
-    --taskboard-card-body-color: #333;
-    --taskboard-card-header-font-weight: bold;
-    --taskboard-card-header-background: #00000020;
-    --taskboard-card-body-padding: 1em;
-    --taskboard-card-hover-background: var(--taskboard-card-background);
-    --taskboard-card-selected-background: var(--taskboard-card-background);
+.b-task-board-base {
+    --b-task-board-background                : var(--b-neutral-95);
+
+    --b-task-board-card-border               : none;
+    --b-task-board-card-border-top-radius    : 4px;
+    --b-task-board-card-border-bottom-radius : 4px;
+    --b-task-board-card-box-shadow           : var(--b-elevation-1);
+
+    --b-task-board-column-header-padding     : 1em;
+    --b-task-board-column-background         : var(--b-neutral-98);
+    --b-task-board-column-header-background  : var(--b-neutral-98);
+
+    .b-colorize {
+        --b-task-board-card-border-inline-start : 6px solid var(--b-primary-80);
+    }
+
+    .b-top-toolbar {
+        border-bottom : 1px solid var(--b-neutral-90);
+    }
 }
 
-.b-theme-classic {
-    --demo-header-background-color: #75757f;
-}
-.b-theme-classic .b-taskboardbase {
-    --taskboard-background: #ddd;
-    --gradient-from: #ffffff77;
-    --gradient-to: #ffffffaa;
+.b-task-board-column-header:not(.b-last),
+.b-task-board-column:not(.b-last) {
+    border-inline-end : 1px solid var(--b-neutral-90);
 }
 
-.b-theme-classic-light {
-    --demo-header-background-color: #8d8d99;
-}
-.b-theme-classic-light .b-taskboardbase {
-    --gradient-from: #ffffffaa;
-    --gradient-to: #ffffffdd;
-    --taskboard-card-body-color: #555;
-    --taskboard-tag-color: #777;
+[data-column=done] .b-task-board-card:not(.b-selected) {
+    opacity : 0.5;
 }
 
-.b-theme-classic-dark {
-    --demo-header-background-color: #111;
-}
-.b-theme-classic-dark .b-taskboardbase {
-    --taskboard-background: #222;
-    --gradient-from: #00000033;
-    --gradient-to: #00000066;
-    --taskboard-card-header-background: #00000050;
-    --taskboard-card-body-color: #ccc;
-    --taskboard-tag-color: #999;
-}
-
-.b-theme-material {
-    --demo-header-background-color: #8d8d99;
-}
-.b-theme-material .b-taskboardbase {
-    --gradient-from: #ffffffaa;
-    --gradient-to: #ffffffcc;
-    --taskboard-tag-color: #444;
-}
-
-header.demo-header {
-    background-color: var(--demo-header-background-color);
-}
-
-.b-taskboard-task-menu {
-    color: var(--taskboard-card-header-color);
-}
-
-.critical {
-    background-color: var(--taskboard-red);
-    border-color: var(--taskboard-red);
-    color: #fff;
-}
-
-.high {
-    background-color: var(--taskboard-orange);
-    border-color: var(--taskboard-orange);
-    color: #fff;
+.b-task-board-card-footer {
+    justify-content : flex-end;
 }

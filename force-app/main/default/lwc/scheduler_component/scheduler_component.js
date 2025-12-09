@@ -91,7 +91,7 @@ export default class Scheduler_component extends LightningElement {
                 const bgColor = resourceRecord.bg || '';
 
                 renderData.style = `background-color:${bgColor};border-color:${bgColor};color:${resourceRecord.textColor}`;
-                renderData.iconCls.add('b-fa', `b-fa-${resourceRecord.icon}`);
+                renderData.iconCls.add('fa', `fa-${resourceRecord.icon}`);
 
                 return bryntum.scheduler.StringHelper.encodeHtml(eventRecord.name);
             },

@@ -1,7 +1,6 @@
 /* globals bryntum : true */
-
-export default base => {
-    class GanttToolbar extends base {
+export default function ganttToolbarInitializer() {
+    class GanttToolbar extends bryntum.gantt.Toolbar {
         // Factoryable type name
         static type = 'gantttoolbar';
 
@@ -9,9 +8,29 @@ export default base => {
 
         static configurable = {
             items : {
+                views : {
+                    type        : 'buttongroup',
+                    toggleGroup : true,
+                    rendition   : 'padded',
+                    items       : {
+                        ganttButton : {
+                            icon       : 'fa fa-chart-gantt',
+                            text       : 'Gantt',
+                            tooltip    : 'Gantt view',
+                            pressed    : true,
+                            toggleable : true
+                        },
+                        resourceViewButton : {
+                            icon     : 'fa fa-users',
+                            text     : 'Resources',
+                            tooltip  : 'Resource grid',
+                            onAction : 'up.onResourceViewButtonClick'
+                        }
+                    }
+                },
                 addTaskButton : {
                     color    : 'b-green',
-                    icon     : 'b-fa b-fa-plus',
+                    icon     : 'fa fa-plus',
                     text     : 'Create',
                     tooltip  : 'Create new task',
                     onAction : 'up.onAddTaskClick'
@@ -26,12 +45,12 @@ export default base => {
                     type  : 'buttonGroup',
                     items : {
                         expandAllButton : {
-                            icon     : 'b-fa b-fa-angle-double-down',
+                            icon     : 'fa fa-angle-double-down',
                             tooltip  : 'Expand all',
                             onAction : 'up.onExpandAllClick'
                         },
                         collapseAllButton : {
-                            icon     : 'b-fa b-fa-angle-double-up',
+                            icon     : 'fa fa-angle-double-up',
                             tooltip  : 'Collapse all',
                             onAction : 'up.onCollapseAllClick'
                         }
@@ -41,54 +60,57 @@ export default base => {
                     type  : 'buttonGroup',
                     items : {
                         zoomInButton : {
-                            icon     : 'b-fa b-fa-search-plus',
+                            icon     : 'fa fa-search-plus',
                             tooltip  : 'Zoom in',
                             onAction : 'up.onZoomInClick'
                         },
                         zoomOutButton : {
-                            icon     : 'b-fa b-fa-search-minus',
+                            icon     : 'fa fa-search-minus',
                             tooltip  : 'Zoom out',
                             onAction : 'up.onZoomOutClick'
                         },
                         zoomToFitButton : {
-                            icon     : 'b-fa b-fa-compress-arrows-alt',
+                            icon     : 'fa fa-compress-arrows-alt',
                             tooltip  : 'Zoom to fit',
                             onAction : 'up.onZoomToFitClick'
                         },
                         previousButton : {
-                            icon     : 'b-fa b-fa-angle-left',
+                            icon     : 'fa fa-angle-left',
                             tooltip  : 'Previous time span',
                             onAction : 'up.onShiftPreviousClick'
                         },
                         nextButton : {
-                            icon     : 'b-fa b-fa-angle-right',
+                            icon     : 'fa fa-angle-right',
                             tooltip  : 'Next time span',
                             onAction : 'up.onShiftNextClick'
                         }
                     }
                 },
+                projectEditorButton : {
+                    type     : 'button',
+                    text     : 'Edit project',
+                    icon     : 'fa fa-edit',
+                    onAction : 'up.onProjectEditorButtonClick'
+                },
                 spacer       : {  type : 'widget', cls : 'b-toolbar-fill' },
                 filterByName : {
                     type                 : 'textfield',
                     cls                  : 'filter-by-name',
-                    flex                 : '0 0 13.5em',
-                    // Label used for material, hidden in other themes
-                    label                : 'Find tasks by name',
-                    // Placeholder for others
+                    flex                 : '0 0 14em',
                     placeholder          : 'Find tasks by name',
                     clearable            : true,
                     keyStrokeChangeDelay : 100,
                     triggers             : {
                         filter : {
                             align : 'end',
-                            cls   : 'b-fa b-fa-filter'
+                            cls   : 'fa fa-filter'
                         }
                     },
                     onChange : 'up.onFilterChange'
                 },
                 featuresButton : {
                     type    : 'button',
-                    icon    : 'b-fa b-fa-tasks',
+                    icon    : 'fa fa-tasks',
                     text    : 'Settings',
                     tooltip : 'Toggle features',
                     menu    : {
@@ -99,39 +121,35 @@ export default base => {
                         items        : {
                             settings : {
                                 text : 'UI settings',
-                                icon : 'b-fa-sliders-h',
+                                icon : 'fa fa-sliders-h',
                                 menu : {
-                                    cls         : 'settings-menu',
-                                    layoutStyle : {
-                                        flexDirection : 'column'
-                                    },
+                                    cls          : 'settings-menu',
+                                    layout       : 'vbox',
                                     onBeforeShow : 'up.onSettingsShow',
                                     defaults     : {
-                                        type      : 'slider',
-                                        showValue : true
+                                        type       : 'slider',
+                                        showValue  : true,
+                                        labelWidth : '10em',
+                                        width      : '25em'
                                     },
                                     items : {
                                         rowHeight : {
                                             text    : 'Row height',
+                                            unit    : 'px',
                                             min     : 30,
                                             max     : 70,
                                             onInput : 'up.onRowHeightChange'
                                         },
                                         barMargin : {
                                             text    : 'Bar margin',
+                                            unit    : 'px',
                                             min     : 0,
                                             max     : 10,
                                             onInput : 'up.onBarMarginChange'
                                         },
-                                        duration : {
-                                            text    : 'Animation duration',
-                                            min     : 0,
-                                            max     : 2000,
-                                            step    : 100,
-                                            onInput : 'up.onAnimationDurationChange'
-                                        },
                                         radius : {
                                             text    : 'Dependency radius',
+                                            unit    : 'px',
                                             min     : 0,
                                             max     : 10,
                                             onInput : 'up.onDependencyRadiusChange'
@@ -227,36 +245,25 @@ export default base => {
             }
         };
 
-        construct(...args) {
-            super.construct(...args);
-
-            this.gantt = this.parent;
-
-            this.styleNode = document.createElement('style');
-            document.head.appendChild(this.styleNode);
-        }
-
-        setAnimationDuration(value) {
-            const
-                me      = this,
-                cssText = `.b-animating .b-gantt-task-wrap { transition-duration: ${value / 1000}s !important; }`;
-
-            me.gantt.transitionDuration = value;
-
-            if (me.transitionRule) {
-                me.transitionRule.cssText = cssText;
-            }
-            else {
-                me.transitionRule = CSSHelper.insertRule(cssText);
-            }
+        get gantt() {
+            return this._gantt || (this._gantt = this.owner);
         }
 
         // region controller methods
 
+        onResourceViewButtonClick() {
+            this.widgetMap.ganttButton.pressed = true;
+            this.gantt.hidden = true;
+            this.resourceGrid.hidden = false;
+        }
+
         async onAddTaskClick() {
             const
                 { gantt } = this,
-                added     = gantt.taskStore.rootNode.appendChild({ name : this.L('New task'), duration : 1 });
+                added     = gantt.taskStore.rootNode.appendChild({
+                    name     : this.L('New task'),
+                    duration : 1
+                });
 
             // run propagation to calculate new task fields
             await gantt.project.commitAsync();
@@ -268,17 +275,6 @@ export default base => {
                 record : added,
                 field  : 'name'
             });
-        }
-
-        onEditTaskClick() {
-            const { gantt } = this;
-
-            if (gantt.selectedRecord) {
-                gantt.editTask(gantt.selectedRecord);
-            }
-            else {
-                Toast.show(this.L('First select the task you want to edit'));
-            }
         }
 
         onExpandAllClick() {
@@ -320,12 +316,8 @@ export default base => {
             this.gantt.rowLines = item.checked;
         }
 
-        onBeforeEditCalendar({ calendarEditor }) {
-            calendarEditor.activeDate = this.gantt.project.startDate;
-        }
-
-        onProjectCalendarSelected({ record }) {
-            this.gantt.project.calendar = record;
+        onProjectEditorButtonClick() {
+            this.gantt.editProject();
         }
 
         onFilterChange({ value }) {
@@ -383,28 +375,29 @@ export default base => {
 
         onSettingsShow({ source : menu }) {
             const
-                { gantt }                                  = this,
-                { rowHeight, barMargin, duration, radius } = menu.widgetMap;
+                { gantt } = this,
+                {
+                    rowHeight,
+                    barMargin,
+                    radius
+                }         = menu.widgetMap;
 
             rowHeight.value = gantt.rowHeight;
             barMargin.value = gantt.barMargin;
             barMargin.max = (gantt.rowHeight / 2) - 5;
-            duration.value = gantt.transitionDuration;
             radius.value = gantt.features.dependencies.radius ?? 0;
         }
 
-        onRowHeightChange({ value, source }) {
+        onRowHeightChange({
+            value,
+            source
+        }) {
             this.gantt.rowHeight = value;
             source.owner.widgetMap.barMargin.max = (value / 2) - 5;
         }
 
         onBarMarginChange({ value }) {
             this.gantt.barMargin = value;
-        }
-
-        onAnimationDurationChange({ value }) {
-            this.gantt.transitionDuration = value;
-            this.styleNode.innerHTML = `.b-animating .b-gantt-task-wrap { transition-duration: ${value / 1000}s !important; }`;
         }
 
         onDependencyRadiusChange({ value }) {
@@ -419,7 +412,7 @@ export default base => {
             this.gantt.columns.get('name').showWbs = item.checked;
         }
 
-    // endregion
+        // endregion
     }
 
     GanttToolbar.initClass();
