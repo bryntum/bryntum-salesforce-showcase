@@ -11,12 +11,20 @@
   --terminal-hide-delay : 300ms;
 }
 
-.b-sch-event-wrap .b-sch-event {
+.b-sch-event-wrap {
   --b-sch-event-border-radius : 3px;
   --b-sch-event-font-weight   : 300;
   --b-sch-event-box-shadow    : var(--b-elevation-2);
+  --b-sch-event-selected-background : var(--b-primary-50);
 
-  &.lubrication {
+  &.b-selected:not(.b-milestone-wrap),
+  &.b-selected.b-milestone-wrap .b-sch-event {
+    --b-sch-event-width-reduction: 0;
+    border: 2px solid var(--b-primary-50);
+    border-radius: var(--b-sch-event-border-radius);
+  }
+
+  .b-sch-event.lubrication {
     background   : repeating-linear-gradient(-45deg, #01BAEF, #01BAEF 7px, white 7px, white 14px);
     border-color : #01BAEF;
   }
