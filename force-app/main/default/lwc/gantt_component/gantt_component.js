@@ -63,6 +63,8 @@ export default class Gantt_component extends LightningElement {
                 rowNumber  : true
             },
 
+            flex : 1,
+
             // display cost related UI controls
             showCostControls : true,
 
@@ -179,6 +181,8 @@ export default class Gantt_component extends LightningElement {
                     resourceGrid = new bryntum.gantt.ResourceGrid({
                         appendTo,
                         project,
+
+                        flex : 1,
                         // resource grid is hidden initially
                         hidden            : true,
                         columns           : {

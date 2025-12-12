@@ -38,6 +38,8 @@ export default class Calendar_component extends LightningElement {
         const calendar = window.calendar = new bryntum.calendar.Calendar({
             appendTo : this.template.querySelector('.container'),
 
+            flex : 1,
+
             // Start life looking at this date
             date : new Date(2020, 9, 12),
 

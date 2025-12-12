@@ -53,6 +53,8 @@ export default class Schedulerpro_component extends LightningElement {
             appendTo,
             project,
 
+            flex : 1,
+
             startDate : new Date(2020, 10, 29),
             endDate   : new Date(2021, 0, 10),
             rowHeight : 50,

@@ -38,6 +38,8 @@ export default class Scheduler_component extends LightningElement {
         const scheduler = window.scheduler = new bryntum.scheduler.Scheduler({
             appendTo : this.template.querySelector('.container'),
 
+            flex : 1,
+
             eventStyle          : null,
             eventColor          : null,
             useInitialAnimation : 'slide-from-left',

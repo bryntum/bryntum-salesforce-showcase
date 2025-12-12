@@ -44,6 +44,8 @@ export default class Taskboard_component extends LightningElement {
 
             appendTo : this.template.querySelector('.container'),
 
+            flex : 1,
+
             // Apply shared demo styling to put it in a nice box
             cls : 'demo-app',
 

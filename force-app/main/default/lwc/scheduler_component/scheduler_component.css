@@ -1,6 +1,8 @@
 .container {
   min-height: 40em;
   height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
 }
 
 .b-float-root {

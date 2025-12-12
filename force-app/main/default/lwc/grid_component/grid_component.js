@@ -95,6 +95,8 @@ export default class Grid_component extends LightningElement {
         window.grid = new Grid({
             appendTo: this.template.querySelector('.container'),
 
+            flex : 1,
+
             selectionMode : {
                 row      : true,
                 checkbox : {
