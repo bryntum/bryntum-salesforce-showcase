@@ -1,9 +1,9 @@
 /* globals bryntum : true */
-import { LightningElement } from "lwc";
-import { ShowToastEvent } from "lightning/platformShowToastEvent";
-import { loadScript, loadStyle } from "lightning/platformResourceLoader";
-import SCHEDULERPRO from "@salesforce/resourceUrl/bryntum_schedulerpro";
-import { CALENDARS, EVENTS, RESOURCES, ASSIGNMENTS } from "./data.js";
+import { LightningElement } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
+import SCHEDULERPRO from '@salesforce/resourceUrl/bryntum_schedulerpro';
+import { data } from './data.js';
 
 export default class Schedulerpro_component extends LightningElement {
     renderedCallback() {
@@ -13,8 +13,11 @@ export default class Schedulerpro_component extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-            loadScript(this, SCHEDULERPRO + "/schedulerpro.lwc.module.js"),
-            loadStyle(this, SCHEDULERPRO + "/schedulerpro.stockholm.css")
+            loadScript(this, SCHEDULERPRO + '/schedulerpro.lwc.module.js'),
+            loadStyle(this, SCHEDULERPRO + '/schedulerpro.css'),
+            loadStyle(this, SCHEDULERPRO + '/svalbard-light.css'),
+            loadStyle(this, SCHEDULERPRO + '/fontawesome/css/fontawesome.css'),
+            loadStyle(this, SCHEDULERPRO + '/fontawesome/css/solid.css')
         ])
             .then(() => {
                 console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
@@ -23,56 +26,78 @@ export default class Schedulerpro_component extends LightningElement {
             .catch(error => {
                 this.dispatchEvent(
                     new ShowToastEvent({
-                        title: "Error loading Bryntum Scheduler Pro",
+                        title: 'Error loading Bryntum Scheduler Pro',
                         message: error,
-                        variant: "error"
+                        variant: 'error'
                     })
                 );
             });
     }
 
     createScheduler() {
-        const container = this.template.querySelector(".container");
+        const { ProjectModel, Timeline, SchedulerPro, StringHelper } = bryntum.schedulerpro;
 
-        const scheduler = window.schedulerpro = new bryntum.schedulerpro.SchedulerPro({
-            project: {
-                calendar: "weekends",
-                eventsData: EVENTS,
-                resourcesData: RESOURCES,
-                assignmentsData: ASSIGNMENTS,
-                calendarsData: CALENDARS
-            },
+        const appendTo = this.template.querySelector('.container');
 
-            startDate: new Date(2020, 10, 29),
-            endDate: new Date(2021, 0, 10),
-            rowHeight: 50,
-            barMargin: 2,
+        const project = new ProjectModel();
 
-            viewPreset: "weekAndDay",
+        project.loadCrudManagerData(data);
 
-            columns: [
+        const timeline = new Timeline({
+            appendTo,
+            project,
+            minHeight : '11em'
+        });
+
+        const scheduler = new SchedulerPro({
+            appendTo,
+            project,
+
+            flex : 1,
+
+            startDate : new Date(2020, 10, 29),
+            endDate   : new Date(2021, 0, 10),
+            rowHeight : 50,
+            barMargin : 2,
+            style     : 'margin-top : 0',
+
+            viewPreset : 'weekAndDay',
+
+            columns : [
                 {
-                    text: "Resource",
-                    field: "name",
-                    width: 200
+                    text  : 'Resource',
+                    field : 'name',
+                    width : 200
+                },
+                {
+                    text   : 'Type',
+                    field  : 'type',
+                    hidden : true
+                },
+                {
+                    text   : 'Tasks',
+                    field  : 'events.length',
+                    width  : 70,
+                    align  : 'right',
+                    editor : false
                 }
             ],
 
-            features: {
+            features : {
                 // Configuring task edit feature adding checkbox
-                taskEdit: {
-                    items: {
+                taskEdit : {
+                    items : {
                         // Adding it to the general tab
-                        generalTab: {
-                            items: {
+                        generalTab : {
+                            items : {
                                 // field name
-                                showInTimelineField: {
-                                    type: "checkbox",
-                                    name: "showInTimeline",
+                                showInTimelineField : {
+                                    type  : 'checkbox',
+                                    name  : 'showInTimeline',
                                     // Text is shown to the right of the checkbox
-                                    text: "Show in timeline",
+                                    text  : 'Show in timeline',
                                     // use empty label to align checkbox with other fields
-                                    label: "&nbsp;"
+                                    label : '&nbsp;'
                                 }
                             }
                         }
@@ -80,22 +105,16 @@ export default class Schedulerpro_component extends LightningElement {
                 }
             },
 
-            eventRenderer({ eventRecord: task, renderData }) {
+            eventRenderer({ eventRecord : task, renderData }) {
                 if (task.showInTimeline) {
-                    renderData.eventColor = "red";
-                } else {
-                    renderData.eventColor = "green";
+                    renderData.eventColor = 'green';
+                }
+                else {
+                    renderData.eventColor = 'blue';
                 }
 
-                return task.name;
+                return StringHelper.encodeHtml(task.name);
             }
         });
-
-        window.timeline = new bryntum.schedulerpro.Timeline({
-            appendTo : container,
-            project  : scheduler.project
-        });
-
-        scheduler.render(container);
     }
 }

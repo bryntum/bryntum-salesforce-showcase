@@ -13,6 +13,13 @@ uses a bundle-specific static resource.
 By default, the app uses dummy resources. To enable the LWCs, follow the instructions below to configure the correct
 resources.
 
+## Version requirements
+
+| Showcase Version | Bryntum Version |
+|------------------|-----------------|
+| 1.0.0            | 6.x.x           |
+| 2.0.0            | 7.x.x           |
+
 ## Setting up the Bryntum Salesforce showcase application
 
 Setting up the application involves two steps:
@@ -77,11 +84,13 @@ Go to settings, search for 'Digital Experience', enable it and save
 
 ### Configuring the static resource
 
-The Bryntum Salesforce showcase app uses mocked resources by default. While Lightning Web Components (LWCs) can be loaded, they will not function properly. 
+The Bryntum Salesforce showcase app uses mocked resources by default. While Lightning Web Components (LWCs) can be
+loaded, they will not function properly. 
 
 To enable LWCs, create the correct static resource using the trial or licensed source code.
 
-The following steps explain how to create the static resource for a Bryntum Grid LWC. Adjust these steps as needed to create the static resource for the Bryntum component you're working with.
+The following steps explain how to create the static resource for a Bryntum Grid LWC. Adjust these steps as needed to
+create the static resource for the Bryntum component you're working with.
 
 1. Download the source code.
 
@@ -92,13 +101,14 @@ The following steps explain how to create the static resource for a Bryntum Grid
 
     Navigate to `staticresources/bryntum_grid` and copy the following directories and files to the static resource:
         
-        - `fonts/`
+        - `fontawesome/`
         - `locales/`
-        - `grid.stockholm.css`: The default theme, imported by LWC.
+        - `grid.css`: Component stylesheets
+        - `svalbard-light.css`: Theme
         - `grid.lwc.module.js`
 
 4. Upload the static resource.
 
     ```
-    sfdx force:source:deploy --sourcepath force-app/main/default/staticresources/bryntum_grid.resource-meta.xml
+    sf project deploy start --source-dir force-app/main/default/staticresources/bryntum_grid
     ```
