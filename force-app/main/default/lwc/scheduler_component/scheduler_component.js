@@ -35,7 +35,16 @@ export default class Scheduler_component extends LightningElement {
     }
 
     createScheduler() {
-        const scheduler = window.scheduler = new bryntum.scheduler.Scheduler({
+        const {
+            Scheduler,
+            StringHelper,
+            ResourceStore,
+            EventStore,
+            DependencyStore,
+            DomHelper
+        } = bryntum.scheduler;
+
+        const scheduler = window.scheduler = new Scheduler({
             appendTo : this.template.querySelector('.container'),
 
             flex : 1,
@@ -75,7 +84,7 @@ export default class Scheduler_component extends LightningElement {
 
                     tooltipTemplate(dependencyModel) {
                         const { fromEvent, toEvent } = dependencyModel;
-                        return bryntum.scheduler.StringHelper.xss`${fromEvent.name} (${fromEvent.id}) -> ${toEvent.name} (${toEvent.id})`;
+                        return StringHelper.xss`${fromEvent.name} (${fromEvent.id}) -> ${toEvent.name} (${toEvent.id})`;
                     }
                 },
                 dependencyMenu : true,
@@ -103,13 +112,13 @@ export default class Scheduler_component extends LightningElement {
             startDate : new Date(2017, 11, 1),
             endDate   : new Date(2017, 11, 3),
 
-            resourceStore   : new bryntum.scheduler.ResourceStore({
+            resourceStore   : new ResourceStore({
                 data : resources
             }),
-            eventStore      : new bryntum.scheduler.EventStore({
+            eventStore      : new EventStore({
                 data : events
             }),
-            dependencyStore : new bryntum.scheduler.DependencyStore({
+            dependencyStore : new DependencyStore({
                 data : dependencies
             }),
 
@@ -137,7 +146,7 @@ export default class Scheduler_component extends LightningElement {
                 renderData.style = `background-color:${bgColor};border-color:${bgColor};color:${resourceRecord.textColor}`;
                 renderData.iconCls.add('fa', `fa-${resourceRecord.icon}`);
 
-                return bryntum.scheduler.StringHelper.encodeHtml(eventRecord.name);
+                return StringHelper.encodeHtml(eventRecord.name);
             },
 
             listeners : {
@@ -211,7 +220,7 @@ export default class Scheduler_component extends LightningElement {
                                 onInput({ value }) {
                                     scheduler.features.dependencies.clickWidth = value;
 
-                                    bryntum.scheduler.DomHelper.addTemporaryClass(scheduler.element, 'b-highlight-click-area', 1000, scheduler);
+                                    DomHelper.addTemporaryClass(scheduler.element, 'b-highlight-click-area', 1000, scheduler);
                                 }
                             }
                         }
@@ -240,7 +249,7 @@ export default class Scheduler_component extends LightningElement {
                                     const eventRecord = scheduler.eventStore.getById(4);
                                     eventRecord && scheduler.features.dependencies.showTerminals(eventRecord, scheduler.getElementFromEventRecord(eventRecord));
 
-                                    bryntum.scheduler.DomHelper.addTemporaryClass(scheduler.element, 'b-highlight-hover-area', 1000, scheduler);
+                                    DomHelper.addTemporaryClass(scheduler.element, 'b-highlight-hover-area', 1000, scheduler);
                                 }
                             },
                             offset : {
@@ -256,7 +265,7 @@ export default class Scheduler_component extends LightningElement {
                                     const eventRecord = scheduler.eventStore.getById(4);
                                     eventRecord && scheduler.features.dependencies.showTerminals(eventRecord, scheduler.getElementFromEventRecord(eventRecord));
 
-                                    bryntum.scheduler.DomHelper.addTemporaryClass(scheduler.element, 'b-highlight-hover-area', 1000, scheduler);
+                                    DomHelper.addTemporaryClass(scheduler.element, 'b-highlight-hover-area', 1000, scheduler);
                                 }
                             },
                             animateTerminals : {
