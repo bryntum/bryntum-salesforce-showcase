@@ -1,6 +1,6 @@
 {
   "orgName": "Bryntum Salesforce Showcase",
-  "edition": "Developer",
+  "edition": "developer",
   "country": "US",
   "language": "en_US",
   "features": ["EnableSetPasswordInApi", "Communities"],

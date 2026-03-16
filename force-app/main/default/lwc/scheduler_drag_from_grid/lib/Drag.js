@@ -10,7 +10,7 @@ export default (base) => {
                 // We size the cloned element manually
                 autoSizeClonedTarget : false,
                 // Only allow drops on the schedule area
-                dropTargetSelector   : '.b-timeline-subgrid',
+                dropTargetSelector   : '.b-timeline-sub-grid',
                 // Only allow drag of row elements inside on the unplanned grid
                 targetSelector       : '.b-grid-row:not(.b-group-row)'
             };
@@ -20,22 +20,22 @@ export default (base) => {
             // Configure DragHelper with schedule's scrollManager to allow scrolling while dragging
             this.scrollManager = this.schedule.scrollManager;
         }
-    
+
         createProxy(element) {
             const
                 proxy        = document.createElement('div'),
                 { schedule } = this,
                 task         = this.grid.getRecordFromElement(element),
-                durationInPx = schedule.timeAxisViewModel.getDistanceForDuration(task.durationMS);
-    
+                durationInPx = schedule.timeAxisViewModel.getDistanceForDuration(task.rawDurationMS);
+
             // Fake an event bar
-            proxy.classList.add('b-sch-event-wrap', 'b-sch-event', 'b-unassigned-class', `b-sch-${schedule.mode}`);
-            proxy.innerHTML = `<div class="b-sch-event b-has-content b-sch-event-withicon">
+            proxy.classList.add('b-sch-event-wrap', 'b-style-tonal', 'b-unassigned-class', `b-sch-${schedule.mode}`, 'b-colorize');
+            proxy.innerHTML = `<div class="b-sch-event b-has-content b-sch-event-with-icon">
                 <div class="b-sch-event-content">
                     <i class="${task.iconCls}"></i> ${task.name}
                 </div>
             </div>`;
-    
+
             if (schedule.isHorizontal) {
                 proxy.style.height = `${schedule.rowHeight - (2 * schedule.resourceMargin)}px`;
                 proxy.style.width  = `${durationInPx}px`;
@@ -44,7 +44,7 @@ export default (base) => {
                 proxy.style.height = `${durationInPx}px`;
                 proxy.style.width  = `${schedule.resourceColumnWidth}px`;
             }
-    
+
             return proxy;
         }
     
