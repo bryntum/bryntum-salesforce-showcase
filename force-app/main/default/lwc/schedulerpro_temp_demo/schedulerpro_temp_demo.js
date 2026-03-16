@@ -140,7 +140,8 @@ export default class Schedulerpro_temp_demo extends LightningElement {
       grid: unplannedGrid,
       schedule,
       constrain: false,
-      outerElement: unplannedGrid.element
+      outerElement: unplannedGrid.element,
+      dragWithin: appendTo
     });
 
     schedule.project.loadCrudManagerData(data);

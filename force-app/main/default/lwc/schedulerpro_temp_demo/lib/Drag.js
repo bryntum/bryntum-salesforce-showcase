@@ -26,50 +26,50 @@ export default (base) => {
     }
 
     createProxy(grabbedElement) {
-      const { context, schedule, grid } = this,
-        draggedAppointment = grid.getRecordFromElement(grabbedElement),
-        durationInPixels = schedule.timeAxisViewModel.getDistanceForDuration(
-          draggedAppointment.durationMS
-        ),
-        proxy = document.createElement("div");
+      const
+          { context, schedule, grid } = this,
+          draggedAppointment          = grid.getRecordFromElement(grabbedElement),
+          durationInPixels            = schedule.timeAxisViewModel.getDistanceForDuration(draggedAppointment.durationMS),
+          proxy                       = document.createElement('div');
 
-      proxy.style.cssText = "";
+      proxy.style.cssText = '';
 
-      proxy.style.width = `${durationInPixels}px`;
-      proxy.style.height =
-        schedule.rowHeight - 2 * schedule.resourceMargin + "px";
+      if (schedule.isHorizontal) {
+        Object.assign(proxy.style, {
+          width    : `${durationInPixels}px`,
+          maxWidth : `${schedule.timeAxisSubGrid.width}px`,
+          height   : `${schedule.rowHeight - 2 * schedule.resourceMargin}px`
+        });
+
+        if (schedule.timeAxisSubGrid.width < durationInPixels) {
+          proxy.classList.add('b-exceeds-axis-width');
+        }
+      }
+      else {
+        Object.assign(proxy.style, {
+          height    : `${durationInPixels}px`,
+          maxHeight : `${schedule.timeAxisSubGrid.height}px`,
+          width     : `${schedule.resourceColumnWidth - 2 * schedule.resourceMargin}px`
+        });
+      }
 
       // Fake an event bar
-      proxy.classList.add(
-        "b-sch-event-wrap",
-        "b-sch-style-border",
-        "b-unassigned-class",
-        "b-sch-horizontal"
-      );
-      proxy.childNodes.forEach((el) => el.remove());
-
-      const innerHTML = StringHelper.xss`
-            <div class="b-sch-event b-has-content b-sch-event-withicon">
+      proxy.classList.add('b-bryntum', 'b-sch-event-wrap', 'b-style-traced', 'b-unassigned-class', schedule.isHorizontal ? 'b-sch-horizontal' : 'b-sch-vertical');
+      proxy.innerHTML = StringHelper.xss`
+            <div class="b-sch-event b-has-content b-sch-event-with-icon">
                 <div class="b-sch-event-content">
                     <i class="b-icon b-${draggedAppointment.iconCls}"></i>
                     <div>
                         <div>${draggedAppointment.name}</div>
-                        <div class="patient-name">Patient: ${
-                          draggedAppointment.patient || ""
-                        }</div>
+                        <div class="patient-name">Patient: ${draggedAppointment.patient || ''}</div>
                     </div>
                 </div>
             </div>
         `;
 
-      const node = window.bryntum.schedulerpro.DomHelper.createElementFromTemplate(innerHTML);
-      proxy.appendChild(node);
-
       let totalDuration = 0;
 
-      grid.selectedRecords.forEach(
-        (appointment) => (totalDuration += appointment.duration)
-      );
+      grid.selectedRecords.forEach(appointment => totalDuration += appointment.duration);
 
       context.totalDuration = totalDuration;
 
