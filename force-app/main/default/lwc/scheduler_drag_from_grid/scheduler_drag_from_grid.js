@@ -176,7 +176,8 @@ export default class SchedulerDragFromGirdDemo extends LightningElement {
             schedule,
             grid         : unplannedGrid,
             constrain    : false,
-            outerElement : unplannedGrid.element
+            outerElement : unplannedGrid.element,
+            dragWithin   : appendTo
         });
 
         schedule.project.loadInlineData(projectData);

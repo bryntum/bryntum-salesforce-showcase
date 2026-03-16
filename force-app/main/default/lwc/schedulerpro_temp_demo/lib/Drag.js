@@ -14,7 +14,7 @@ export default (base) => {
         // Don't drag the actual row element, clone it
         cloneTarget: true,
         // Only allow drops on the schedule area
-        dropTargetSelector: ".b-timeline-subgrid",
+        dropTargetSelector: ".b-timeline-sub-grid",
         // Only allow drag of row elements inside on the unplanned grid
         targetSelector: ".b-grid-row:not(.b-group-row)"
       };
