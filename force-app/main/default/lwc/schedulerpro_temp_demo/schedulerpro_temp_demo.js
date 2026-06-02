@@ -49,7 +49,7 @@ export default class Schedulerpro_temp_demo extends LightningElement {
       DragHelper
     } = bryntum.schedulerpro;
 
-    const appendTo = this.template.querySelector('.container');
+    const appendTo = this.template.querySelector('.bryntum-root-element');
 
     const Schedule = ScheduleMixin(SchedulerPro);
     const UnplannedGrid = UnplannedGridMixin(Grid);

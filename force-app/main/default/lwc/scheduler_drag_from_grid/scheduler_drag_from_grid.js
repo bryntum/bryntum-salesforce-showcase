@@ -49,7 +49,7 @@ export default class SchedulerDragFromGirdDemo extends LightningElement {
             DragHelper
         } = bryntum.scheduler;
 
-        window.appendTo = this.template.querySelector('.container');
+        window.appendTo = this.template.querySelector('.bryntum-root-element');
 
         class CustomResourceModel extends ResourceModel {
             static get $name() {

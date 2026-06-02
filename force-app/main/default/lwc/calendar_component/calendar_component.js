@@ -36,7 +36,7 @@ export default class Calendar_component extends LightningElement {
 
     createCalendar() {
         const calendar = window.calendar = new bryntum.calendar.Calendar({
-            appendTo : this.template.querySelector('.container'),
+            appendTo : this.template.querySelector('.bryntum-root-element'),
 
             flex : 1,
 

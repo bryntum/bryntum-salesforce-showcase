@@ -93,7 +93,7 @@ export default class Grid_component extends LightningElement {
         ColumnStore.registerColumnType(StatusColumn);
 
         window.grid = new Grid({
-            appendTo: this.template.querySelector('.container'),
+            appendTo: this.template.querySelector('.bryntum-root-element'),
 
             flex : 1,
 

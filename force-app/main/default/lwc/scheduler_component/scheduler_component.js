@@ -45,7 +45,7 @@ export default class Scheduler_component extends LightningElement {
         } = bryntum.scheduler;
 
         const scheduler = window.scheduler = new Scheduler({
-            appendTo : this.template.querySelector('.container'),
+            appendTo : this.template.querySelector('.bryntum-root-element'),
 
             flex : 1,
 

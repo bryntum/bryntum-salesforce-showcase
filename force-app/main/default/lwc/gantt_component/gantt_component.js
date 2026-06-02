@@ -50,7 +50,7 @@ export default class Gantt_component extends LightningElement {
             calendars: data.calendars.rows
         });
 
-        const appendTo = this.template.querySelector('.container');
+        const appendTo = this.template.querySelector('.bryntum-root-element');
 
         const gantt = new bryntum.gantt.Gantt({
             project,
