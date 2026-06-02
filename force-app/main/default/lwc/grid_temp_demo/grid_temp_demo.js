@@ -48,7 +48,7 @@ export default class Grid_temp_demo extends LightningElement {
 
         
         window.grid = new bryntum.grid.Grid({
-            appendTo: this.template.querySelector('.container'),
+            appendTo: this.template.querySelector('.bryntum-root-element'),
             features : {
                 group        : true,
                 filter       : true,

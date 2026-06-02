@@ -42,7 +42,7 @@ export default class Taskboard_component extends LightningElement {
         const taskboard = new bryntum.taskboard.TaskBoard({
             project,
 
-            appendTo : this.template.querySelector('.container'),
+            appendTo : this.template.querySelector('.bryntum-root-element'),
 
             flex : 1,
 

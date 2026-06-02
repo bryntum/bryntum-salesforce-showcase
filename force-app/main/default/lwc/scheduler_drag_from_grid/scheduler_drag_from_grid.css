@@ -1,4 +1,4 @@
-.container {
+.bryntum-root-element {
   min-height     : 40em;
   height         : 100%;
   display        : flex;

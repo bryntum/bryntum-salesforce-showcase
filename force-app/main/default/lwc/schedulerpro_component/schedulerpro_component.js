@@ -37,7 +37,7 @@ export default class Schedulerpro_component extends LightningElement {
     createScheduler() {
         const { ProjectModel, Timeline, SchedulerPro, StringHelper } = bryntum.schedulerpro;
 
-        const appendTo = this.template.querySelector('.container');
+        const appendTo = this.template.querySelector('.bryntum-root-element');
 
         const project = new ProjectModel();
 
