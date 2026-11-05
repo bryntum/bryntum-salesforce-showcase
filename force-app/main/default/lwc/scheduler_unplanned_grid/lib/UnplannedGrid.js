@@ -1,5 +1,5 @@
 export default (base) => {
-  const { StringHelper } = window.bryntum.schedulerpro;
+  const { StringHelper } = window.bryntum.scheduler;
 
   return class UnplnnedGrid extends base {
     static get configurable() {

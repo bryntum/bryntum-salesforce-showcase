@@ -15,25 +15,25 @@ export default class Gantt_component extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-            loadScript(this, GANTT + '/gantt.lwc.module.js'),
-            loadStyle(this, GANTT + '/gantt.css'),
-            loadStyle(this, GANTT + '/svalbard-light.css'),
-            loadStyle(this, GANTT + '/fontawesome/css/fontawesome.css'),
-            loadStyle(this, GANTT + '/fontawesome/css/solid.css')
+          loadScript(this, GANTT + "/gantt.lwc.module.min.js"),
+          loadStyle(this, GANTT + "/gantt.css"),
+          loadStyle(this, GANTT + "/svalbard.css"),
+          loadStyle(this, GANTT + "/fontawesome/css/fontawesome.css"),
+          loadStyle(this, GANTT + "/fontawesome/css/solid.css")
         ])
-            .then(() => {
-                console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
-                this.createGantt();
-            })
-            .catch(error => {
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Error loading Bryntum Gantt',
-                        message: error,
-                        variant: 'error'
-                    })
-                );
-            });
+          .then(() => {
+            console.log(`Bryntum Core version: ${bryntum.getVersion("core")}`);
+            this.createGantt();
+          })
+          .catch((error) => {
+            this.dispatchEvent(
+              new ShowToastEvent({
+                title: "Error loading Bryntum Gantt",
+                message: error,
+                variant: "error"
+              })
+            );
+          });
     }
 
     createGantt() {

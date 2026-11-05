@@ -12,9 +12,9 @@ export default class Grid_component extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-            loadScript(this, GRID + '/grid.lwc.module.js'),
+            loadScript(this, GRID + '/grid.lwc.module.min.js'),
             loadStyle(this, GRID + '/grid.css'),
-            loadStyle(this, GRID + '/svalbard-light.css'),
+            loadStyle(this, GRID + '/svalbard.css'),
             loadStyle(this, GRID + '/fontawesome/css/fontawesome.css'),
             loadStyle(this, GRID + '/fontawesome/css/solid.css')
         ]).then(() => {
@@ -32,6 +32,8 @@ export default class Grid_component extends LightningElement {
     }
 
     createGrid() {
+        //bryntum.licenseKey = 'eyJ2IjoxLCJpZCI6ImxpY19hN2JjZmU2NzVmZjdjZjQ0YmEzYyIsInR5cGUiOiJ0cmlhbCIsInByb2R1Y3RzIjp7ImVudGVycHJpc2UiOlsiZ3JpZCJdfSwic3VwcG9ydEVuZCI6IjIwMjctMTEtMjUiLCJsaWNlbnNlRW5kIjoiMjAyNy0xMS0yNSJ9.C2RkY1EOVPUDdMNfeaexLqiuairTfSA5t11ogi4DV+lykuk4BJECicI+xUcnT9+kR9VsmQf1MUl5GfYWpeA4z5vikl5UlhuIYGrxJkePb1yUBtdOT2ShX5HNR0DscuriOdQKCXRSg+uT+oayS1T3/h1xhXIcTgTt+LriLW4BM6/TwbwCwqvihdJCRwJX44QxcEZgcwFj2589bJdGIMrG+wGhB+h3t5lUy5EMM2a8k/BiHn2eYnIsUp9jd4QUCd7kdpYHF3j0NA5UYqUlgBkDIvkBsN1bpsfU8dWt4LwqR5Jhy/lWHGWPuvJQAyd2aRM8FUKJM2iBWLNucc9ULrWVXg==';
+
         const {
             Column,
             ColumnStore,

@@ -13,10 +13,6 @@
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>
-        <tab>BryntumSchedulerPro</tab>
-        <visibility>Visible</visibility>
-    </tabSettings>
-    <tabSettings>
         <tab>BryntumGantt</tab>
         <visibility>Visible</visibility>
     </tabSettings>
@@ -33,7 +29,7 @@
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>
-        <tab>SchedulerProTempDemo</tab>
+        <tab>SchedulerUnplannedGridDemo</tab>
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>

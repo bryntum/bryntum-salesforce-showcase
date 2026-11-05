@@ -1,6 +1,6 @@
-export default (SchedulerProClass) => {
+export default (baseClass) => {
 
-  return class Schedule extends SchedulerProClass {
+  return class Schedule extends baseClass {
     // Customized scheduler displaying hospital appointments
     static get $name() {
       return "Schedule";

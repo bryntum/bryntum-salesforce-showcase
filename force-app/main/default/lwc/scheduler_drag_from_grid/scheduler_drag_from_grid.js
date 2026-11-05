@@ -20,21 +20,25 @@ export default class SchedulerDragFromGirdDemo extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-            loadScript(this, SCHEDULER + '/scheduler.lwc.module.js'),
-            loadStyle(this, SCHEDULER + '/scheduler.css'),
-            loadStyle(this, SCHEDULER + '/svalbard-light.css'),
-            loadStyle(this, SCHEDULER + '/fontawesome/css/fontawesome.css'),
-            loadStyle(this, SCHEDULER + '/fontawesome/css/solid.css')
-        ]).then(() => {
-            console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
+          loadScript(this, SCHEDULER + "/scheduler.lwc.module.min.js"),
+          loadStyle(this, SCHEDULER + "/scheduler.css"),
+          loadStyle(this, SCHEDULER + "/svalbard.css"),
+          loadStyle(this, SCHEDULER + "/fontawesome/css/fontawesome.css"),
+          loadStyle(this, SCHEDULER + "/fontawesome/css/solid.css")
+        ])
+          .then(() => {
+            console.log(`Bryntum Core version: ${bryntum.getVersion("core")}`);
             this.createScheduler();
-        }).catch((error) => {
-            this.dispatchEvent(new ShowToastEvent({
-                title   : 'Error loading Bryntum Scheduler',
-                message : error,
-                variant : 'error'
-            }));
-        });
+          })
+          .catch((error) => {
+            this.dispatchEvent(
+              new ShowToastEvent({
+                title: "Error loading Bryntum Scheduler",
+                message: error,
+                variant: "error"
+              })
+            );
+          });
     }
 
     createScheduler() {

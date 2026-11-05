@@ -2,7 +2,7 @@
 import { LightningElement } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
-import SCHEDULERPRO from '@salesforce/resourceUrl/bryntum_schedulerpro';
+import SCHEDULER from '@salesforce/resourceUrl/bryntum_scheduler';
 import ScheduleMixin from './lib/Schedule';
 import UnplannedGridMixin from './lib/UnplannedGrid';
 import AppointmentMixin from './lib/Appointment';
@@ -10,7 +10,7 @@ import DoctorMixin from './lib/Doctor';
 import DragMixin from './lib/Drag';
 import { data } from './data';
 
-export default class Schedulerpro_temp_demo extends LightningElement {
+export default class Scheduler_unplanned_grid extends LightningElement {
   renderedCallback() {
     if (this.bryntumInitialized) {
       return;
@@ -18,15 +18,15 @@ export default class Schedulerpro_temp_demo extends LightningElement {
     this.bryntumInitialized = true;
 
     Promise.all([
-      loadScript(this, SCHEDULERPRO + '/schedulerpro.lwc.module.js'),
-      loadStyle(this, SCHEDULERPRO + '/schedulerpro.css'),
-      loadStyle(this, SCHEDULERPRO + '/svalbard-light.css'),
-      loadStyle(this, SCHEDULERPRO + '/fontawesome/css/fontawesome.css'),
-      loadStyle(this, SCHEDULERPRO + '/fontawesome/css/solid.css')
+      loadScript(this, SCHEDULER + '/scheduler.lwc.module.min.js'),
+      loadStyle(this, SCHEDULER + '/scheduler.css'),
+      loadStyle(this, SCHEDULER + '/svalbard.css'),
+      loadStyle(this, SCHEDULER + '/fontawesome/css/fontawesome.css'),
+      loadStyle(this, SCHEDULER + '/fontawesome/css/solid.css')
     ])
       .then(() => {
         console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
-        this.createSchedulerPro();
+        this.createScheduler();
       })
       .catch((error) => {
         this.dispatchEvent(
@@ -39,19 +39,19 @@ export default class Schedulerpro_temp_demo extends LightningElement {
       });
   }
 
-  createSchedulerPro() {
+  createScheduler() {
     const {
       Grid,
-      SchedulerPro,
+      Scheduler,
       EventModel,
       ResourceModel,
       Splitter,
       DragHelper
-    } = bryntum.schedulerpro;
+    } = bryntum.scheduler;
 
     const appendTo = this.template.querySelector('.bryntum-root-element');
 
-    const Schedule = ScheduleMixin(SchedulerPro);
+    const Schedule = ScheduleMixin(Scheduler);
     const UnplannedGrid = UnplannedGridMixin(Grid);
     const Appointment = AppointmentMixin(EventModel);
     const Doctor = DoctorMixin(ResourceModel);

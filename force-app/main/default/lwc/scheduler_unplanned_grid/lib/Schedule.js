@@ -1,7 +1,7 @@
-export default (SchedulerProClass) => {
-  const { DateHelper, Toast } = window.bryntum.schedulerpro;
+export default (baseClass) => {
+  const { DateHelper, Toast, StringHelper } = window.bryntum.scheduler;
 
-  return class Schedule extends SchedulerProClass {
+  return class Schedule extends baseClass {
     // Customized scheduler displaying hospital appointments
     static get $name() {
       return "Schedule";
@@ -237,7 +237,7 @@ export default (SchedulerProClass) => {
         },
 
         onSave() {
-          Toast.show("TODO: Save data (see onSave() event for SchedulerPro)");
+          Toast.show("TODO: Save data (see onSave() event)");
           // console.log('Changes:', this.project.changes);
         },
 
@@ -289,7 +289,7 @@ export default (SchedulerProClass) => {
             },
             {
               class: "b-patient",
-              html: window.bryntum.schedulerpro.StringHelper
+              html: StringHelper
                 .xss`<div>Patient: ${eventRecord.patient || ""}</div>`
             }
           ]

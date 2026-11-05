@@ -1,5 +1,5 @@
 export default (base) => {
-  const { DateHelper, StringHelper, DomHelper } = window.bryntum.schedulerpro;
+  const { DateHelper, StringHelper, DomHelper } = window.bryntum.scheduler;
 
   return class Drag extends base {
     static get defaultConfig() {
