@@ -37,6 +37,9 @@ export default class Gantt_component extends LightningElement {
     }
 
     createGantt() {
+        // Register your Bryntum Enterprise license key here, without a key the component runs in trial mode
+        bryntum.licenseKey = 'key-goes-here';
+
         initWidgets()
 
         const project = new bryntum.gantt.ProjectModel({

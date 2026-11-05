@@ -35,6 +35,9 @@ export default class Calendar_component extends LightningElement {
     }
 
     createCalendar() {
+        // Register your Bryntum Enterprise license key here, without a key the component runs in trial mode
+        bryntum.licenseKey = 'key-goes-here';
+
         const calendar = window.calendar = new bryntum.calendar.Calendar({
             appendTo : this.template.querySelector('.bryntum-root-element'),
 

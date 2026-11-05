@@ -35,6 +35,9 @@ export default class Scheduler_component extends LightningElement {
     }
 
     createScheduler() {
+        // Register your Bryntum Enterprise license key here, without a key the component runs in trial mode
+        bryntum.licenseKey = 'key-goes-here';
+
         const {
             Scheduler,
             StringHelper,

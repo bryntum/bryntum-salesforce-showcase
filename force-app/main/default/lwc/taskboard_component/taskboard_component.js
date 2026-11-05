@@ -35,6 +35,9 @@ export default class Taskboard_component extends LightningElement {
     }
 
     createTaskBoard() {
+        // Register your Bryntum Enterprise license key here, without a key the component runs in trial mode
+        bryntum.licenseKey = 'key-goes-here';
+
         const project = new bryntum.taskboard.ProjectModel({
             tasks : data.tasks.rows
         });

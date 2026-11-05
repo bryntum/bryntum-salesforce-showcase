@@ -34,6 +34,9 @@ export default class Grid_temp_demo extends LightningElement {
     }
 
     createGrid() {
+        // Register your Bryntum Enterprise license key here, without a key the component runs in trial mode
+        bryntum.licenseKey = 'key-goes-here';
+
         const
             btnCfg = {
                 type        : 'button',
