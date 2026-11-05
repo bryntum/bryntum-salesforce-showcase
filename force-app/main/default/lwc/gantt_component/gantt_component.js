@@ -15,7 +15,7 @@ export default class Gantt_component extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-          loadScript(this, GANTT + "/gantt.lwc.module.min.js"),
+          loadScript(this, GANTT + "/gantt.lwc.min.js"),
           loadStyle(this, GANTT + "/gantt.css"),
           loadStyle(this, GANTT + "/svalbard.css"),
           loadStyle(this, GANTT + "/fontawesome/css/fontawesome.css"),

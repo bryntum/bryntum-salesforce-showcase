@@ -13,7 +13,7 @@ export default class Taskboard_component extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-            loadScript(this, TASKBOARD + '/taskboard.lwc.module.min.js'),
+            loadScript(this, TASKBOARD + '/taskboard.lwc.min.js'),
             loadStyle(this, TASKBOARD + '/taskboard.css'),
             loadStyle(this, TASKBOARD + '/svalbard.css'),
             loadStyle(this, TASKBOARD + '/fontawesome/css/fontawesome.css'),

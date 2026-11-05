@@ -13,7 +13,7 @@ export default class Scheduler_component extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-          loadScript(this, SCHEDULER + "/scheduler.lwc.module.min.js"),
+          loadScript(this, SCHEDULER + "/scheduler.lwc.min.js"),
           loadStyle(this, SCHEDULER + "/scheduler.css"),
           loadStyle(this, SCHEDULER + "/svalbard.css"),
           loadStyle(this, SCHEDULER + "/fontawesome/css/fontawesome.css"),

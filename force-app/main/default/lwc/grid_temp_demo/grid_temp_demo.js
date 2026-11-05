@@ -12,7 +12,7 @@ export default class Grid_temp_demo extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-          loadScript(this, GRID + "/grid.lwc.module.min.js"),
+          loadScript(this, GRID + "/grid.lwc.min.js"),
           loadStyle(this, GRID + "/grid.css"),
           loadStyle(this, GRID + "/svalbard.css"),
           loadStyle(this, GRID + "/fontawesome/css/fontawesome.css"),

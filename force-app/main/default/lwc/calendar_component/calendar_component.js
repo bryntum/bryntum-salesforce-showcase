@@ -13,7 +13,7 @@ export default class Calendar_component extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-            loadScript(this, CALENDAR + '/calendar.lwc.module.min.js'),
+            loadScript(this, CALENDAR + '/calendar.lwc.min.js'),
             loadStyle(this, CALENDAR + '/calendar.css'),
             loadStyle(this, CALENDAR + '/svalbard.css'),
             loadStyle(this, CALENDAR + '/fontawesome/css/fontawesome.css'),
