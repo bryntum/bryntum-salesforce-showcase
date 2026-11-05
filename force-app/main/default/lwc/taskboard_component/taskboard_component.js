@@ -13,87 +13,88 @@ export default class Taskboard_component extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-            loadScript(this, TASKBOARD + '/taskboard.lwc.module.js'),
+            loadScript(this, TASKBOARD + '/taskboard.lwc.min.js'),
             loadStyle(this, TASKBOARD + '/taskboard.css'),
-            loadStyle(this, TASKBOARD + '/svalbard-light.css'),
+            loadStyle(this, TASKBOARD + '/svalbard.css'),
             loadStyle(this, TASKBOARD + '/fontawesome/css/fontawesome.css'),
             loadStyle(this, TASKBOARD + '/fontawesome/css/solid.css')
         ])
             .then(() => {
-                console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
+                console.log(
+                    `Bryntum Core version: ${bryntum.getVersion('core')}`
+                );
                 this.createTaskBoard();
             })
-            .catch(error => {
+            .catch((error) => {
                 this.dispatchEvent(
                     new ShowToastEvent({
-                        title   : 'Error loading Bryntum Task Board',
-                        message : error,
-                        variant : 'error'
+                        title: 'Error loading Bryntum Task Board',
+                        message: error,
+                        variant: 'error'
                     })
                 );
             });
     }
 
     createTaskBoard() {
+        // Register your Bryntum Enterprise license key here, without a key the component runs in trial mode
+        bryntum.licenseKey = 'key-goes-here';
+
         const project = new bryntum.taskboard.ProjectModel({
-            tasks : data.tasks.rows
+            tasks: data.tasks.rows
         });
 
         const taskboard = new bryntum.taskboard.TaskBoard({
             project,
 
-            appendTo : this.template.querySelector('.bryntum-root-element'),
+            appendTo: this.template.querySelector('.bryntum-root-element'),
 
-            flex : 1,
+            flex: 1,
 
             // Apply shared demo styling to put it in a nice box
-            cls : 'demo-app',
+            cls: 'demo-app',
 
             // Experimental, transition moving cards using the editor
-            useDomTransition : true,
+            useDomTransition: true,
 
-            features : {
-                columnDrag   : true,
-                swimlaneDrag : true
+            features: {
+                columnDrag: true,
+                swimlaneDrag: true
             },
 
-            columns : [
-                'todo',
-                'doing',
-                'done'
+            columns: ['todo', 'doing', 'done'],
+
+            columnField: 'status',
+
+            swimlanes: [
+                { id: 'high', text: 'High', color: 'red' },
+                { id: 'medium', text: 'Medium', color: 'orange' },
+                { id: 'low', text: 'Low', color: 'lime' }
             ],
 
-            columnField : 'status',
+            swimlaneField: 'prio',
 
-            swimlanes : [
-                { id : 'high', text : 'High', color : 'red' },
-                { id : 'medium', text : 'Medium', color : 'orange' },
-                { id : 'low', text : 'Low', color : 'lime' }
-            ],
-
-            swimlaneField : 'prio',
-
-            footerItems : {
-                resourceAvatars : { overlap : true }
+            footerItems: {
+                resourceAvatars: { overlap: true }
             },
 
-            tbar : [
+            tbar: [
                 // Field for filtering tasks
-                { type : 'taskfilterfield' },
+                { type: 'taskfilterfield' },
                 // Field for filtering columns
-                { type : 'columnfilterfield' },
+                { type: 'columnfilterfield' },
                 // Field for filtering swimlanes
-                { type : 'swimlanefilterfield' },
+                { type: 'swimlanefilterfield' },
                 // Move the last items to the right
                 '->',
                 // Button to pick which columns are shown
-                { type : 'columnpickerbutton' },
+                { type: 'columnpickerbutton' },
                 // Button to pick which swimlanes are shown
-                { type : 'swimlanepickerbutton' }
+                { type: 'swimlanepickerbutton' }
             ],
 
             // Since each column has its own store chained from the project's taskStore, filtering the master must be chained
-            chainFilters : true
+            chainFilters: true
         });
     }
 }

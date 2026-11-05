@@ -56,11 +56,10 @@
     <tabs>BryntumGrid</tabs>
     <tabs>BryntumScheduler</tabs>
     <tabs>BryntumSchedulerDragFromGrid</tabs>
-    <tabs>BryntumSchedulerPro</tabs>
     <tabs>BryntumGantt</tabs>
     <tabs>BryntumCalendar</tabs>
     <tabs>BryntumTaskBoard</tabs>
     <tabs>GridTempDemo</tabs>
-    <tabs>SchedulerProTempDemo</tabs>
+    <tabs>SchedulerUnplannedGridDemo</tabs>
     <uiType>Lightning</uiType>
 </CustomApplication>

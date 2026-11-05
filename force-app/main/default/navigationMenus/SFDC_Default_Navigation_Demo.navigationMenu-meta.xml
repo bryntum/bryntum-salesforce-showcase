@@ -18,13 +18,6 @@
         <type>InternalLink</type>
     </navigationMenuItem>
     <navigationMenuItem>
-        <label>Scheduler Pro</label>
-        <position>3</position>
-        <publiclyAvailable>true</publiclyAvailable>
-        <target>/schedulerpro</target>
-        <type>InternalLink</type>
-    </navigationMenuItem>
-    <navigationMenuItem>
         <label>Gantt</label>
         <position>4</position>
         <publiclyAvailable>true</publiclyAvailable>
