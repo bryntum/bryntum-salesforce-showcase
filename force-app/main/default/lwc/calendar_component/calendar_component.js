@@ -20,10 +20,12 @@ export default class Calendar_component extends LightningElement {
             loadStyle(this, CALENDAR + '/fontawesome/css/solid.css')
         ])
             .then(() => {
-                console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
+                console.log(
+                    `Bryntum Core version: ${bryntum.getVersion('core')}`
+                );
                 this.createCalendar();
             })
-            .catch(error => {
+            .catch((error) => {
                 this.dispatchEvent(
                     new ShowToastEvent({
                         title: 'Error loading Bryntum Calendar',
@@ -38,54 +40,54 @@ export default class Calendar_component extends LightningElement {
         // Register your Bryntum Enterprise license key here, without a key the component runs in trial mode
         bryntum.licenseKey = 'key-goes-here';
 
-        const calendar = window.calendar = new bryntum.calendar.Calendar({
-            appendTo : this.template.querySelector('.bryntum-root-element'),
+        const calendar = (window.calendar = new bryntum.calendar.Calendar({
+            appendTo: this.template.querySelector('.bryntum-root-element'),
 
-            flex : 1,
+            flex: 1,
 
             // Start life looking at this date
-            date : new Date(2020, 9, 12),
+            date: new Date(2020, 9, 12),
 
             // 'day', 'week', 'month', etc.
-            mode : 'week',
+            mode: 'week',
 
-            crudManager : {},
+            crudManager: {},
 
-            sidebar : {
-                items : {
-                    datePicker : {
+            sidebar: {
+                items: {
+                    datePicker: {
                         // highlight the selected cell's week row
-                        highlightSelectedWeek : true
+                        highlightSelectedWeek: true
                     },
-                    compactHeader : {
-                        weight : 100,
-                        type   : 'slidetoggle',
-                        text   : 'Show compact header',
+                    compactHeader: {
+                        weight: 100,
+                        type: 'slidetoggle',
+                        text: 'Show compact header',
 
                         // "up." means resolve in owner will call on the Calendar
-                        onChange : 'up.onToggleCompactHeader'
+                        onChange: 'up.onToggleCompactHeader'
                     }
                 }
             },
 
             // Features named by the properties are included.
             // An object is used to configure the feature.
-            features : {
-                eventTooltip : {
+            features: {
+                eventTooltip: {
                     // Configuration options are passed on to the tooltip instance
                     // We want the tooltip's left edge aligned to the right edge of the event if possible.
-                    align : 'l-r'
+                    align: 'l-r'
                 }
             },
 
             onToggleCompactHeader({ checked }) {
-                this.eachView(v => {
+                this.eachView((v) => {
                     if (v.isDayView) {
                         v.compactHeader = checked;
                     }
                 });
             }
-        });
+        }));
 
         calendar.crudManager.loadCrudManagerData(data).then(() => {});
     }

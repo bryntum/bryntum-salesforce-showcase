@@ -17,18 +17,22 @@ export default class Grid_component extends LightningElement {
             loadStyle(this, GRID + '/svalbard.css'),
             loadStyle(this, GRID + '/fontawesome/css/fontawesome.css'),
             loadStyle(this, GRID + '/fontawesome/css/solid.css')
-        ]).then(() => {
-            console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
-            this.createGrid();
-        }).catch(error => {
-            this.dispatchEvent(
-                new ShowToastEvent({
-                    title: 'Error loading Bryntum Grid',
-                    message: error,
-                    variant: 'error'
-                })
-            );
-        });
+        ])
+            .then(() => {
+                console.log(
+                    `Bryntum Core version: ${bryntum.getVersion('core')}`
+                );
+                this.createGrid();
+            })
+            .catch((error) => {
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Error loading Bryntum Grid',
+                        message: error,
+                        variant: 'error'
+                    })
+                );
+            });
     }
 
     createGrid() {
@@ -52,13 +56,13 @@ export default class Grid_component extends LightningElement {
 
             // Override default values
             static defaults = {
-                align  : 'center',
-                field  : 'status',
-                editor : {
-                    type       : 'combo',
-                    editable   : false,
-                    autoExpand : true,
-                    items      : [
+                align: 'center',
+                field: 'status',
+                editor: {
+                    type: 'combo',
+                    editable: false,
+                    autoExpand: true,
+                    items: [
                         [0, 'Todo'],
                         [1, 'In progress'],
                         [2, 'Review'],
@@ -69,22 +73,22 @@ export default class Grid_component extends LightningElement {
 
             renderer({ value }) {
                 const colors = {
-                    0 : 'blue',
-                    1 : 'orange',
-                    2 : 'red',
-                    3 : 'green',
-                    4 : 'purple'
+                    0: 'blue',
+                    1: 'orange',
+                    2: 'red',
+                    3: 'green',
+                    4: 'purple'
                 };
 
                 if (typeof value === 'number') {
                     return {
-                        className : {
-                            'status-tag' : true
+                        className: {
+                            'status-tag': true
                         },
-                        style : {
-                            '--color' : `var(--b-color-${colors[value] || 'gray'})`
+                        style: {
+                            '--color': `var(--b-color-${colors[value] || 'gray'})`
                         },
-                        text : this.editor.items[value]?.text
+                        text: this.editor.items[value]?.text
                     };
                 }
 
@@ -98,63 +102,64 @@ export default class Grid_component extends LightningElement {
         window.grid = new Grid({
             appendTo: this.template.querySelector('.bryntum-root-element'),
 
-            flex : 1,
+            flex: 1,
 
-            selectionMode : {
-                row      : true,
-                checkbox : {
+            selectionMode: {
+                row: true,
+                checkbox: {
                     // These configs are applied to the checkbox selection column
-                    checkCls : 'b-my-checkbox'
+                    checkCls: 'b-my-checkbox'
                 },
-                showCheckAll : true
+                showCheckAll: true
             },
 
-            columns : [
-                { type : 'rownumber' },
+            columns: [
+                { type: 'rownumber' },
                 {
-                    text     : 'Template',
-                    minWidth : 185,
-                    flex     : 1,
-                    field    : 'name',
-                    type     : 'template',
-                    template : data => StringHelper.xss`Hi ${data.record.name}!`,
+                    text: 'Template',
+                    minWidth: 185,
+                    flex: 1,
+                    field: 'name',
+                    type: 'template',
+                    template: (data) =>
+                        StringHelper.xss`Hi ${data.record.name}!`,
                     // Cheaper measuring when sizing to fit content
-                    fitMode  : 'value',
-                    editor   : {
-                        label : 'Name'
+                    fitMode: 'value',
+                    editor: {
+                        label: 'Name'
                     }
                 },
                 {
-                    type    : 'widget',
-                    text    : 'Chips',
-                    field   : 'skills',
-                    width   : 300,
-                    widgets : [
+                    type: 'widget',
+                    text: 'Chips',
+                    field: 'skills',
+                    width: 300,
+                    widgets: [
                         {
-                            type           : 'chipview',
-                            valueProperty  : 'items',
-                            itemsFocusable : false,
-                            navigator      : null,
-                            closable       : false,
-                            scrollable     : null,
-                            style          : {
-                                flexFlow : 'row wrap',
-                                display  : 'flex',
-                                padding  : '5px 0 3px 0'
+                            type: 'chipview',
+                            valueProperty: 'items',
+                            itemsFocusable: false,
+                            navigator: null,
+                            closable: false,
+                            scrollable: null,
+                            style: {
+                                flexFlow: 'row wrap',
+                                display: 'flex',
+                                padding: '5px 0 3px 0'
                             }
                         }
                     ],
-                    cellEditor : {
+                    cellEditor: {
                         // The editable ChipView auto heights and may overflow the cell height.
-                        matchSize : {
-                            height : false
+                        matchSize: {
+                            height: false
                         }
                     },
-                    editor : {
-                        type        : 'combo',
-                        multiSelect : true,
-                        editable    : false,
-                        items       : DataGenerator.skills
+                    editor: {
+                        type: 'combo',
+                        multiSelect: true,
+                        editable: false,
+                        items: DataGenerator.skills
                     },
                     finalizeCellEdit({ value }) {
                         const valid = value.length < 4;
@@ -166,93 +171,95 @@ export default class Grid_component extends LightningElement {
                     }
                 },
                 {
-                    text     : 'Percent',
-                    field    : 'percent',
-                    flex     : 1,
-                    minWidth : 150,
-                    type     : 'percent'
+                    text: 'Percent',
+                    field: 'percent',
+                    flex: 1,
+                    minWidth: 150,
+                    type: 'percent'
                 },
                 {
-                    text    : 'Widget',
-                    width   : 90,
-                    type    : 'widget',
-                    align   : 'center',
-                    widgets : [
+                    text: 'Widget',
+                    width: 90,
+                    type: 'widget',
+                    align: 'center',
+                    widgets: [
                         {
-                            type      : 'button',
-                            icon      : 'fa fa-plus',
-                            height    : '2.3em',
-                            width     : '2.3em',
-                            minHeight : 0,
-                            rendition : 'filled',
-                            color     : 'b-blue',
-                            onAction  : ({ source : btn }) => {
+                            type: 'button',
+                            icon: 'fa fa-plus',
+                            height: '2.3em',
+                            width: '2.3em',
+                            minHeight: 0,
+                            rendition: 'filled',
+                            color: 'b-blue',
+                            onAction: ({ source: btn }) => {
                                 btn.cellInfo.record.age++;
                             }
                         }
                     ]
                 },
                 {
-                    text          : 'Number',
-                    field         : 'age',
-                    width         : 90,
-                    align         : 'right',
-                    type          : 'number',
-                    instantUpdate : true
+                    text: 'Number',
+                    field: 'age',
+                    width: 90,
+                    align: 'right',
+                    type: 'number',
+                    instantUpdate: true
                 },
                 {
-                    text  : 'Custom rendering',
-                    width : 160,
-                    type  : 'status'
+                    text: 'Custom rendering',
+                    width: 160,
+                    type: 'status'
                 },
                 {
-                    text   : 'Date',
-                    field  : 'start',
-                    width  : 135,
-                    type   : 'date',
-                    format : 'MMMM D YYYY'
+                    text: 'Date',
+                    field: 'start',
+                    width: 135,
+                    type: 'date',
+                    format: 'MMMM D YYYY'
                 },
                 {
-                    text   : 'Time',
-                    field  : 'time',
-                    type   : 'time',
-                    format : 'LT'
+                    text: 'Time',
+                    field: 'time',
+                    type: 'time',
+                    format: 'LT'
                 },
 
                 {
-                    text     : 'Link',
-                    field    : 'name',
-                    type     : 'template',
-                    width    : 120,
-                    editor   : false,
-                    template : data => `<a href="https://bryntum.com" target="_blank">Click me</a>`
+                    text: 'Link',
+                    field: 'name',
+                    type: 'template',
+                    width: 120,
+                    editor: false,
+                    template: (data) =>
+                        `<a href="https://bryntum.com" target="_blank">Click me</a>`
                 },
                 {
-                    type    : 'rating',
-                    text    : 'Rating',
-                    cellCls : 'satisfaction',
-                    max     : 5,
-                    field   : 'rating'
+                    type: 'rating',
+                    text: 'Rating',
+                    cellCls: 'satisfaction',
+                    max: 5,
+                    field: 'rating'
                 },
                 {
-                    type    : 'action',
-                    field   : 'rating',
-                    width   : 90,
-                    text    : 'Actions',
-                    align   : 'center',
-                    actions : [
+                    type: 'action',
+                    field: 'rating',
+                    width: 90,
+                    text: 'Actions',
+                    align: 'center',
+                    actions: [
                         {
-                            cls     : 'fa fa-minus',
-                            tooltip : 'Decrease rating',
-                            onClick : ({ record }) => {
+                            cls: 'fa fa-minus',
+                            tooltip: 'Decrease rating',
+                            onClick: ({ record }) => {
                                 if (record.rating > 1) {
                                     record.rating--;
                                 }
                             }
-                        }, {
-                            cls     : 'fa fa-plus',
-                            tooltip : 'Increase rating',
-                            onClick : ({ record }) => {
+                        },
+                        {
+                            cls: 'fa fa-plus',
+                            tooltip: 'Increase rating',
+                            onClick: ({ record }) => {
                                 if (record.rating < 5) {
                                     record.rating++;
                                 }
@@ -261,44 +268,44 @@ export default class Grid_component extends LightningElement {
                     ]
                 },
                 {
-                    text     : 'Notes',
-                    field    : 'notes',
-                    minWidth : 200,
-                    flex     : 1,
-                    editor   : {
-                        type : 'textareapickerfield'
+                    text: 'Notes',
+                    field: 'notes',
+                    minWidth: 200,
+                    flex: 1,
+                    editor: {
+                        type: 'textareapickerfield'
                     }
                 },
                 {
-                    type    : 'check',
-                    text    : 'Enabled',
-                    field   : 'active',
-                    widgets : [
+                    type: 'check',
+                    text: 'Enabled',
+                    field: 'active',
+                    widgets: [
                         {
-                            type      : 'slidetoggle',
-                            ariaLabel : 'Toggle enabled state'
+                            type: 'slidetoggle',
+                            ariaLabel: 'Toggle enabled state'
                         }
                     ]
                 },
                 {
-                    text  : 'String',
-                    field : 'firstName'
+                    text: 'String',
+                    field: 'firstName'
                 },
                 {
-                    text     : 'Calculated field',
-                    minWidth : 160,
-                    field    : 'fullName'
+                    text: 'Calculated field',
+                    minWidth: 160,
+                    field: 'fullName'
                 }
             ],
 
-            features : {
-                headerMenu : {
-                    moveColumns : true
+            features: {
+                headerMenu: {
+                    moveColumns: true
                 }
             },
 
-            store : {
-                fields : [
+            store: {
+                fields: [
                     'title',
                     'title',
                     'name',
@@ -310,24 +317,28 @@ export default class Grid_component extends LightningElement {
                     'color',
                     'relatedTo',
                     'notes',
-                    { name : 'skills', type : 'array' },
-                    { name : 'rank', type : 'number' },
-                    { name : 'age', type : 'number' },
-                    { name : 'percent', type : 'number' },
-                    { name : 'active', type : 'boolean' },
-                    { name : 'done', type : 'boolean' },
-                    { name : 'rating', type : 'int' },
-                    { name : 'score', type : 'int' },
-                    { name : 'start', type : 'date' },
-                    { name : 'time', type : 'date' },
-                    { name : 'finish', type : 'date' },
+                    { name: 'skills', type: 'array' },
+                    { name: 'rank', type: 'number' },
+                    { name: 'age', type: 'number' },
+                    { name: 'percent', type: 'number' },
+                    { name: 'active', type: 'boolean' },
+                    { name: 'done', type: 'boolean' },
+                    { name: 'rating', type: 'int' },
+                    { name: 'score', type: 'int' },
+                    { name: 'start', type: 'date' },
+                    { name: 'time', type: 'date' },
+                    { name: 'finish', type: 'date' },
                     // Calculated field
-                    { name : 'fullName', calculate : record => `${record.firstName || ''} ${record.surName || ''}` }
+                    {
+                        name: 'fullName',
+                        calculate: (record) =>
+                            `${record.firstName || ''} ${record.surName || ''}`
+                    }
                 ],
 
-                data : DataGenerator.generateData({
-                    count     : 50,
-                    addSkills : 3,
+                data: DataGenerator.generateData({
+                    count: 50,
+                    addSkills: 3,
                     rowCallback(data) {
                         data.status = (data.id % 5) % 4;
                     }

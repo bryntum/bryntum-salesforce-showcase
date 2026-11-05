@@ -20,25 +20,27 @@ export default class SchedulerDragFromGirdDemo extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-          loadScript(this, SCHEDULER + "/scheduler.lwc.min.js"),
-          loadStyle(this, SCHEDULER + "/scheduler.css"),
-          loadStyle(this, SCHEDULER + "/svalbard.css"),
-          loadStyle(this, SCHEDULER + "/fontawesome/css/fontawesome.css"),
-          loadStyle(this, SCHEDULER + "/fontawesome/css/solid.css")
+            loadScript(this, SCHEDULER + '/scheduler.lwc.min.js'),
+            loadStyle(this, SCHEDULER + '/scheduler.css'),
+            loadStyle(this, SCHEDULER + '/svalbard.css'),
+            loadStyle(this, SCHEDULER + '/fontawesome/css/fontawesome.css'),
+            loadStyle(this, SCHEDULER + '/fontawesome/css/solid.css')
         ])
-          .then(() => {
-            console.log(`Bryntum Core version: ${bryntum.getVersion("core")}`);
-            this.createScheduler();
-          })
-          .catch((error) => {
-            this.dispatchEvent(
-              new ShowToastEvent({
-                title: "Error loading Bryntum Scheduler",
-                message: error,
-                variant: "error"
-              })
-            );
-          });
+            .then(() => {
+                console.log(
+                    `Bryntum Core version: ${bryntum.getVersion('core')}`
+                );
+                this.createScheduler();
+            })
+            .catch((error) => {
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Error loading Bryntum Scheduler',
+                        message: error,
+                        variant: 'error'
+                    })
+                );
+            });
     }
 
     createScheduler() {
@@ -68,8 +70,8 @@ export default class SchedulerDragFromGirdDemo extends LightningElement {
                     // Do not persist `cls` field because we change its value on dragging unplanned resources to
                     // highlight the row
                     {
-                        name    : 'cls',
-                        persist : false
+                        name: 'cls',
+                        persist: false
                     }
                 ];
             }
@@ -82,71 +84,75 @@ export default class SchedulerDragFromGirdDemo extends LightningElement {
         const UnplannedGrid = UnplannedGridMixin(Grid);
         const Drag = DragMixin(DragHelper);
 
-        let schedule = window.schedule = new Schedule({
-            ref         : 'schedule',
-            appendTo    : appendTo,
-            startDate   : new Date(2025, 11, 1, 8),
-            endDate     : new Date(2025, 11, 1, 18),
-            flex        : 4,
-            crudManager : {
-                autoLoad : true,
+        let schedule = (window.schedule = new Schedule({
+            ref: 'schedule',
+            appendTo: appendTo,
+            startDate: new Date(2025, 11, 1, 8),
+            endDate: new Date(2025, 11, 1, 18),
+            flex: 4,
+            crudManager: {
+                autoLoad: true,
                 // This config enables response validation and dumping of found errors to the browser console.
                 // It's meant to be used as a development stage helper only so please set it to false for production
                 // systems.
-                validateResponse : true,
-                eventStore       : {
-                    storeClass : TaskStore
+                validateResponse: true,
+                eventStore: {
+                    storeClass: TaskStore
                 },
-                resourceStore    : {
-                    modelClass : CustomResourceModel
+                resourceStore: {
+                    modelClass: CustomResourceModel
                 }
             },
 
-            tbar : [
+            tbar: [
                 'Schedule view',
                 '->',
-                { type : 'viewpresetcombo' },
+                { type: 'viewpresetcombo' },
                 {
-                    type        : 'button',
-                    toggleable  : true,
-                    icon        : 'b-fa-calendar',
-                    pressedIcon : 'b-fa-calendar-check',
-                    text        : 'Automatic rescheduling',
-                    tooltip     : 'Toggles whether to automatically reschedule overlapping tasks',
-                    cls         : 'reschedule-button',
+                    type: 'button',
+                    toggleable: true,
+                    icon: 'b-fa-calendar',
+                    pressedIcon: 'b-fa-calendar-check',
+                    text: 'Automatic rescheduling',
+                    tooltip:
+                        'Toggles whether to automatically reschedule overlapping tasks',
+                    cls: 'reschedule-button',
                     onToggle({ pressed }) {
                         schedule.autoRescheduleTasks = pressed;
                     }
                 },
                 {
-                    type        : 'buttonGroup',
-                    toggleGroup : true,
-                    items       : [
+                    type: 'buttonGroup',
+                    toggleGroup: true,
+                    items: [
                         {
-                            icon            : 'b-fa-fw b-fa-arrows-alt-v',
-                            pressed         : 'up.isVertical',
-                            tooltip         : 'Vertical mode',
-                            schedulerConfig : {
-                                mode           : 'vertical',
-                                subGridConfigs : {
-                                    locked : {
-                                        minWidth : 100,
-                                        flex     : null
+                            icon: 'b-fa-fw b-fa-arrows-alt-v',
+                            pressed: 'up.isVertical',
+                            tooltip: 'Vertical mode',
+                            schedulerConfig: {
+                                mode: 'vertical',
+                                subGridConfigs: {
+                                    locked: {
+                                        minWidth: 100,
+                                        flex: null
                                     }
                                 }
                             }
                         },
                         {
-                            icon            : 'b-fa-fw b-fa-arrows-alt-h',
-                            pressed         : 'up.isHorizontal',
-                            tooltip         : 'Horizontal mode',
-                            schedulerConfig : {
-                                mode : 'horizontal'
+                            icon: 'b-fa-fw b-fa-arrows-alt-h',
+                            pressed: 'up.isHorizontal',
+                            tooltip: 'Horizontal mode',
+                            schedulerConfig: {
+                                mode: 'horizontal'
                             }
                         }
                     ],
-                    onAction({ source : button }) {
-                        const newConfig = { ...schedule.initialConfig, ...button.schedulerConfig };
+                    onAction({ source: button }) {
+                        const newConfig = {
+                            ...schedule.initialConfig,
+                            ...button.schedulerConfig
+                        };
 
                         // Recreate the scheduler to switch orientation
                         schedule.destroy();
@@ -157,34 +163,34 @@ export default class SchedulerDragFromGirdDemo extends LightningElement {
                     }
                 }
             ]
-        });
+        }));
 
         window.splitter = new Splitter({
             appendTo
         });
 
-        const unplannedGrid = window.unplannedGrid = new UnplannedGrid({
+        const unplannedGrid = (window.unplannedGrid = new UnplannedGrid({
             appendTo,
-            ref         : 'unplanned',
-            flex        : '0 1 400px',
-            title       : 'Unplanned Tasks',
-            collapsible : true,
-            ui          : 'toolbar',
+            ref: 'unplanned',
+            flex: '0 1 400px',
+            title: 'Unplanned Tasks',
+            collapsible: true,
+            ui: 'toolbar',
 
             // Schedulers stores are contained by a project, pass it to the grid to allow it to access them
-            project : schedule.project,
-            store   : {
-                modelClass : Task
+            project: schedule.project,
+            store: {
+                modelClass: Task
             }
-        });
+        }));
 
         // Handles dragging
         window.drag = new Drag({
             schedule,
-            grid         : unplannedGrid,
-            constrain    : false,
-            outerElement : unplannedGrid.element,
-            dragWithin   : appendTo
+            grid: unplannedGrid,
+            constrain: false,
+            outerElement: unplannedGrid.element,
+            dragWithin: appendTo
         });
 
         schedule.project.loadInlineData(projectData);
@@ -198,7 +204,7 @@ export default class SchedulerDragFromGirdDemo extends LightningElement {
                     unplannedGrid.store.add(event);
                 });
             },
-            thisObj : this
+            thisObj: this
         });
     }
 }

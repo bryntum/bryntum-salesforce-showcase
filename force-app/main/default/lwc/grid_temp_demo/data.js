@@ -5,7 +5,7 @@ export const columns = [
         field: 'name',
         flex: 1,
         type: 'template',
-        template: (data) => `Hi ${data.record.data.name}!`,
+        template: (data) => `Hi ${data.record.data.name}!`
     },
     { text: 'Percent', field: 'percent', flex: 1, type: 'percent' },
     {
@@ -22,16 +22,16 @@ export const columns = [
                 cls: 'b-blue b-raised',
                 onAction: ({ source: btn }) => {
                     btn.cellInfo.record.percent++;
-                },
-            },
-        ],
+                }
+            }
+        ]
     },
     {
         text: 'Date',
         field: 'start',
         flex: 1,
         type: 'date',
-        format: 'MMMM Do YYYY',
+        format: 'MMMM Do YYYY'
     },
     { text: 'Time', field: 'time', flex: 1, type: 'time', format: 'LT' },
     {
@@ -40,14 +40,14 @@ export const columns = [
         type: 'template',
         editor: false,
         template: () =>
-            `<a href="//www.bryntum.com" target="_blank">Click me</a>`,
+            `<a href="//www.bryntum.com" target="_blank">Click me</a>`
     },
     {
         type: 'rating',
         text: 'Rating',
         cellCls: 'satisfaction',
         max: 5,
-        field: 'rating',
+        field: 'rating'
     },
     {
         type: 'action',
@@ -60,7 +60,7 @@ export const columns = [
                     if (record.rating > 1) {
                         record.rating--;
                     }
-                },
+                }
             },
             {
                 cls: 'b-fa b-fa-plus-circle',
@@ -69,10 +69,10 @@ export const columns = [
                     if (record.rating < 5) {
                         record.rating++;
                     }
-                },
-            },
-        ],
-    },
+                }
+            }
+        ]
+    }
 ];
 
 export const data = [
@@ -95,7 +95,7 @@ export const data = [
         percent: 13,
         done: false,
         rating: 2,
-        relatedTo: 3,
+        relatedTo: 3
     },
     {
         id: 2,
@@ -116,7 +116,7 @@ export const data = [
         percent: 13,
         done: false,
         rating: 2,
-        relatedTo: 9,
+        relatedTo: 9
     },
     {
         id: 3,
@@ -137,7 +137,7 @@ export const data = [
         percent: 85,
         done: true,
         rating: 3,
-        relatedTo: 3,
+        relatedTo: 3
     },
     {
         id: 4,
@@ -158,7 +158,7 @@ export const data = [
         percent: 30,
         done: true,
         rating: 0,
-        relatedTo: 11,
+        relatedTo: 11
     },
     {
         id: 5,
@@ -179,7 +179,7 @@ export const data = [
         percent: 26,
         done: true,
         rating: 2,
-        relatedTo: 12,
+        relatedTo: 12
     },
     {
         id: 6,
@@ -200,7 +200,7 @@ export const data = [
         percent: 78,
         done: true,
         rating: 4,
-        relatedTo: 6,
+        relatedTo: 6
     },
     {
         id: 7,
@@ -221,7 +221,7 @@ export const data = [
         percent: 64,
         done: true,
         rating: 0,
-        relatedTo: 12,
+        relatedTo: 12
     },
     {
         id: 8,
@@ -242,7 +242,7 @@ export const data = [
         percent: 13,
         done: false,
         rating: 2,
-        relatedTo: 16,
+        relatedTo: 16
     },
     {
         id: 9,
@@ -263,7 +263,7 @@ export const data = [
         percent: 30,
         done: false,
         rating: 3,
-        relatedTo: 11,
+        relatedTo: 11
     },
     {
         id: 10,
@@ -284,7 +284,7 @@ export const data = [
         percent: 24,
         done: false,
         rating: 4,
-        relatedTo: 11,
+        relatedTo: 11
     },
     {
         id: 11,
@@ -305,7 +305,7 @@ export const data = [
         percent: 38,
         done: true,
         rating: 1,
-        relatedTo: 14,
+        relatedTo: 14
     },
     {
         id: 12,
@@ -326,7 +326,7 @@ export const data = [
         percent: 64,
         done: false,
         rating: 1,
-        relatedTo: 18,
+        relatedTo: 18
     },
     {
         id: 13,
@@ -347,7 +347,7 @@ export const data = [
         percent: 99,
         done: true,
         rating: 4,
-        relatedTo: 14,
+        relatedTo: 14
     },
     {
         id: 14,
@@ -368,6 +368,6 @@ export const data = [
         percent: 97,
         done: false,
         rating: 2,
-        relatedTo: 20,
-    },
+        relatedTo: 20
+    }
 ];
