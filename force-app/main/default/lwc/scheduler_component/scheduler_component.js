@@ -13,22 +13,22 @@ export default class Scheduler_component extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-          loadScript(this, SCHEDULER + "/scheduler.lwc.min.js"),
-          loadStyle(this, SCHEDULER + "/scheduler.css"),
-          loadStyle(this, SCHEDULER + "/svalbard.css"),
-          loadStyle(this, SCHEDULER + "/fontawesome/css/fontawesome.css"),
-          loadStyle(this, SCHEDULER + "/fontawesome/css/solid.css")
+          loadScript(this, SCHEDULER + '/scheduler.lwc.min.js'),
+          loadStyle(this, SCHEDULER + '/scheduler.css'),
+          loadStyle(this, SCHEDULER + '/svalbard.css'),
+          loadStyle(this, SCHEDULER + '/fontawesome/css/fontawesome.css'),
+          loadStyle(this, SCHEDULER + '/fontawesome/css/solid.css')
         ])
           .then(() => {
-            console.log(`Bryntum Core version: ${bryntum.getVersion("core")}`);
+            console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
             this.createScheduler();
           })
           .catch((error) => {
             this.dispatchEvent(
               new ShowToastEvent({
-                title: "Error loading Bryntum Scheduler",
+                title: 'Error loading Bryntum Scheduler',
                 message: error,
-                variant: "error"
+                variant: 'error'
               })
             );
           });
@@ -48,17 +48,17 @@ export default class Scheduler_component extends LightningElement {
         } = bryntum.scheduler;
 
         const scheduler = (window.scheduler = new Scheduler({
-          appendTo: this.template.querySelector(".bryntum-root-element"),
-          //tier: "enterprise",
+          appendTo: this.template.querySelector('.bryntum-root-element'),
+          //tier: 'enterprise',
 
           flex: 1,
           smoothZoom: true,
           eventStyle: null,
           eventColor: null,
-          useInitialAnimation: "slide-from-left",
+          useInitialAnimation: 'slide-from-left',
           multiEventSelect: true,
           // Css class used in app styling for animating terminals, can be toggled from the UI
-          cls: "animate-terminals",
+          cls: 'animate-terminals',
 
           features: {
             stripe: true,
@@ -107,9 +107,9 @@ export default class Scheduler_component extends LightningElement {
 
           columns: [
             {
-              text: "Production line",
+              text: 'Production line',
               width: 150,
-              field: "name"
+              field: 'name'
             }
           ],
 
@@ -118,7 +118,7 @@ export default class Scheduler_component extends LightningElement {
 
           //project: {
           //  //autoLoad: false,
-          //  //loadUrl: "data/data.json"
+          //  //loadUrl: 'data/data.json'
           //},
           resourceStore: new ResourceStore({
             data: resources
@@ -131,28 +131,28 @@ export default class Scheduler_component extends LightningElement {
           }),
 
           viewPreset: {
-            base: "hourAndDay",
+            base: 'hourAndDay',
             tickWidth: 25,
             columnLinesFor: 0,
             headers: [
               {
-                unit: "d",
-                align: "center",
-                dateFormat: "ddd DD MMM"
+                unit: 'd',
+                align: 'center',
+                dateFormat: 'ddd DD MMM'
               },
               {
-                unit: "h",
-                align: "center",
-                dateFormat: "HH"
+                unit: 'h',
+                align: 'center',
+                dateFormat: 'HH'
               }
             ]
           },
 
           eventRenderer({ eventRecord, resourceRecord, renderData }) {
-            const bgColor = resourceRecord.bg || "";
+            const bgColor = resourceRecord.bg || '';
 
             renderData.style = `background-color:${bgColor};border-color:${bgColor};color:${resourceRecord.textColor}`;
-            renderData.iconCls.add("fa", `fa-${resourceRecord.icon}`);
+            renderData.iconCls.add('fa', `fa-${resourceRecord.icon}`);
 
             return StringHelper.encodeHtml(eventRecord.name);
           },
@@ -166,21 +166,21 @@ export default class Scheduler_component extends LightningElement {
 
           tbar: [
             {
-              type: "buttongroup",
-              label: "Marker",
-              rendition: "padded",
+              type: 'buttongroup',
+              label: 'Marker',
+              rendition: 'padded',
               toggleGroup: true,
               items: {
                 defaultMarker: {
-                  text: "Default",
+                  text: 'Default',
                   pressed: true,
                   markerDef: null
                 },
                 // These buttons have custom marker definitions (SVG path definitions for the arrow heads)
-                thinMarker: { text: "Thin", markerDef: "M3,0 L8,3 L3,6" },
+                thinMarker: { text: 'Thin', markerDef: 'M3,0 L8,3 L3,6' },
                 circleMarker: {
-                  text: "Circle",
-                  markerDef: "M2,3 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"
+                  text: 'Circle',
+                  markerDef: 'M2,3 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0'
                 }
               },
               onToggle({ source }) {
@@ -195,53 +195,53 @@ export default class Scheduler_component extends LightningElement {
               }
             },
             {
-              ref: "lineSettingsButton",
-              type: "button",
-              text: "Line settings",
+              ref: 'lineSettingsButton',
+              type: 'button',
+              text: 'Line settings',
               menu: {
                 defaults: {
-                  labelWidth: "11em"
+                  labelWidth: '11em'
                 },
                 items: {
                   stroke: {
-                    type: "slider",
+                    type: 'slider',
                     min: 1,
                     max: 3,
                     value: 1,
-                    text: "Stroke",
-                    unit: "px",
+                    text: 'Stroke',
+                    unit: 'px',
                     onInput({ value }) {
                       // scheduler.features.dependencies.radius = value;
                       scheduler.timeAxisSubGridElement.style.setProperty(
-                        "--b-dependency-stroke-width",
+                        '--b-dependency-stroke-width',
                         value
                       );
                     }
                   },
                   radius: {
-                    type: "slider",
+                    type: 'slider',
                     min: 0,
                     max: 10,
                     value: 10,
-                    text: "Radius",
-                    unit: "px",
+                    text: 'Radius',
+                    unit: 'px',
                     onInput({ value }) {
                       scheduler.features.dependencies.radius = value;
                     }
                   },
                   clickWidth: {
-                    type: "slider",
+                    type: 'slider',
                     min: 1,
                     max: 20,
                     value: 10,
-                    text: "Click width",
-                    unit: "px",
+                    text: 'Click width',
+                    unit: 'px',
                     onInput({ value }) {
                       scheduler.features.dependencies.clickWidth = value;
 
                       DomHelper.addTemporaryClass(
                         scheduler.element,
-                        "b-highlight-click-area",
+                        'b-highlight-click-area',
                         1000,
                         scheduler
                       );
@@ -251,22 +251,22 @@ export default class Scheduler_component extends LightningElement {
               }
             },
             {
-              ref: "terminalSettingsButton",
-              type: "button",
-              text: "Terminal settings",
+              ref: 'terminalSettingsButton',
+              type: 'button',
+              text: 'Terminal settings',
               menu: {
                 defaults: {
-                  labelWidth: "12em"
+                  labelWidth: '12em'
                 },
                 items: {
                   size: {
-                    type: "slider",
+                    type: 'slider',
                     min: 10,
                     max: 16,
                     step: 2,
                     value: 14,
-                    text: "Terminal size",
-                    unit: "px",
+                    text: 'Terminal size',
+                    unit: 'px',
                     onInput({ value }) {
                       scheduler.features.dependencies.terminalSize = value;
 
@@ -280,19 +280,19 @@ export default class Scheduler_component extends LightningElement {
 
                       DomHelper.addTemporaryClass(
                         scheduler.element,
-                        "b-highlight-hover-area",
+                        'b-highlight-hover-area',
                         1000,
                         scheduler
                       );
                     }
                   },
                   offset: {
-                    type: "slider",
+                    type: 'slider',
                     min: -8,
                     max: 8,
                     value: 4,
-                    text: "Terminal offset",
-                    unit: "px",
+                    text: 'Terminal offset',
+                    unit: 'px',
                     onInput({ value }) {
                       scheduler.features.dependencies.terminalOffset = value;
 
@@ -307,21 +307,21 @@ export default class Scheduler_component extends LightningElement {
 
                       DomHelper.addTemporaryClass(
                         scheduler.element,
-                        "b-highlight-hover-area",
+                        'b-highlight-hover-area',
                         1000,
                         scheduler
                       );
                     }
                   },
                   animateTerminals: {
-                    type: "checkbox",
-                    text: "Animate terminals",
+                    type: 'checkbox',
+                    text: 'Animate terminals',
                     checked: true,
                     onChange({ checked }) {
                       scheduler.widgetMap.terminalSettingsButton.menu.widgetMap.hideDelay.min =
                         checked ? 300 : 0;
                       scheduler.element.classList.toggle(
-                        "animate-terminals",
+                        'animate-terminals',
                         checked
                       );
                     }
@@ -330,14 +330,14 @@ export default class Scheduler_component extends LightningElement {
               }
             },
 
-            "->",
+            '->',
             {
-              ref: "mouseUpAnywhere",
-              type: "slidetoggle",
+              ref: 'mouseUpAnywhere',
+              type: 'slidetoggle',
               checked: true,
-              icon: "fa fa-square",
-              pressedIcon: "fa fa-check-square",
-              text: "Mouse up anywhere on target",
+              icon: 'fa fa-square',
+              pressedIcon: 'fa fa-check-square',
+              text: 'Mouse up anywhere on target',
               tooltip: `Uncheck to require a drop on a target event bar side circle to define the dependency type.
                        If dropped on the event bar, the defaultValue of the DependencyModel <code>type</code> field will be used to
                        determine the target task side.`,

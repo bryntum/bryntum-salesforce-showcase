@@ -12,22 +12,22 @@ export default class Grid_temp_demo extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-          loadScript(this, GRID + "/grid.lwc.min.js"),
-          loadStyle(this, GRID + "/grid.css"),
-          loadStyle(this, GRID + "/svalbard.css"),
-          loadStyle(this, GRID + "/fontawesome/css/fontawesome.css"),
-          loadStyle(this, GRID + "/fontawesome/css/solid.css")
+          loadScript(this, GRID + '/grid.lwc.min.js'),
+          loadStyle(this, GRID + '/grid.css'),
+          loadStyle(this, GRID + '/svalbard.css'),
+          loadStyle(this, GRID + '/fontawesome/css/fontawesome.css'),
+          loadStyle(this, GRID + '/fontawesome/css/solid.css')
         ])
           .then(() => {
-            console.log(`Bryntum Core version: ${bryntum.getVersion("core")}`);
+            console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
             this.createGrid();
           })
           .catch((error) => {
             this.dispatchEvent(
               new ShowToastEvent({
-                title: "Error loading Bryntum Grid",
+                title: 'Error loading Bryntum Grid',
                 message: error,
-                variant: "error"
+                variant: 'error'
               })
             );
           });

@@ -15,22 +15,22 @@ export default class Gantt_component extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
-          loadScript(this, GANTT + "/gantt.lwc.min.js"),
-          loadStyle(this, GANTT + "/gantt.css"),
-          loadStyle(this, GANTT + "/svalbard.css"),
-          loadStyle(this, GANTT + "/fontawesome/css/fontawesome.css"),
-          loadStyle(this, GANTT + "/fontawesome/css/solid.css")
+          loadScript(this, GANTT + '/gantt.lwc.min.js'),
+          loadStyle(this, GANTT + '/gantt.css'),
+          loadStyle(this, GANTT + '/svalbard.css'),
+          loadStyle(this, GANTT + '/fontawesome/css/fontawesome.css'),
+          loadStyle(this, GANTT + '/fontawesome/css/solid.css')
         ])
           .then(() => {
-            console.log(`Bryntum Core version: ${bryntum.getVersion("core")}`);
+            console.log(`Bryntum Core version: ${bryntum.getVersion('core')}`);
             this.createGantt();
           })
           .catch((error) => {
             this.dispatchEvent(
               new ShowToastEvent({
-                title: "Error loading Bryntum Gantt",
+                title: 'Error loading Bryntum Gantt',
                 message: error,
-                variant: "error"
+                variant: 'error'
               })
             );
           });
@@ -203,7 +203,7 @@ export default class Gantt_component extends LightningElement {
                                     showEventCount : false,
                                     width          : 200
                                 },
-                                // add new "City" column
+                                // add new 'City' column
                                 city : {
                                     text  : 'City',
                                     field : 'city'
