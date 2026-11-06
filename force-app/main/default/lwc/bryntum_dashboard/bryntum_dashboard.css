@@ -1,0 +1,91 @@
+.dashboard {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 11rem);
+    min-height: 720px;
+}
+
+.kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.kpi {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+}
+
+.kpi-alert {
+    border-color: #fe8f7d;
+    background: #fff6f5;
+}
+
+.kpi-value {
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.kpi-label {
+    font-size: 0.8rem;
+    color: #444;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.kpi-hint {
+    font-size: 0.75rem;
+    color: #888;
+}
+
+.views {
+    padding-bottom: 0.5rem;
+}
+
+.bryntum-root-element {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.b-float-root {
+    z-index: 100;
+}
+
+.dashboard-status {
+    display: inline-block;
+    padding: 0.1em 0.6em;
+    border-radius: 1em;
+    font-size: 0.85em;
+    color: #fff;
+    background: #747474;
+}
+
+.dashboard-status-active,
+.dashboard-status-completed {
+    background: #2e844a;
+}
+
+.dashboard-status-planned,
+.dashboard-status-in-progress {
+    background: #0176d3;
+}
+
+.dashboard-status-on-hold {
+    background: #dd7a01;
+}
+
+.dashboard-status-late {
+    background: #ba0517;
+}
+
+.dashboard-over-budget {
+    color: #ba0517;
+    font-weight: 600;
+}

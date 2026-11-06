@@ -137,6 +137,60 @@ license key, set it on the `bryntum` global object in the LWC before the compone
 bryntum.licenseKey = 'key-goes-here';
 ```
 
+## Portfolio dashboard
+
+The **Bryntum Dashboard** tab shows a project portfolio stored in Salesforce: KPI tiles, a grid of the projects, a
+Gantt chart of all tasks and a resource histogram. The buttons above the widgets switch between the overview and a
+full height view of the projects, the Gantt or the resources. The Gantt, the Grid and the histogram all come from the
+`bryntum_gantt` static resource. An Apex controller
+(`BryntumDashboardController`) loads the records in the format of the Bryntum project model. The type, status,
+account and manager columns of the projects grid offer the related records in a combo, nothing else can be entered.
+Changes made in the grid are not saved yet.
+
+### Data model
+
+The data lives in custom objects, one per Bryntum store:
+
+| Object                       | Bryntum store | Notes                                                              |
+|------------------------------|---------------|--------------------------------------------------------------------|
+| `BryntumProject__c`          | Task tree     | Projects are the top level nodes of the Gantt, linked to an Account |
+| `BryntumProjectType__c`      | -             | Project types, offered in the type column of the projects grid     |
+| `BryntumProjectStatus__c`    | -             | Project statuses with a sort order, offered in the status column   |
+| `BryntumTask__c`             | Tasks         | Master-detail to the project, self lookup for the parent task       |
+| `BryntumResource__c`         | Resources     | Role, department, hourly rate and max units                        |
+| `BryntumAssignment__c`       | Assignments   | Task, resource and units                                           |
+| `BryntumDependency__c`       | Dependencies  | FS, SS, FF or SF, with lag                                         |
+| `BryntumCalendar__c`         | Calendars     | With `BryntumCalendarInterval__c` for non-working time             |
+
+Every object has an `ExternalId__c` field, the Account gets a `Bryntum_External_Id__c` field, both are used by the
+data import.
+
+### Generating and importing the dataset
+
+The dataset is generated, not stored in the repository. The generator in `scripts/data/generate-data.js` uses a
+seeded pseudo random generator: the same configuration always produces the same records, a different seed produces a
+different dataset. All parameters, such as the number of projects, tasks, resources and assignments per task, are in
+`scripts/data/config.js`.
+
+1. Generate the CSV files in `data/generated`:
+
+    ```
+    npm run data:generate
+    ```
+
+    Any parameter can be overridden on the command line, for example `npm run data:generate -- --seed 7 --projects 4`.
+
+2. Upload the records to the default org with Bulk API upserts:
+
+    ```
+    npm run data:import
+    ```
+
+    Add `-- --target-org <alias>` to import into another org. The import can be repeated, records are matched on their
+    external ID. To remove all generated records from the org, run `npm run data:clean`.
+
+3. Open the **Bryntum Dashboard** tab in the Bryntum app.
+
 ## Links
 
 - [Salesforce quick start](https://bryntum.com/products/grid/docs/guide/Grid/quick-start/salesforce)

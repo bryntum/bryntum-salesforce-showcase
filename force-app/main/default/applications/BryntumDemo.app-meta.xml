@@ -53,6 +53,10 @@
     <navType>Standard</navType>
     <setupExperience>all</setupExperience>
     <!-- <tabs>standard-home</tabs> -->
+    <tabs>BryntumDashboard</tabs>
+    <tabs>BryntumProject__c</tabs>
+    <tabs>BryntumTask__c</tabs>
+    <tabs>BryntumResource__c</tabs>
     <tabs>BryntumGrid</tabs>
     <tabs>BryntumScheduler</tabs>
     <tabs>BryntumSchedulerDragFromGrid</tabs>
@@ -60,6 +64,8 @@
     <tabs>BryntumCalendar</tabs>
     <tabs>BryntumTaskBoard</tabs>
     <tabs>GridTempDemo</tabs>
+    <tabs>BryntumProjectType__c</tabs>
+    <tabs>BryntumProjectStatus__c</tabs>
     <tabs>SchedulerUnplannedGridDemo</tabs>
     <uiType>Lightning</uiType>
 </CustomApplication>

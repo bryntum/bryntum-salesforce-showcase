@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Portfolio dashboard built with Bryntum Gantt, Grid and Resource Histogram</description>
+    <lwcComponent>bryntum_dashboard</lwcComponent>
+    <label>Bryntum Dashboard</label>
+    <motif>Custom19: Wrench</motif>
+</CustomTab>

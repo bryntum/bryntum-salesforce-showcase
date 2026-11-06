@@ -14,6 +14,9 @@
     "prettier:verify": "prettier --list-different \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
     "postinstall": "husky install",
     "precommit": "lint-staged",
+    "data:generate": "node scripts/data/generate-data.js",
+    "data:import": "node scripts/data/import-data.js",
+    "data:clean": "sf apex run --file scripts/apex/clean-bryntum-data.apex",
     "create-static-resources": "npx bryntum-grid-salesforce && npx bryntum-scheduler-salesforce && npx bryntum-gantt-salesforce && npx bryntum-calendar-salesforce && npx bryntum-taskboard-salesforce"
   },
   "devDependencies": {
