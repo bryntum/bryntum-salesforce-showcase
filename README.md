@@ -151,9 +151,10 @@ sf data update record -s Bryntum_License__c -w "Name='Showcase'" -v "Key__c='<yo
 Both commands target the project default org, pass `-o <alias>` to use another one. Hard reload the components to
 pick up a changed key.
 
-Users need read access to the object and field and access to the `BryntumLicense` Apex class, which the
-`bryntumdemo` permission set grants. If the record is missing, or the user has no access, the components fall back
-to trial mode without failing.
+Users need access to the `BryntumLicense` Apex class, which the `bryntumdemo` permission set grants to internal
+users and the `Demo Profile` guest profile grants to visitors of the Digital Experience site. The class runs in
+system mode, so no record access is needed. If the record is missing, or the user cannot call the class, the
+components fall back to trial mode without failing.
 
 **Option 2: put the key into the code**
 

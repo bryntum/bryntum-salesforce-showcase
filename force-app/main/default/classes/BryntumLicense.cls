@@ -2,12 +2,14 @@
  * Reads the Bryntum license key stored in the org (Bryntum_License__c.Key__c) so it never has to live in source.
  *
  * The query is dynamic on purpose: the class compiles and deploys to an org that does not have the object, and
- * at runtime any failure (object missing, no record, no read access) resolves to null so the components simply
- * run in trial mode.
+ * at runtime any failure (object missing, no record) resolves to null so the components simply run in trial mode.
+ *
+ * It runs without sharing and in system mode so that Experience Cloud guest users, who have no record access,
+ * can still receive the key. The key is shipped to the browser anyway, it is not user data.
  */
-public with sharing class BryntumLicense {
+public without sharing class BryntumLicense {
     @TestVisible
-    private static final String QUERY = 'SELECT Key__c FROM Bryntum_License__c WITH USER_MODE ORDER BY CreatedDate DESC LIMIT 1';
+    private static final String QUERY = 'SELECT Key__c FROM Bryntum_License__c ORDER BY CreatedDate DESC LIMIT 1';
 
     @AuraEnabled(cacheable=true)
     public static String getKey() {
