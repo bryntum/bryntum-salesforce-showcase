@@ -2,6 +2,7 @@
 import { LightningElement } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
+import getLicenseKey from '@salesforce/apex/BryntumLicense.getKey';
 import GANTT from '@salesforce/resourceUrl/bryntum_gantt';
 import initWidgets from './lib/WidgetInitializer.js';
 import TaskModelMixin from './lib/Task';
@@ -15,13 +16,25 @@ export default class Gantt_component extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
+            // Resolves to null when the org has no key, the component then runs in trial mode
+            getLicenseKey().catch(() => null),
             loadScript(this, GANTT + '/gantt.lwc.min.js'),
             loadStyle(this, GANTT + '/gantt.css'),
             loadStyle(this, GANTT + '/svalbard.css'),
             loadStyle(this, GANTT + '/fontawesome/css/fontawesome.css'),
             loadStyle(this, GANTT + '/fontawesome/css/solid.css')
         ])
-            .then(() => {
+            .then(([licenseKey]) => {
+                // Register your Bryntum Enterprise license key here, without a key the component runs in trial mode.
+                // This showcase reads the key from the Bryntum_License__c record in the org, replace it with your own:
+                // bryntum.licenseKey = 'key-goes-here';
+                if (licenseKey) {
+                    bryntum.licenseKey = licenseKey;
+                } else {
+                    console.warn(
+                        'No Bryntum license key found in the org (Bryntum_License__c), running in trial mode'
+                    );
+                }
                 console.log(
                     `Bryntum Core version: ${bryntum.getVersion('core')}`
                 );
@@ -39,9 +52,6 @@ export default class Gantt_component extends LightningElement {
     }
 
     createGantt() {
-        // Register your Bryntum Enterprise license key here, without a key the component runs in trial mode
-        bryntum.licenseKey = 'key-goes-here';
-
         initWidgets();
 
         const project = new bryntum.gantt.ProjectModel({

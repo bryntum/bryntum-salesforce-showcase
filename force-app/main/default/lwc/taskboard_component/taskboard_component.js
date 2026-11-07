@@ -2,6 +2,7 @@
 import { LightningElement } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
+import getLicenseKey from '@salesforce/apex/BryntumLicense.getKey';
 import TASKBOARD from '@salesforce/resourceUrl/bryntum_taskboard';
 import data from './data/data';
 
@@ -13,13 +14,25 @@ export default class Taskboard_component extends LightningElement {
         this.bryntumInitialized = true;
 
         Promise.all([
+            // Resolves to null when the org has no key, the component then runs in trial mode
+            getLicenseKey().catch(() => null),
             loadScript(this, TASKBOARD + '/taskboard.lwc.min.js'),
             loadStyle(this, TASKBOARD + '/taskboard.css'),
             loadStyle(this, TASKBOARD + '/svalbard.css'),
             loadStyle(this, TASKBOARD + '/fontawesome/css/fontawesome.css'),
             loadStyle(this, TASKBOARD + '/fontawesome/css/solid.css')
         ])
-            .then(() => {
+            .then(([licenseKey]) => {
+                // Register your Bryntum Enterprise license key here, without a key the component runs in trial mode.
+                // This showcase reads the key from the Bryntum_License__c record in the org, replace it with your own:
+                // bryntum.licenseKey = 'key-goes-here';
+                if (licenseKey) {
+                    bryntum.licenseKey = licenseKey;
+                } else {
+                    console.warn(
+                        'No Bryntum license key found in the org (Bryntum_License__c), running in trial mode'
+                    );
+                }
                 console.log(
                     `Bryntum Core version: ${bryntum.getVersion('core')}`
                 );
@@ -37,9 +50,6 @@ export default class Taskboard_component extends LightningElement {
     }
 
     createTaskBoard() {
-        // Register your Bryntum Enterprise license key here, without a key the component runs in trial mode
-        bryntum.licenseKey = 'key-goes-here';
-
         const project = new bryntum.taskboard.ProjectModel({
             tasks: data.tasks.rows
         });

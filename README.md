@@ -129,13 +129,47 @@ sf project deploy start --source-dir force-app/main/default/staticresources
 ### Registering the license key
 
 The Salesforce packages are available only for the Enterprise tier and are valid only with an Enterprise license.
-Without a license key the components run in trial mode, which is fully functional for 14 days. To register your
-license key, set it on the `bryntum` global object in the LWC before the component is created, for example in
-`createGrid()` in `force-app/main/default/lwc/grid_component/grid_component.js`:
+Without a license key the components run in trial mode, which is fully functional for 14 days. The key can be
+registered in one of two ways: loaded from the org, or put into the code directly.
+
+**Option 1: load the key from the org (default)**
+
+The key is kept out of source. Each component calls the `BryntumLicense.getKey()` Apex method on load, which reads
+the key from the `Bryntum License` custom object (`Bryntum_License__c.Key__c`) and assigns it to `bryntum.licenseKey`
+before the component is created. To store your key in the org, create a single record:
+
+```
+sf data create record -s Bryntum_License__c -v "Name='Showcase' Key__c='<your license key>'"
+```
+
+To replace it later:
+
+```
+sf data update record -s Bryntum_License__c -w "Name='Showcase'" -v "Key__c='<your new license key>'"
+```
+
+Both commands target the project default org, pass `-o <alias>` to use another one. Hard reload the components to
+pick up a changed key.
+
+Users need read access to the object and field and access to the `BryntumLicense` Apex class, which the
+`bryntumdemo` permission set grants. If the record is missing, or the user has no access, the components fall back
+to trial mode without failing.
+
+**Option 2: put the key into the code**
+
+Replace the org lookup where each component assigns the key, for example in
+`force-app/main/default/lwc/grid_component/grid_component.js`:
 
 ```javascript
-bryntum.licenseKey = 'key-goes-here';
+// Register your Bryntum Enterprise license key here, without a key the component runs in trial mode.
+// This showcase reads the key from the Bryntum_License__c record in the org, replace it with your own:
+// bryntum.licenseKey = 'key-goes-here';
+if (licenseKey) {
+    bryntum.licenseKey = licenseKey;
+}
 ```
+
+Keep in mind that a key committed to source is visible to everyone with access to the repository.
 
 ## Links
 
