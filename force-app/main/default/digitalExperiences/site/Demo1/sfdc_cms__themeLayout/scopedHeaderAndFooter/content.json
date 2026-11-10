@@ -27,7 +27,7 @@
             "layoutDirectionTablet" : "row",
             "maxContentWidth" : "",
             "sectionColumnGutterWidth" : "",
-            "sectionConfig" : "{\"UUID\":\"57048ebb-3327-49c6-82d2-996d3f765f23\",\"columns\":[{\"UUID\":\"a257ff24-4577-4aa5-88ea-dcbde6d0f907\",\"columnName\":\"Logo\",\"columnKey\":\"headerSection\",\"columnWidth\":\"2\",\"seedComponents\":null},{\"UUID\":\"d437941a-4737-4260-80ab-123101d00989\",\"columnName\":\"Navigation\",\"columnKey\":\"e144d\",\"columnWidth\":\"10\",\"seedComponents\":[]}]}",
+            "sectionConfig" : "{\"UUID\":\"57048ebb-3327-49c6-82d2-996d3f765f23\",\"columns\":[{\"UUID\":\"a257ff24-4577-4aa5-88ea-dcbde6d0f907\",\"columnName\":\"Logo\",\"columnKey\":\"headerSection\",\"columnWidth\":\"1\",\"seedComponents\":null},{\"UUID\":\"d437941a-4737-4260-80ab-123101d00989\",\"columnName\":\"Navigation\",\"columnKey\":\"e144d\",\"columnWidth\":\"11\",\"seedComponents\":[]}]}",
             "sectionMinHeight" : "",
             "sectionVerticalAlign" : "center"
           },
