@@ -3,16 +3,16 @@
   "edition": "developer",
   "country": "US",
   "language": "en_US",
-  "features": ["EnableSetPasswordInApi", "Communities"],
+  "features": ["EnableSetPasswordInApi", "Communities", "Sites"],
   "settings": {
-    "lightningExperienceSettings": {
-      "enableS1DesktopEnabled": true
-    },
-    "mobileSettings": {
-      "enableS1EncryptedStoragePref2": false
-    },
-    "communitiesSettings": {
-      "enableNetworksEnabled": true
-    }
+      "lightningExperienceSettings": {
+          "enableS1DesktopEnabled": true
+      },
+      "mobileSettings": {
+          "enableS1EncryptedStoragePref2": false
+      },
+      "communitiesSettings": {
+          "enableNetworksEnabled": true
+      }
   }
 }
