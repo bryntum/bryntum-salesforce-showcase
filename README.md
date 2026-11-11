@@ -172,6 +172,35 @@ if (licenseKey) {
 
 Keep in mind that a key committed to source is visible to everyone with access to the repository.
 
+### Favicon and logo of the demo site
+
+Both images are asset files in `force-app/main/default/contentassets` and are deployed with the rest of the metadata,
+so no upload through Experience Builder is needed. Guests load them from the site under
+`/demo/sfsites/c/file-asset/<asset name>`.
+
+- The favicon is `bryntum_favicon` (64x64 PNG). The Build Your Own (LWR) template has no favicon setting, so it is
+  registered through the head markup in
+  `force-app/main/default/digitalExperiences/site/Demo1/sfdc_cms__appPage/mainAppPage/content.json`
+  (Experience Builder: Settings, Advanced, Edit Head Markup).
+- The header logo is `bryntum_logo_white`, the white Bryntum wordmark, shown by the Site Logo component in the
+  header theme layout
+  `force-app/main/default/digitalExperiences/site/Demo1/sfdc_cms__themeLayout/scopedHeaderAndFooter/content.json`.
+  Its `imageInfo` attribute points at the asset URL instead of a CMS image, which keeps the logo out of the org's
+  CMS workspace and makes the site reproducible from the repo. On phones the component switches to the blue square
+  mark `bryntum_logo` through `imageInfoMobile`, and a media query in the head markup drops the blue bar background
+  there so the square logo sits on a plain header. The Site Logo component caps the image height at 25px on phones
+  inside its own shadow DOM, so the mobile logo width is set to 25 as well; a larger value only adds empty space. The standard navigation bar cannot hold an image, so the header
+  section itself is the brand bar: a 2/12 logo column and a 10/12 navigation column laid out as a row on every
+  device size (a 1/12 column squeezes the logo below 90px on small desktops), the CSS class `bryntum-header` whose blue background is defined in the head markup, and a transparent
+  navigation bar so both sit on one strip.
+- The layout has a device-specific Mobile version, stored as `mobile/mobile.json` next to `content.json`. Device
+  versions are only retrieved and deployed with API version 64 or later, which is why `sourceApiVersion` in
+  `sfdx-project.json` is 64.0. Deploying the layout with an older API version fails with "We can't delete some device
+  versions".
+
+To swap either image, replace the `.asset` file, deploy `force-app/main/default/contentassets`, and publish the site
+with `sf community publish -n Demo`.
+
 ## Links
 
 - [Salesforce quick start](https://bryntum.com/products/grid/docs/guide/Grid/quick-start/salesforce)
