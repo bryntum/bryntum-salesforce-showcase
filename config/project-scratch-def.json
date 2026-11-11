@@ -3,7 +3,7 @@
   "edition": "developer",
   "country": "US",
   "language": "en_US",
-  "features": ["EnableSetPasswordInApi", "Communities", "Sites", "SiteDotCom"],
+  "features": ["EnableSetPasswordInApi", "Communities", "Sites"],
   "settings": {
       "lightningExperienceSettings": {
           "enableS1DesktopEnabled": true
@@ -13,9 +13,6 @@
       },
       "communitiesSettings": {
           "enableNetworksEnabled": true
-      },
-      "orgPreferenceSettings": {
-          "networksEnabled": true
       }
   }
 }
