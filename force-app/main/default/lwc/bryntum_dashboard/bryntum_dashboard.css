@@ -2,49 +2,8 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 11rem);
+    height: 100vh;
     min-height: 720px;
-}
-
-.kpis {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 0.75rem;
-    padding-bottom: 0.75rem;
-}
-
-.kpi {
-    background: #fff;
-    border: 1px solid #e5e5e5;
-    border-radius: 0.5rem;
-    padding: 0.75rem 1rem;
-}
-
-.kpi-alert {
-    border-color: #fe8f7d;
-    background: #fff6f5;
-}
-
-.kpi-value {
-    font-size: 1.6rem;
-    font-weight: 600;
-    line-height: 1.2;
-}
-
-.kpi-label {
-    font-size: 0.8rem;
-    color: #444;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-}
-
-.kpi-hint {
-    font-size: 0.75rem;
-    color: #888;
-}
-
-.views {
-    padding-bottom: 0.5rem;
 }
 
 .bryntum-root-element {

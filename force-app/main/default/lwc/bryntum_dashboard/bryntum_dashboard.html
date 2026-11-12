@@ -3,28 +3,6 @@
         <template if:true={loading}>
             <lightning-spinner alternative-text="Loading the portfolio" size="medium"></lightning-spinner>
         </template>
-        <div class="kpis">
-            <template for:each={kpis} for:item="kpi">
-                <div key={kpi.key} class={kpi.cls}>
-                    <div class="kpi-value">{kpi.value}</div>
-                    <div class="kpi-label">{kpi.label}</div>
-                    <div class="kpi-hint">{kpi.hint}</div>
-                </div>
-            </template>
-        </div>
-        <div class="views">
-            <lightning-button-group>
-                <template for:each={viewButtons} for:item="button">
-                    <lightning-button
-                        key={button.name}
-                        label={button.label}
-                        variant={button.variant}
-                        data-view={button.name}
-                        onclick={handleViewClick}
-                    ></lightning-button>
-                </template>
-            </lightning-button-group>
-        </div>
         <div class="bryntum-root-element" lwc:dom="manual"></div>
     </div>
 </template>

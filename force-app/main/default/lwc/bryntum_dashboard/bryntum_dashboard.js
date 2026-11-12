@@ -1,211 +1,179 @@
 /* globals bryntum : true */
-import { LightningElement } from 'lwc';
+import { LightningElement, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
-import GANTT from '@salesforce/resourceUrl/bryntum_gantt';
-import getPortfolioData from '@salesforce/apex/BryntumDashboardController.getPortfolioData';
-
-const DAY = 24 * 60 * 60 * 1000;
-
-const currencyFormat = {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0
-};
+import {
+    getPortfolio,
+    loadStyles,
+    registerWidget,
+    findWidget,
+    selectProject,
+    TASK_STATUSES,
+    TASK_PRIORITIES,
+    DEPARTMENTS,
+    currencyFormat,
+    errorMessage,
+    childrenOf,
+    leavesOf
+} from 'c/bryntumPortfolio';
 
 /**
- * Portfolio dashboard: KPI tiles, a grid of projects, a Gantt chart of all tasks and a resource histogram, all built
- * from the records of the Bryntum custom objects. The Bryntum widgets come from the bryntum_gantt static resource,
- * which also contains the Grid and the Scheduler Pro classes.
+ * One view of the Bryntum dashboard: the projects grid, the Gantt timeline or the resource histogram, chosen with
+ * the "view" property in the Lightning App Builder. The Bryntum Dashboard page shows the Salesforce portfolio
+ * dashboard in its first tab and one instance of this component in each of the other tabs. All instances share the
+ * project model of the c/bryntumPortfolio module, so an edit in one tab shows up in the others and every change is
+ * saved to Salesforce through the project's auto sync.
  */
 export default class Bryntum_dashboard extends LightningElement {
-    kpis = [];
+    // projects | timeline | resources
+    @api view = 'projects';
     loading = true;
-    view = 'overview';
-
-    views = [
-        { name: 'overview', label: 'Overview' },
-        { name: 'projects', label: 'Projects' },
-        { name: 'gantt', label: 'Gantt' },
-        { name: 'resources', label: 'Resources' }
-    ];
-
-    get viewButtons() {
-        return this.views.map((view) => ({
-            ...view,
-            variant: view.name === this.view ? 'brand' : 'neutral'
-        }));
-    }
-
-    handleViewClick(event) {
-        this.showView(event.currentTarget.dataset.view);
-    }
 
     renderedCallback() {
-        if (this.bryntumInitialized) {
+        if (this.initialized) {
             return;
         }
-        this.bryntumInitialized = true;
+        this.initialized = true;
 
         Promise.all([
-            loadScript(this, GANTT + '/gantt.lwc.min.js'),
-            loadStyle(this, GANTT + '/gantt.css'),
-            loadStyle(this, GANTT + '/svalbard.css'),
-            loadStyle(this, GANTT + '/fontawesome/css/fontawesome.css'),
-            loadStyle(this, GANTT + '/fontawesome/css/solid.css'),
-            getPortfolioData()
+            loadStyles(this),
+            getPortfolio(this, (message) =>
+                this.toast('Could not save the changes to Salesforce', message)
+            )
         ])
-            .then((results) => {
-                this.createDashboard(JSON.parse(results[5]));
+            .then(([, portfolio]) => {
+                this.portfolio = portfolio;
+                this.createWidget();
+                return portfolio.ready;
             })
-            .catch((error) => {
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Error loading the Bryntum dashboard',
-                        message:
-                            error?.body?.message ||
-                            error?.message ||
-                            String(error),
-                        variant: 'error'
-                    })
-                );
-            })
+            .then(() => this.afterReady())
+            .catch((error) =>
+                this.toast('Error loading the Bryntum dashboard', error)
+            )
             .finally(() => {
                 this.loading = false;
             });
     }
 
     disconnectedCallback() {
-        this.histogram?.destroy();
-        this.gantt?.destroy();
-        this.grid?.destroy();
-        this.project?.destroy();
+        this.detachDataReady?.();
+        this.unregister?.();
+        this.widget?.destroy();
     }
 
-    createDashboard(data) {
-        // Register your Bryntum Enterprise license key here, without a key the component runs in trial mode
-        bryntum.licenseKey = 'key-goes-here';
+    toast(title, error) {
+        this.dispatchEvent(
+            new ShowToastEvent({
+                title,
+                message: errorMessage(error),
+                variant: 'error'
+            })
+        );
+    }
 
-        const {
-            ProjectModel,
-            TaskModel,
-            ResourceModel,
-            Grid,
-            Gantt,
-            ResourceHistogram,
-            Splitter,
-            DateHelper,
-            StringHelper
-        } = bryntum.gantt;
+    createWidget() {
         const root = this.template.querySelector('.bryntum-root-element');
-        const today = DateHelper.clearTime(new Date());
-
-        // Extra fields that come from the Salesforce records
-        class DashboardTask extends TaskModel {
-            static get fields() {
-                return [
-                    'projectId',
-                    'isProject',
-                    'status',
-                    'priority',
-                    'complexity',
-                    'plannedCost'
-                ];
-            }
+        if (this.view === 'timeline') {
+            this.widget = this.createGantt(root);
+        } else if (this.view === 'resources') {
+            this.widget = this.createHistogram(root);
+        } else {
+            this.widget = this.createGrid(root);
         }
+        this.unregister = registerWidget(this.widget);
+    }
 
-        class DashboardResource extends ResourceModel {
-            static get fields() {
-                return [
-                    'role',
-                    'department',
-                    'city',
-                    'email',
-                    'hourlyRate',
-                    'maxUnits'
-                ];
-            }
+    afterReady() {
+        const { widget, portfolio } = this;
+        if (this.view === 'timeline') {
+            widget.scrollToDate(portfolio.today, { block: 'center' });
+        } else if (this.view === 'projects') {
+            widget.refreshRows();
         }
+    }
 
-        const generalCalendar = data.calendars.rows.find(
-            (calendar) => calendar.name === 'General'
-        );
+    statusRenderer({ value }) {
+        if (!value) {
+            return '';
+        }
+        const cls = value.toLowerCase().replace(/\s+/g, '-');
+        return `<span class="dashboard-status dashboard-status-${cls}">${bryntum.gantt.StringHelper.encodeHtml(value)}</span>`;
+    }
 
-        const project = (this.project = new ProjectModel({
-            taskModelClass: DashboardTask,
-            resourceModelClass: DashboardResource,
-            calendar: generalCalendar?.id,
-            hoursPerDay: 24,
-            daysPerWeek: 5,
-            daysPerMonth: 20,
-            // Keeps the stored start dates of tasks without predecessors
-            autoSetConstraints: true,
-            calendars: data.calendars.rows,
-            tasks: this.buildTaskTree(data.tasks.rows),
-            resources: data.resources.rows,
-            assignments: data.assignments.rows,
-            dependencies: data.dependencies.rows
-        }));
-
-        const summaries = this.summarizeProjects(data, today);
-        this.kpis = this.calculateKpis(data, summaries, today);
-
-        const statusRenderer = ({ value }) => {
-            if (!value) {
-                return '';
-            }
-            const cls = value.toLowerCase().replace(/\s+/g, '-');
-            return `<span class="dashboard-status dashboard-status-${cls}">${StringHelper.encodeHtml(value)}</span>`;
+    pickColumn(text, field, values, extra = {}) {
+        return {
+            text,
+            field,
+            editor: { type: 'combo', editable: false, items: values },
+            ...extra
         };
+    }
 
-        // Lookup columns show the name of the related record and offer the allowed records in a combo, no free text
-        const lookupColumn = (text, field, entities, extra = {}) => {
-            const names = new Map(
-                entities.map((entity) => [entity.id, entity.name])
+    // Lookup columns show the name of the related record and offer the allowed records in a combo, no free text
+    lookupColumn(text, field, entities, extra = {}) {
+        const names = new Map(
+            entities.map((entity) => [entity.id, entity.name])
+        );
+        return {
+            text,
+            field,
+            renderer: ({ value }) => names.get(value) || '',
+            editor: {
+                type: 'combo',
+                editable: false,
+                items: entities.map((entity) => ({
+                    id: entity.id,
+                    text: entity.name
+                }))
+            },
+            ...extra
+        };
+    }
+
+    /**
+     * The projects grid lists the project nodes of the shared task store, edits go straight into the same records
+     */
+    createGrid(root) {
+        const { Grid } = bryntum.gantt;
+        const { project, data, statusNames, today } = this.portfolio;
+        const projectStore = project.taskStore.chain(
+            (record) => record.isProject
+        );
+        const plannedCostOf = (node) =>
+            childrenOf(node).reduce(
+                (sum, child) => sum + (child.plannedCost || 0),
+                0
             );
-            return {
-                text,
-                field,
-                renderer: ({ value }) => names.get(value) || '',
-                editor: {
-                    type: 'combo',
-                    editable: false,
-                    items: entities.map((entity) => ({
-                        id: entity.id,
-                        text: entity.name
-                    }))
-                },
-                ...extra
-            };
-        };
-        const statusNames = new Map(
-            data.projectStatuses.map((status) => [status.id, status.name])
-        );
+        const overdueOf = (node) =>
+            leavesOf(node).filter(
+                (task) =>
+                    !task.isProject &&
+                    task.endDate < today &&
+                    task.percentDone < 100
+            ).length;
 
-        const grid = (this.grid = new Grid({
+        const grid = new Grid({
             appendTo: root,
             cls: 'dashboard-projects',
-            flex: '0 0 230px',
-            minHeight: 150,
+            flex: '1 1 0',
             rowHeight: 36,
-            store: { data: summaries },
+            store: projectStore,
             selectionMode: { row: true, multiSelect: false },
             columns: [
                 { text: 'Project', field: 'name', flex: 2, minWidth: 180 },
-                lookupColumn('Type', 'typeId', data.projectTypes, {
+                this.lookupColumn('Type', 'typeId', data.projectTypes, {
                     width: 120
                 }),
-                lookupColumn('Status', 'statusId', data.projectStatuses, {
+                this.lookupColumn('Status', 'statusId', data.projectStatuses, {
                     width: 110,
                     htmlEncode: false,
                     renderer: ({ value }) =>
-                        statusRenderer({ value: statusNames.get(value) })
+                        this.statusRenderer({ value: statusNames.get(value) })
                 }),
-                lookupColumn('Account', 'accountId', data.accounts, {
+                this.lookupColumn('Account', 'accountId', data.accounts, {
                     flex: 1,
                     minWidth: 130
                 }),
-                lookupColumn('Manager', 'managerId', data.managers, {
+                this.lookupColumn('Manager', 'managerId', data.managers, {
                     width: 150
                 }),
                 {
@@ -213,20 +181,24 @@ export default class Bryntum_dashboard extends LightningElement {
                     text: 'Start',
                     field: 'startDate',
                     width: 110,
-                    format: 'MMM D, YYYY'
+                    format: 'MMM D, YYYY',
+                    // Calculated from the tasks by the scheduling engine
+                    editor: false
                 },
                 {
                     type: 'date',
                     text: 'End',
                     field: 'endDate',
                     width: 110,
-                    format: 'MMM D, YYYY'
+                    format: 'MMM D, YYYY',
+                    editor: false
                 },
                 {
                     type: 'percent',
                     text: 'Progress',
                     field: 'percentDone',
-                    width: 120
+                    width: 120,
+                    editor: false
                 },
                 {
                     type: 'number',
@@ -238,10 +210,11 @@ export default class Bryntum_dashboard extends LightningElement {
                 {
                     type: 'number',
                     text: 'Planned cost',
-                    field: 'plannedCost',
                     width: 120,
                     format: currencyFormat,
-                    renderer({ value, record, cellElement, column }) {
+                    editor: false,
+                    renderer({ record, cellElement, column }) {
+                        const value = plannedCostOf(record);
                         cellElement.classList.toggle(
                             'dashboard-over-budget',
                             value > record.budget
@@ -252,15 +225,19 @@ export default class Bryntum_dashboard extends LightningElement {
                 {
                     type: 'number',
                     text: 'Tasks',
-                    field: 'taskCount',
-                    width: 80
+                    width: 80,
+                    editor: false,
+                    renderer: ({ record }) =>
+                        leavesOf(record).filter((task) => !task.isProject)
+                            .length
                 },
                 {
                     type: 'number',
                     text: 'Overdue',
-                    field: 'overdue',
                     width: 90,
-                    renderer({ value, cellElement }) {
+                    editor: false,
+                    renderer({ record, cellElement }) {
+                        const value = overdueOf(record);
                         cellElement.classList.toggle(
                             'dashboard-over-budget',
                             value > 0
@@ -271,31 +248,29 @@ export default class Bryntum_dashboard extends LightningElement {
             ],
             listeners: {
                 selectionChange: ({ selected }) =>
-                    this.selectProject(selected[0]?.id)
+                    selectProject(this.portfolio, selected[0]?.id)
             }
-        }));
+        });
 
-        this.splitters = [new Splitter({ appendTo: root })];
+        // The engine fills in the dates and progress of the project nodes after the grid first painted them
+        this.detachDataReady = project.on({
+            dataReady: () => grid.refreshRows(),
+            thisObj: this
+        });
+        return grid;
+    }
 
-        const taskDates = data.tasks.rows.filter((task) => task.startDate);
-        const firstDate = new Date(
-            Math.min(
-                ...taskDates.map((task) => new Date(task.startDate).getTime())
-            )
-        );
-        const lastDate = new Date(
-            Math.max(
-                ...taskDates.map((task) => new Date(task.endDate).getTime())
-            )
-        );
+    createGantt(root) {
+        const { Gantt, DateHelper } = bryntum.gantt;
+        const { project, today, firstDate, lastDate } = this.portfolio;
 
-        const gantt = (this.gantt = new Gantt({
+        const gantt = new Gantt({
             appendTo: root,
-            flex: 2,
-            minHeight: 250,
+            flex: 1,
             project,
-            readOnly: true,
             dependencyIdField: 'sequenceNumber',
+            // A fixed width for the columns leaves room for the timeline
+            subGridConfigs: { locked: { width: 620 } },
             startDate: DateHelper.add(firstDate, -7, 'day'),
             endDate: DateHelper.add(lastDate, 14, 'day'),
             viewPreset: 'weekAndDayLetter',
@@ -303,13 +278,11 @@ export default class Bryntum_dashboard extends LightningElement {
             rowHeight: 36,
             columns: [
                 { type: 'name', width: 280 },
-                {
-                    text: 'Status',
-                    field: 'status',
+                this.pickColumn('Status', 'status', TASK_STATUSES, {
                     width: 110,
                     htmlEncode: false,
-                    renderer: statusRenderer
-                },
+                    renderer: this.statusRenderer
+                }),
                 { type: 'startdate', width: 110 },
                 { type: 'enddate', width: 110 },
                 { type: 'duration', width: 90 },
@@ -323,7 +296,9 @@ export default class Bryntum_dashboard extends LightningElement {
                     format: currencyFormat
                 },
                 { type: 'deadlinedate', width: 110 },
-                { text: 'Priority', field: 'priority', width: 90 }
+                this.pickColumn('Priority', 'priority', TASK_PRIORITIES, {
+                    width: 90
+                })
             ],
             features: {
                 baselines: false,
@@ -339,7 +314,13 @@ export default class Bryntum_dashboard extends LightningElement {
                     type: 'button',
                     text: 'All projects',
                     icon: 'fa fa-layer-group',
-                    onClick: () => grid.deselectAll()
+                    tooltip: 'Show the tasks of all projects',
+                    onClick: () => {
+                        findWidget(
+                            (widget) => widget.type === 'grid'
+                        )?.deselectAll();
+                        selectProject(this.portfolio, null);
+                    }
                 },
                 {
                     type: 'button',
@@ -390,17 +371,22 @@ export default class Bryntum_dashboard extends LightningElement {
                     onClick: () => gantt.zoomIn()
                 }
             ]
-        }));
+        });
+        return gantt;
+    }
 
-        this.splitters.push(new Splitter({ appendTo: root }));
+    createHistogram(root) {
+        const { ResourceHistogram, DateHelper } = bryntum.gantt;
+        const { project, firstDate, lastDate } = this.portfolio;
 
-        this.histogram = new ResourceHistogram({
+        return new ResourceHistogram({
             appendTo: root,
             flex: 1,
-            minHeight: 180,
             project,
-            partner: gantt,
-            readOnly: true,
+            subGridConfigs: { locked: { width: 420 } },
+            startDate: DateHelper.add(firstDate, -7, 'day'),
+            endDate: DateHelper.add(lastDate, 14, 'day'),
+            viewPreset: 'weekAndDayLetter',
             rowHeight: 40,
             showBarTip: true,
             showMaxEffort: true,
@@ -412,257 +398,17 @@ export default class Bryntum_dashboard extends LightningElement {
                     showEventCount: false,
                     showImage: false,
                     showRole: 'role',
-                    width: 240
+                    width: 200
                 },
-                { text: 'Department', field: 'department', width: 120 },
-                { text: 'City', field: 'city', width: 110 }
+                this.pickColumn('Department', 'department', DEPARTMENTS, {
+                    width: 110
+                }),
+                { text: 'City', field: 'city', width: 100 }
             ],
             features: {
                 group: 'department',
                 scheduleTooltip: false
             }
         });
-
-        // Open the timeline around today once the engine has calculated the schedule
-        project
-            .commitAsync()
-            .then(() => gantt.scrollToDate(today, { block: 'center' }));
-    }
-
-    /**
-     * Nests the flat task rows (linked with parentId) into a tree with children arrays
-     */
-    buildTaskTree(rows) {
-        const byId = new Map(
-            rows.map((row) => [row.id, { ...row, children: [] }])
-        );
-        const roots = [];
-        byId.forEach((node) => {
-            const parent = node.parentId ? byId.get(node.parentId) : null;
-            if (parent) {
-                parent.children.push(node);
-            } else {
-                roots.push(node);
-            }
-        });
-        const byIndex = (a, b) =>
-            (a.orderedParentIndex || 0) - (b.orderedParentIndex || 0);
-        byId.forEach((node) => {
-            node.children.sort(byIndex);
-            if (!node.children.length) {
-                delete node.children;
-            }
-        });
-        return roots.sort(byIndex);
-    }
-
-    /**
-     * Rolls the task data up per project for the projects grid
-     */
-    summarizeProjects(data, today) {
-        const tasks = data.tasks.rows.filter((task) => !task.isProject);
-        const parentIds = new Set(tasks.map((task) => task.parentId));
-
-        return data.projects.map((project) => {
-            const projectTasks = tasks.filter(
-                (task) => task.projectId === project.id
-            );
-            const leaves = projectTasks.filter(
-                (task) => !parentIds.has(task.id)
-            );
-            const phases = projectTasks.filter(
-                (task) => task.parentId === project.id
-            );
-            const totalDuration = phases.reduce(
-                (sum, task) => sum + (task.duration || 0),
-                0
-            );
-
-            return {
-                ...project,
-                startDate: project.startDate
-                    ? new Date(project.startDate)
-                    : null,
-                endDate: project.endDate ? new Date(project.endDate) : null,
-                taskCount: leaves.length,
-                overdue: leaves.filter(
-                    (task) =>
-                        new Date(task.endDate) < today && task.percentDone < 100
-                ).length,
-                plannedCost: phases.reduce(
-                    (sum, task) => sum + (task.plannedCost || 0),
-                    0
-                ),
-                percentDone: totalDuration
-                    ? Math.round(
-                          phases.reduce(
-                              (sum, task) =>
-                                  sum +
-                                  (task.percentDone || 0) *
-                                      (task.duration || 0),
-                              0
-                          ) / totalDuration
-                      )
-                    : 0
-            };
-        });
-    }
-
-    /**
-     * Calculates the numbers for the KPI tiles
-     */
-    calculateKpis(data, summaries, today) {
-        const tasks = data.tasks.rows.filter((task) => !task.isProject);
-        const parentIds = new Set(tasks.map((task) => task.parentId));
-        const leaves = tasks.filter((task) => !parentIds.has(task.id));
-        const taskById = new Map(leaves.map((task) => [task.id, task]));
-        const resourceById = new Map(
-            data.resources.rows.map((resource) => [resource.id, resource])
-        );
-
-        // Allocation per resource and day in the next 30 days, to find the overallocated resources
-        const windowStart = today.getTime();
-        const windowEnd = windowStart + 30 * DAY;
-        const allocation = new Map();
-        data.assignments.rows.forEach((assignment) => {
-            const task = taskById.get(assignment.event);
-            if (!task || task.percentDone >= 100) {
-                return;
-            }
-            const days = allocation.get(assignment.resource) || new Map();
-            allocation.set(assignment.resource, days);
-            const start = Math.max(
-                new Date(task.startDate).getTime(),
-                windowStart
-            );
-            const end = Math.min(new Date(task.endDate).getTime(), windowEnd);
-            for (let time = start; time < end; time += DAY) {
-                days.set(
-                    time,
-                    (days.get(time) || 0) + (assignment.units || 100)
-                );
-            }
-        });
-        let overallocated = 0;
-        allocation.forEach((days, resourceId) => {
-            const maxUnits = resourceById.get(resourceId)?.maxUnits || 100;
-            if ([...days.values()].some((units) => units > maxUnits)) {
-                overallocated++;
-            }
-        });
-
-        const budget = summaries.reduce(
-            (sum, project) => sum + (project.budget || 0),
-            0
-        );
-        const plannedCost = summaries.reduce(
-            (sum, project) => sum + project.plannedCost,
-            0
-        );
-        const overdue = summaries.reduce(
-            (sum, project) => sum + project.overdue,
-            0
-        );
-        const inProgress = leaves.filter(
-            (task) => task.status === 'In Progress'
-        ).length;
-        const completed = leaves.filter(
-            (task) => task.percentDone >= 100
-        ).length;
-        const dueThisMonth = leaves.filter((task) => {
-            const end = new Date(task.endDate);
-            return (
-                task.percentDone < 100 &&
-                end >= today &&
-                end < new Date(today.getFullYear(), today.getMonth() + 1, 1)
-            );
-        }).length;
-        const money = new Intl.NumberFormat('en-US', currencyFormat);
-
-        return [
-            {
-                key: 'projects',
-                label: 'Active projects',
-                value: summaries.filter(
-                    (project) => project.status === 'Active'
-                ).length,
-                hint: `${summaries.length} projects in total`
-            },
-            {
-                key: 'tasks',
-                label: 'Tasks in progress',
-                value: inProgress,
-                hint: `${completed} of ${leaves.length} tasks completed`
-            },
-            {
-                key: 'overdue',
-                label: 'Overdue tasks',
-                value: overdue,
-                hint: `${dueThisMonth} more due this month`,
-                cls: overdue ? 'kpi kpi-alert' : 'kpi'
-            },
-            {
-                key: 'budget',
-                label: 'Planned cost vs budget',
-                value: budget
-                    ? `${Math.round((plannedCost / budget) * 100)}%`
-                    : '-',
-                hint: `${money.format(plannedCost)} of ${money.format(budget)}`,
-                cls: plannedCost > budget ? 'kpi kpi-alert' : 'kpi'
-            },
-            {
-                key: 'resources',
-                label: 'Overallocated next 30 days',
-                value: overallocated,
-                hint: `${data.resources.rows.length} resources in the pool`,
-                cls: overallocated ? 'kpi kpi-alert' : 'kpi'
-            }
-        ].map((kpi) => ({ cls: 'kpi', ...kpi }));
-    }
-
-    /**
-     * Shows all widgets (overview) or one of them using the full height
-     */
-    showView(view) {
-        this.view = view;
-        if (!this.grid) {
-            return;
-        }
-        const overview = view === 'overview';
-        this.grid.hidden = !overview && view !== 'projects';
-        this.gantt.hidden = !overview && view !== 'gantt';
-        this.histogram.hidden = !overview && view !== 'resources';
-        this.splitters.forEach((splitter) => (splitter.hidden = !overview));
-        // The projects grid has a fixed height in the overview and fills the dashboard on its own
-        this.grid.element.style.flex = overview ? '0 0 230px' : '1 1 0';
-    }
-
-    /**
-     * Shows the tasks and the resources of one project, or everything when no project is selected
-     */
-    selectProject(projectId) {
-        const { taskStore, resourceStore } = this.project;
-
-        if (projectId) {
-            taskStore.filter({
-                id: 'project',
-                filterBy: (task) => task.projectId === projectId
-            });
-            resourceStore.filter({
-                id: 'project',
-                filterBy: (resource) =>
-                    resource.assignments.some(
-                        (assignment) =>
-                            assignment.event?.projectId === projectId
-                    )
-            });
-            const projectNode = taskStore.getById(projectId);
-            if (projectNode) {
-                this.gantt.scrollTaskIntoView(projectNode);
-            }
-        } else {
-            taskStore.removeFilter('project');
-            resourceStore.removeFilter('project');
-        }
     }
 }

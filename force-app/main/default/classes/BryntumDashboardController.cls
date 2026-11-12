@@ -1,7 +1,11 @@
 /**
  * Loads the portfolio data for the Bryntum dashboard in the format of the Bryntum project model: calendars, tasks,
  * resources, assignments and dependencies. Projects become top level nodes of the task tree, their tasks are nested
- * under them with the parentId field. Read only.
+ * under them with the parentId field.
+ *
+ * saveChanges() receives the sync package of the Bryntum project (a changeset per store with added, updated and
+ * removed rows) and writes it to the custom objects. New records are identified by the $PhantomId Bryntum assigns,
+ * the response maps every phantom id to the id of the inserted record so the client can adopt it.
  */
 public with sharing class BryntumDashboardController {
     private static final Map<String, Integer> DEPENDENCY_TYPES = new Map<String, Integer>{
@@ -10,8 +14,16 @@ public with sharing class BryntumDashboardController {
         'FS' => 2,
         'FF' => 3
     };
+    private static final Map<Integer, String> DEPENDENCY_CODES = new Map<Integer, String>{
+        0 => 'SS',
+        1 => 'SF',
+        2 => 'FS',
+        3 => 'FF'
+    };
+    private static final String PHANTOM_ID = '$PhantomId';
 
-    @AuraEnabled(cacheable=true)
+    // Not cacheable: the dashboard writes back, a cached copy would be stale after a page reload
+    @AuraEnabled
     public static String getPortfolioData() {
         Map<String, Object> result = new Map<String, Object>();
         result.put('calendars', new Map<String, Object>{ 'rows' => loadCalendars() });
@@ -139,13 +151,22 @@ public with sharing class BryntumDashboardController {
         List<Map<String, Object>> rows = new List<Map<String, Object>>();
         Integer projectIndex = 0;
         // Projects are the top level nodes of the task tree
-        for (BryntumProject__c project : [SELECT Id, Name, ProjectStatus__r.Name, Calendar__c FROM BryntumProject__c ORDER BY StartDate__c, Name]) {
+        for (BryntumProject__c project : [
+            SELECT Id, Name, ProjectStatus__r.Name, Calendar__c, ProjectType__c, ProjectStatus__c, Account__c, Manager__c, Budget__c
+            FROM BryntumProject__c
+            ORDER BY StartDate__c, Name
+        ]) {
             rows.add(new Map<String, Object>{
                 'id' => project.Id,
                 'name' => project.Name,
                 'projectId' => project.Id,
                 'isProject' => true,
                 'status' => project.ProjectStatus__r?.Name,
+                'typeId' => project.ProjectType__c,
+                'statusId' => project.ProjectStatus__c,
+                'accountId' => project.Account__c,
+                'managerId' => project.Manager__c,
+                'budget' => project.Budget__c,
                 'orderedParentIndex' => projectIndex++,
                 'expanded' => true
             });
@@ -243,4 +264,535 @@ public with sharing class BryntumDashboardController {
         }
         return rows;
     }
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // Saving
+    // ---------------------------------------------------------------------------------------------------------------
+
+    @AuraEnabled
+    public static String saveChanges(String changes) {
+        Map<String, Object> pack = (Map<String, Object>) JSON.deserializeUntyped(changes);
+        Map<String, Object> response = new Map<String, Object>{ 'success' => true };
+        if (pack.containsKey('requestId')) {
+            response.put('requestId', pack.get('requestId'));
+        }
+        Savepoint savepoint = Database.setSavepoint();
+        try {
+            Map<String, Id> ids = new Map<String, Id>();
+            // Removals first, children before parents, so that lookups never point at deleted records
+            removeDependencies(removedIds(pack, 'dependencies'));
+            removeAssignments(removedIds(pack, 'assignments'));
+            removeTasks(removedIds(pack, 'tasks'));
+            removeResources(removedIds(pack, 'resources'));
+            response.put('resources', saveResources(storeChanges(pack, 'resources'), ids));
+            response.put('tasks', saveTasks(storeChanges(pack, 'tasks'), ids));
+            response.put('assignments', saveAssignments(storeChanges(pack, 'assignments'), ids));
+            response.put('dependencies', saveDependencies(storeChanges(pack, 'dependencies'), ids));
+        }
+        catch (Exception e) {
+            Database.rollback(savepoint);
+            // setMessage keeps the text readable for the client and for tests
+            AuraHandledException failure = new AuraHandledException(e.getMessage());
+            failure.setMessage(e.getMessage() + ' (' + e.getTypeName() + ' at ' + e.getLineNumber() + ')');
+            throw failure;
+        }
+        return JSON.serialize(response);
+    }
+
+    private static Map<String, Object> storeChanges(Map<String, Object> pack, String store) {
+        Object value = pack.get(store);
+        return value instanceof Map<String, Object> ? (Map<String, Object>) value : new Map<String, Object>();
+    }
+
+    private static List<Map<String, Object>> rows(Map<String, Object> changes, String key) {
+        List<Map<String, Object>> result = new List<Map<String, Object>>();
+        Object value = changes.get(key);
+        if (value instanceof List<Object>) {
+            for (Object row : (List<Object>) value) {
+                result.add((Map<String, Object>) row);
+            }
+        }
+        return result;
+    }
+
+    private static Set<Id> removedIds(Map<String, Object> pack, String store) {
+        Set<Id> result = new Set<Id>();
+        for (Map<String, Object> row : rows(storeChanges(pack, store), 'removed')) {
+            Id recordId = toId(row.get('id'));
+            if (recordId != null) {
+                result.add(recordId);
+            }
+        }
+        return result;
+    }
+
+    private static Map<String, Object> phantomRows(List<Map<String, Object>> added, List<SObject> inserted) {
+        List<Map<String, Object>> result = new List<Map<String, Object>>();
+        for (Integer i = 0; i < added.size(); i++) {
+            result.add(new Map<String, Object>{ PHANTOM_ID => added[i].get(PHANTOM_ID), 'id' => inserted[i].Id });
+        }
+        return new Map<String, Object>{ 'rows' => result };
+    }
+
+    // Resolves a Bryntum id that may be a phantom id of a record inserted earlier in the same package
+    private static Id resolveId(Object value, Map<String, Id> ids) {
+        if (value == null) {
+            return null;
+        }
+        String key = String.valueOf(value);
+        if (ids.containsKey(key)) {
+            return ids.get(key);
+        }
+        Id recordId = toId(value);
+        if (recordId == null) {
+            throw new DashboardException('Unknown record reference: ' + key);
+        }
+        return recordId;
+    }
+
+    private static Id toId(Object value) {
+        if (value == null) {
+            return null;
+        }
+        String text = String.valueOf(value);
+        if ((text.length() == 15 || text.length() == 18) && text.isAlphanumeric()) {
+            try {
+                return (Id) text;
+            }
+            catch (Exception e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    private static Boolean isProjectId(Id recordId) {
+        return recordId != null && recordId.getSObjectType() == BryntumProject__c.SObjectType;
+    }
+
+    private static Decimal toDecimal(Object value) {
+        if (value == null) {
+            return null;
+        }
+        return value instanceof Decimal ? (Decimal) value : Decimal.valueOf(String.valueOf(value));
+    }
+
+    private static Boolean toBoolean(Object value) {
+        return value == null ? null : Boolean.valueOf(value);
+    }
+
+    private static String toText(Object value) {
+        return value == null ? null : String.valueOf(value);
+    }
+
+    // Bryntum serializes dates as ISO 8601 strings, with or without a time zone offset
+    private static DateTime toDateTime(Object value) {
+        if (value == null) {
+            return null;
+        }
+        String text = String.valueOf(value);
+        try {
+            return (DateTime) JSON.deserialize('"' + text + '"', DateTime.class);
+        }
+        catch (Exception e) {
+            return DateTime.valueOf(text.replace('T', ' ').left(19));
+        }
+    }
+
+    // Bryntum sends local time with an offset (YYYY-MM-DDTHH:mm:ss+hh:mm), the calendar date is the leading part
+    private static Date toDate(Object value) {
+        if (value == null) {
+            return null;
+        }
+        String text = String.valueOf(value);
+        if (text.length() >= 10 && Pattern.matches('^\\d{4}-\\d{2}-\\d{2}.*', text)) {
+            return Date.valueOf(text.left(10));
+        }
+        DateTime stamp = toDateTime(value);
+        return stamp == null ? null : stamp.date();
+    }
+
+    // ---- Resources -------------------------------------------------------------------------------------------------
+
+    private static void applyResourceFields(BryntumResource__c resource, Map<String, Object> row) {
+        if (row.containsKey('name')) {
+            resource.Name = toText(row.get('name'));
+        }
+        if (row.containsKey('role')) {
+            resource.Role__c = toText(row.get('role'));
+        }
+        if (row.containsKey('department')) {
+            resource.Department__c = toText(row.get('department'));
+        }
+        if (row.containsKey('city')) {
+            resource.City__c = toText(row.get('city'));
+        }
+        if (row.containsKey('email')) {
+            resource.Email__c = toText(row.get('email'));
+        }
+        if (row.containsKey('hourlyRate')) {
+            resource.HourlyRate__c = toDecimal(row.get('hourlyRate'));
+        }
+        if (row.containsKey('maxUnits')) {
+            resource.MaxUnits__c = toDecimal(row.get('maxUnits'));
+        }
+        if (row.containsKey('calendar')) {
+            resource.Calendar__c = toId(row.get('calendar'));
+        }
+    }
+
+    private static Map<String, Object> saveResources(Map<String, Object> changes, Map<String, Id> ids) {
+        List<Map<String, Object>> added = rows(changes, 'added');
+        List<BryntumResource__c> inserts = new List<BryntumResource__c>();
+        for (Map<String, Object> row : added) {
+            BryntumResource__c resource = new BryntumResource__c(Name = 'New resource');
+            applyResourceFields(resource, row);
+            inserts.add(resource);
+        }
+        insert inserts;
+        for (Integer i = 0; i < added.size(); i++) {
+            ids.put(String.valueOf(added[i].get(PHANTOM_ID)), inserts[i].Id);
+        }
+
+        List<BryntumResource__c> updates = new List<BryntumResource__c>();
+        for (Map<String, Object> row : rows(changes, 'updated')) {
+            BryntumResource__c resource = new BryntumResource__c(Id = toId(row.get('id')));
+            applyResourceFields(resource, row);
+            updates.add(resource);
+        }
+        update updates;
+        return phantomRows(added, inserts);
+    }
+
+    private static void removeResources(Set<Id> resourceIds) {
+        if (resourceIds.isEmpty()) {
+            return;
+        }
+        delete [SELECT Id FROM BryntumAssignment__c WHERE Resource__c IN :resourceIds];
+        delete [SELECT Id FROM BryntumResource__c WHERE Id IN :resourceIds];
+    }
+
+    // ---- Tasks and project nodes -----------------------------------------------------------------------------------
+
+    private static void applyTaskFields(BryntumTask__c task, Map<String, Object> row) {
+        if (row.containsKey('name')) {
+            task.Name = toText(row.get('name'));
+        }
+        if (row.containsKey('startDate')) {
+            task.StartDate__c = toDateTime(row.get('startDate'));
+        }
+        if (row.containsKey('endDate')) {
+            task.EndDate__c = toDateTime(row.get('endDate'));
+        }
+        if (row.containsKey('duration')) {
+            task.Duration__c = toDecimal(row.get('duration'));
+        }
+        if (row.containsKey('durationUnit')) {
+            task.DurationUnit__c = toText(row.get('durationUnit'));
+        }
+        if (row.containsKey('effort')) {
+            task.Effort__c = toDecimal(row.get('effort'));
+        }
+        if (row.containsKey('percentDone')) {
+            task.PercentDone__c = toDecimal(row.get('percentDone'));
+        }
+        if (row.containsKey('priority')) {
+            task.Priority__c = toText(row.get('priority'));
+        }
+        if (row.containsKey('complexity')) {
+            task.Complexity__c = toText(row.get('complexity'));
+        }
+        if (row.containsKey('status')) {
+            task.Status__c = toText(row.get('status'));
+        }
+        if (row.containsKey('plannedCost')) {
+            task.Cost__c = toDecimal(row.get('plannedCost'));
+        }
+        if (row.containsKey('constraintType')) {
+            task.ConstraintType__c = toText(row.get('constraintType'));
+        }
+        if (row.containsKey('constraintDate')) {
+            task.ConstraintDate__c = toDateTime(row.get('constraintDate'));
+        }
+        if (row.containsKey('deadlineDate')) {
+            task.Deadline__c = toDateTime(row.get('deadlineDate'));
+        }
+        if (row.containsKey('manuallyScheduled')) {
+            task.ManuallyScheduled__c = toBoolean(row.get('manuallyScheduled')) == true;
+        }
+        if (row.containsKey('rollup')) {
+            task.Rollup__c = toBoolean(row.get('rollup')) == true;
+        }
+        if (row.containsKey('showInTimeline')) {
+            task.ShowInTimeline__c = toBoolean(row.get('showInTimeline')) == true;
+        }
+        if (row.containsKey('calendar')) {
+            task.Calendar__c = toId(row.get('calendar'));
+        }
+        if (row.containsKey('note')) {
+            task.Note__c = toText(row.get('note'));
+        }
+        if (row.containsKey('orderedParentIndex')) {
+            task.OrderIndex__c = toDecimal(row.get('orderedParentIndex'));
+        }
+    }
+
+    // A task directly under a project node has no parent task, its project is the node
+    private static void applyTaskParent(BryntumTask__c task, Id parentId, Map<Id, Id> projectOfTask) {
+        if (isProjectId(parentId)) {
+            task.Parent__c = null;
+            task.Project__c = parentId;
+        }
+        else {
+            task.Parent__c = parentId;
+            if (projectOfTask.containsKey(parentId)) {
+                task.Project__c = projectOfTask.get(parentId);
+            }
+        }
+    }
+
+    private static Map<Id, Id> projectsOfParents(Set<Id> parentIds) {
+        Map<Id, Id> result = new Map<Id, Id>();
+        for (BryntumTask__c parent : [SELECT Id, Project__c FROM BryntumTask__c WHERE Id IN :parentIds]) {
+            result.put(parent.Id, parent.Project__c);
+        }
+        return result;
+    }
+
+    private static void applyProjectFields(BryntumProject__c project, Map<String, Object> row) {
+        if (row.containsKey('name')) {
+            project.Name = toText(row.get('name'));
+        }
+        if (row.containsKey('typeId')) {
+            project.ProjectType__c = toId(row.get('typeId'));
+        }
+        if (row.containsKey('statusId')) {
+            project.ProjectStatus__c = toId(row.get('statusId'));
+        }
+        if (row.containsKey('accountId')) {
+            project.Account__c = toId(row.get('accountId'));
+        }
+        if (row.containsKey('managerId')) {
+            project.Manager__c = toId(row.get('managerId'));
+        }
+        if (row.containsKey('budget')) {
+            project.Budget__c = toDecimal(row.get('budget'));
+        }
+        // The engine rolls the dates of the tasks up to the project node, keep the project record in step
+        if (row.containsKey('startDate')) {
+            project.StartDate__c = toDate(row.get('startDate'));
+        }
+        if (row.containsKey('endDate')) {
+            project.EndDate__c = toDate(row.get('endDate'));
+        }
+    }
+
+    private static Map<String, Object> saveTasks(Map<String, Object> changes, Map<String, Id> ids) {
+        List<Map<String, Object>> added = rows(changes, 'added');
+        List<BryntumTask__c> inserted = new List<BryntumTask__c>();
+        Map<String, BryntumTask__c> byPhantom = new Map<String, BryntumTask__c>();
+        // New tasks may be nested under other new tasks, insert level by level until every parent is known
+        List<Map<String, Object>> pending = new List<Map<String, Object>>(added);
+        while (!pending.isEmpty()) {
+            List<Map<String, Object>> ready = new List<Map<String, Object>>();
+            List<Map<String, Object>> later = new List<Map<String, Object>>();
+            Set<Id> parentIds = new Set<Id>();
+            for (Map<String, Object> row : pending) {
+                String parentKey = toText(row.get('parentId'));
+                Id parentId = ids.containsKey(parentKey) ? ids.get(parentKey) : toId(parentKey);
+                if (parentId == null) {
+                    later.add(row);
+                }
+                else {
+                    ready.add(row);
+                    parentIds.add(parentId);
+                }
+            }
+            if (ready.isEmpty()) {
+                throw new DashboardException('New tasks must be nested under a project or an existing task');
+            }
+            Map<Id, Id> projectOfTask = projectsOfParents(parentIds);
+            List<BryntumTask__c> batch = new List<BryntumTask__c>();
+            for (Map<String, Object> row : ready) {
+                BryntumTask__c task = new BryntumTask__c(Name = 'New task', DurationUnit__c = 'day');
+                applyTaskFields(task, row);
+                String parentKey = toText(row.get('parentId'));
+                applyTaskParent(task, ids.containsKey(parentKey) ? ids.get(parentKey) : toId(parentKey), projectOfTask);
+                batch.add(task);
+            }
+            insert batch;
+            for (Integer i = 0; i < ready.size(); i++) {
+                String phantom = String.valueOf(ready[i].get(PHANTOM_ID));
+                ids.put(phantom, batch[i].Id);
+                byPhantom.put(phantom, batch[i]);
+            }
+            pending = later;
+        }
+        for (Map<String, Object> row : added) {
+            inserted.add(byPhantom.get(String.valueOf(row.get(PHANTOM_ID))));
+        }
+
+        List<BryntumTask__c> taskUpdates = new List<BryntumTask__c>();
+        List<BryntumProject__c> projectUpdates = new List<BryntumProject__c>();
+        List<Map<String, Object>> updatedRows = rows(changes, 'updated');
+        Set<Id> parentIds = new Set<Id>();
+        for (Map<String, Object> row : updatedRows) {
+            Id parentId = resolveId(row.get('parentId'), ids);
+            if (parentId != null && !isProjectId(parentId)) {
+                parentIds.add(parentId);
+            }
+        }
+        Map<Id, Id> projectOfTask = projectsOfParents(parentIds);
+        for (Map<String, Object> row : updatedRows) {
+            Id recordId = resolveId(row.get('id'), ids);
+            if (isProjectId(recordId)) {
+                BryntumProject__c project = new BryntumProject__c(Id = recordId);
+                applyProjectFields(project, row);
+                projectUpdates.add(project);
+            }
+            else {
+                BryntumTask__c task = new BryntumTask__c(Id = recordId);
+                applyTaskFields(task, row);
+                if (row.containsKey('parentId')) {
+                    applyTaskParent(task, resolveId(row.get('parentId'), ids), projectOfTask);
+                }
+                taskUpdates.add(task);
+            }
+        }
+        update taskUpdates;
+        update projectUpdates;
+        return phantomRows(added, inserted);
+    }
+
+    private static void removeTasks(Set<Id> removedIds) {
+        Set<Id> projectIds = new Set<Id>();
+        Set<Id> taskIds = new Set<Id>();
+        for (Id recordId : removedIds) {
+            if (isProjectId(recordId)) {
+                projectIds.add(recordId);
+            }
+            else {
+                taskIds.add(recordId);
+            }
+        }
+        if (!projectIds.isEmpty()) {
+            for (BryntumTask__c task : [SELECT Id FROM BryntumTask__c WHERE Project__c IN :projectIds]) {
+                taskIds.add(task.Id);
+            }
+        }
+        // Subtasks go with their parent
+        Set<Id> level = new Set<Id>(taskIds);
+        for (Integer depth = 0; depth < 20 && !level.isEmpty(); depth++) {
+            Set<Id> next = new Set<Id>();
+            for (BryntumTask__c child : [SELECT Id FROM BryntumTask__c WHERE Parent__c IN :level AND Id NOT IN :taskIds]) {
+                next.add(child.Id);
+            }
+            taskIds.addAll(next);
+            level = next;
+        }
+        if (!taskIds.isEmpty()) {
+            delete [SELECT Id FROM BryntumAssignment__c WHERE Task__c IN :taskIds];
+            delete [SELECT Id FROM BryntumDependency__c WHERE FromTask__c IN :taskIds OR ToTask__c IN :taskIds];
+            delete [SELECT Id FROM BryntumTask__c WHERE Id IN :taskIds];
+        }
+        if (!projectIds.isEmpty()) {
+            delete [SELECT Id FROM BryntumProject__c WHERE Id IN :projectIds];
+        }
+    }
+
+    // ---- Assignments -----------------------------------------------------------------------------------------------
+
+    private static void applyAssignmentFields(BryntumAssignment__c assignment, Map<String, Object> row, Map<String, Id> ids) {
+        if (row.containsKey('event')) {
+            assignment.Task__c = resolveId(row.get('event'), ids);
+        }
+        if (row.containsKey('resource')) {
+            assignment.Resource__c = resolveId(row.get('resource'), ids);
+        }
+        if (row.containsKey('units')) {
+            assignment.Units__c = toDecimal(row.get('units'));
+        }
+    }
+
+    private static Map<String, Object> saveAssignments(Map<String, Object> changes, Map<String, Id> ids) {
+        List<Map<String, Object>> added = rows(changes, 'added');
+        List<BryntumAssignment__c> inserts = new List<BryntumAssignment__c>();
+        for (Map<String, Object> row : added) {
+            BryntumAssignment__c assignment = new BryntumAssignment__c(Units__c = 100);
+            applyAssignmentFields(assignment, row, ids);
+            inserts.add(assignment);
+        }
+        insert inserts;
+        for (Integer i = 0; i < added.size(); i++) {
+            ids.put(String.valueOf(added[i].get(PHANTOM_ID)), inserts[i].Id);
+        }
+        List<BryntumAssignment__c> updates = new List<BryntumAssignment__c>();
+        for (Map<String, Object> row : rows(changes, 'updated')) {
+            BryntumAssignment__c assignment = new BryntumAssignment__c(Id = toId(row.get('id')));
+            applyAssignmentFields(assignment, row, ids);
+            updates.add(assignment);
+        }
+        update updates;
+        return phantomRows(added, inserts);
+    }
+
+    private static void removeAssignments(Set<Id> assignmentIds) {
+        if (!assignmentIds.isEmpty()) {
+            delete [SELECT Id FROM BryntumAssignment__c WHERE Id IN :assignmentIds];
+        }
+    }
+
+    // ---- Dependencies ----------------------------------------------------------------------------------------------
+
+    private static void applyDependencyFields(BryntumDependency__c dependency, Map<String, Object> row, Map<String, Id> ids) {
+        if (row.containsKey('fromEvent')) {
+            dependency.FromTask__c = resolveId(row.get('fromEvent'), ids);
+        }
+        if (row.containsKey('toEvent')) {
+            dependency.ToTask__c = resolveId(row.get('toEvent'), ids);
+        }
+        if (row.containsKey('type')) {
+            Integer code = toDecimal(row.get('type')).intValue();
+            dependency.Type__c = DEPENDENCY_CODES.containsKey(code) ? DEPENDENCY_CODES.get(code) : 'FS';
+        }
+        if (row.containsKey('lag')) {
+            dependency.Lag__c = toDecimal(row.get('lag'));
+        }
+        if (row.containsKey('lagUnit')) {
+            dependency.LagUnit__c = toText(row.get('lagUnit'));
+        }
+        if (row.containsKey('active')) {
+            dependency.Active__c = toBoolean(row.get('active')) == true;
+        }
+    }
+
+    private static Map<String, Object> saveDependencies(Map<String, Object> changes, Map<String, Id> ids) {
+        List<Map<String, Object>> added = rows(changes, 'added');
+        List<BryntumDependency__c> inserts = new List<BryntumDependency__c>();
+        for (Map<String, Object> row : added) {
+            BryntumDependency__c dependency = new BryntumDependency__c(Type__c = 'FS', Lag__c = 0, LagUnit__c = 'day', Active__c = true);
+            applyDependencyFields(dependency, row, ids);
+            inserts.add(dependency);
+        }
+        insert inserts;
+        for (Integer i = 0; i < added.size(); i++) {
+            ids.put(String.valueOf(added[i].get(PHANTOM_ID)), inserts[i].Id);
+        }
+        List<BryntumDependency__c> updates = new List<BryntumDependency__c>();
+        for (Map<String, Object> row : rows(changes, 'updated')) {
+            BryntumDependency__c dependency = new BryntumDependency__c(Id = toId(row.get('id')));
+            applyDependencyFields(dependency, row, ids);
+            updates.add(dependency);
+        }
+        update updates;
+        return phantomRows(added, inserts);
+    }
+
+    private static void removeDependencies(Set<Id> dependencyIds) {
+        if (!dependencyIds.isEmpty()) {
+            delete [SELECT Id FROM BryntumDependency__c WHERE Id IN :dependencyIds];
+        }
+    }
+
+    public class DashboardException extends Exception {}
 }

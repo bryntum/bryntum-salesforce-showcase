@@ -203,13 +203,34 @@ with `sf community publish -n Demo`.
 
 ## Portfolio dashboard
 
-The **Bryntum Dashboard** tab shows a project portfolio stored in Salesforce: KPI tiles, a grid of the projects, a
-Gantt chart of all tasks and a resource histogram. The buttons above the widgets switch between the overview and a
-full height view of the projects, the Gantt or the resources. The Gantt, the Grid and the histogram all come from the
-`bryntum_gantt` static resource. An Apex controller
-(`BryntumDashboardController`) loads the records in the format of the Bryntum project model. The type, status,
-account and manager columns of the projects grid offer the related records in a combo, nothing else can be entered.
-Changes made in the grid are not saved yet.
+The **Bryntum Dashboard** tab is a Lightning App Page (`flexipages/Bryntum_Dashboard`) with four tabs:
+
+| Tab       | Content                                                                                              |
+|-----------|------------------------------------------------------------------------------------------------------|
+| Overview  | The standard Salesforce *Dashboard* component showing the `Bryntum Portfolio` dashboard              |
+| Projects  | The `bryntum_dashboard` component with `view` = `projects`: a Bryntum Grid of the project records    |
+| Timeline  | The same component with `view` = `timeline`: a Bryntum Gantt chart of all tasks                      |
+| Resources | The same component with `view` = `resources`: a Bryntum Resource Histogram                           |
+
+The portfolio dashboard is built from reports on the Bryntum custom objects (`reports/Bryntum_Reports`,
+`dashboards/Bryntum_Dashboards`): budget and planned cost totals and per project, projects by status, tasks by status
+and by priority, resources by department. It runs as the logged-in user and is refreshed with its Refresh button.
+Tasks and assignments are details of a master-detail relationship and have no standalone standard report type, the
+custom report types in `reportTypes` provide them and a flat projects type.
+
+The three Bryntum views share one project model, created once by the `c/bryntumPortfolio` module and handed to every
+instance of the component on the page. A project renamed in the grid is renamed in the Gantt, selecting a project in
+the grid filters the timeline and the histogram to it, and **All projects** in the Gantt toolbar shows everything
+again. The Gantt, the Grid and the histogram all come from the `bryntum_gantt` static resource.
+
+Every change is saved to Salesforce. The project's auto sync collects the changes of all stores and hands them to
+`BryntumDashboardController.saveChanges`, which inserts, updates and deletes the records of the custom objects in one
+transaction and returns the ids of new records. Tasks, dependencies and assignments created in the Gantt, resource
+fields edited in the histogram and the project fields edited in the grid all go through this path. The type, status,
+account, manager, task status, priority and department columns offer the allowed values in a combo, since the
+matching picklists are restricted. `getPortfolioData` loads the records in the format of the Bryntum project model and
+is not cached, so a reload always shows the saved state. After edits, refresh the Salesforce dashboard to see them in
+the charts.
 
 ### Data model
 
