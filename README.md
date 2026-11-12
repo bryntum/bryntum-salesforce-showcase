@@ -214,40 +214,37 @@ The **Bryntum Dashboard** tab is a Lightning App Page (`flexipages/Bryntum_Dashb
 
 | Tab       | Content                                                                                              |
 |-----------|------------------------------------------------------------------------------------------------------|
-| Overview  | The standard Salesforce *Dashboard* component showing the `Bryntum Portfolio` dashboard              |
+| Overview  | The `bryntum_overview` component: KPI tiles and charts of the portfolio, see below                    |
 | Projects  | The `bryntum_dashboard` component with `view` = `projects`: a Bryntum Grid of the project records    |
 | Timeline  | The same component with `view` = `timeline`: a Bryntum Gantt chart of all tasks                      |
 | Resources | The same component with `view` = `resources`: a Bryntum Resource Histogram                           |
-
-The portfolio dashboard is built from reports on the Bryntum custom objects (`reports/Bryntum_Reports`,
-`dashboards/Bryntum_Dashboards`): budget and planned cost totals and per project, projects by status, tasks by status
-and by priority, resources by department. It runs as the logged-in user and is refreshed with its Refresh button.
-Tasks and assignments are details of a master-detail relationship and have no standalone standard report type, the
-custom report types in `reportTypes` provide them and a flat projects type.
 
 The three Bryntum views share one project model, created once by the `c/bryntumPortfolio` module and handed to every
 instance of the component on the page. A project renamed in the grid is renamed in the Gantt, selecting a project in
 the grid filters the timeline and the histogram to it, and **All projects** in the Gantt toolbar shows everything
 again. The Gantt, the Grid and the histogram all come from the `bryntum_gantt` static resource.
 
-Every change is saved to Salesforce. The project's auto sync collects the changes of all stores and hands them to
-`BryntumDashboardController.saveChanges`, which inserts, updates and deletes the records of the custom objects in one
-transaction and returns the ids of new records. Tasks, dependencies and assignments created in the Gantt, resource
-fields edited in the histogram and the project fields edited in the grid all go through this path. The type, status,
-account, manager, task status, priority and department columns offer the allowed values in a combo, since the
-matching picklists are restricted. `getPortfolioData` loads the records in the format of the Bryntum project model and
-is not cached, so a reload always shows the saved state. After edits, refresh the Salesforce dashboard to see them in
-the charts.
+Every change is saved to Salesforce. The project model reports edits with its `hasChanges` event, the module
+collects them for half a second and sends `project.changes` (a changeset per store with added, updated and removed
+rows, new records carry a `$PhantomId`) to `BryntumDashboardController.saveChanges`, which inserts, updates and
+deletes the records of the custom objects in one transaction. It answers with the rows it saved, the ids of the new
+records and references to them resolved, and the module applies that answer with `project.applyProjectChanges()`:
+the new records adopt their ids and the saved fields are no longer pending, while an edit made during the request
+goes with the next save. Tasks, dependencies and assignments created in the Gantt, resource fields edited in the
+histogram and the project fields edited in the grid all go through this path. The type, account and manager columns
+offer the related records in a combo, the status, priority and department columns the values of the restricted
+picklists. `getPortfolioData` loads the records in the format of the Bryntum project model and is not cached, so a
+reload always shows the saved state.
 
 ### Portfolio overview on the Digital Experience site
 
-Salesforce dashboards cannot be shown on an LWR site and guest visitors cannot run reports, so the Home page of the
-Demo site shows the `bryntum_workspace` component instead: a button bar with Overview, Projects, Timeline and
-Resources. Overview is the `bryntum_overview` component: KPI tiles, a task completion ring (`lightning-progress-ring`)
-and bar diagrams drawn with plain HTML (budget vs planned cost per project, projects by status, tasks by status and
-priority, resources by department), no charting library. The other three are the `bryntum_dashboard` views. All of
-them are built from the same shared project model and work for guests, because `BryntumDashboardController` reads
-and writes without sharing. The guest user needs the `Bryntum_Guest` permission set described above.
+The Home page of the Demo site shows the `bryntum_workspace` component: a button bar with Overview, Projects,
+Timeline and Resources. Overview is the same `bryntum_overview` component as the first tab of the App Page: KPI
+tiles, a task completion ring (`lightning-progress-ring`) and bar diagrams drawn with plain HTML (budget vs planned
+cost per project, projects by status, tasks by status and priority, resources by department), no charting library.
+The other three are the `bryntum_dashboard` views. All of them are built from the same shared project model and work
+for guests, because `BryntumDashboardController` reads and writes without sharing. The guest user needs the
+`Bryntum_Guest` permission set described above.
 
 The views are editable and save to Salesforce by default, which is what a test org wants. The component has two
 settings in Experience Builder (and in the Lightning App Builder for the `bryntum_dashboard` views): **Read only**
@@ -262,9 +259,8 @@ The data lives in custom objects, one per Bryntum store:
 
 | Object                       | Bryntum store | Notes                                                              |
 |------------------------------|---------------|--------------------------------------------------------------------|
-| `BryntumProject__c`          | Task tree     | Projects are the top level nodes of the Gantt, linked to an Account. `StatusDate__c` holds a status date picked in the Gantt toolbar |
+| `BryntumProject__c`          | Task tree     | Projects are the top level nodes of the Gantt, linked to an Account. `Status__c` is a restricted picklist (Planned, Active, On Hold, Completed), `StatusDate__c` holds a status date picked in the Gantt toolbar |
 | `BryntumProjectType__c`      | -             | Project types, offered in the type column of the projects grid     |
-| `BryntumProjectStatus__c`    | -             | Project statuses with a sort order, offered in the status column   |
 | `BryntumTask__c`             | Tasks         | Master-detail to the project, self lookup for the parent task       |
 | `BryntumResource__c`         | Resources     | Role, department, hourly rate and max units                        |
 | `BryntumAssignment__c`       | Assignments   | Task, resource and units                                           |

@@ -114,21 +114,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>BryntumProjectStatus__c.ExternalId__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>BryntumProjectStatus__c.IsClosed__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>BryntumProjectStatus__c.SortOrder__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>BryntumProjectType__c.Description__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -189,11 +174,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>BryntumProject__c.ProjectStatus__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>BryntumProject__c.ProjectType__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -205,6 +185,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>BryntumProject__c.StatusDate__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>BryntumProject__c.Status__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -406,15 +391,6 @@
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>true</modifyAllRecords>
-        <object>BryntumProjectStatus__c</object>
-        <viewAllRecords>true</viewAllRecords>
-    </objectPermissions>
-    <objectPermissions>
-        <allowCreate>true</allowCreate>
-        <allowDelete>true</allowDelete>
-        <allowEdit>true</allowEdit>
-        <allowRead>true</allowRead>
-        <modifyAllRecords>true</modifyAllRecords>
         <object>BryntumProjectType__c</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
@@ -471,22 +447,6 @@
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>
-        <tab>BryntumProjectStatus__c</tab>
-        <visibility>Visible</visibility>
-    </tabSettings>
-    <tabSettings>
-        <tab>BryntumProjectType__c</tab>
-        <visibility>Visible</visibility>
-    </tabSettings>
-    <tabSettings>
-        <tab>BryntumProject__c</tab>
-        <visibility>Visible</visibility>
-    </tabSettings>
-    <tabSettings>
-        <tab>BryntumResource__c</tab>
-        <visibility>Visible</visibility>
-    </tabSettings>
-    <tabSettings>
         <tab>BryntumScheduler</tab>
         <visibility>Visible</visibility>
     </tabSettings>
@@ -496,10 +456,6 @@
     </tabSettings>
     <tabSettings>
         <tab>BryntumTaskBoard</tab>
-        <visibility>Visible</visibility>
-    </tabSettings>
-    <tabSettings>
-        <tab>BryntumTask__c</tab>
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>

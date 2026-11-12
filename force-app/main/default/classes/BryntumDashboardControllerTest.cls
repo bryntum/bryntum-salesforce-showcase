@@ -11,10 +11,8 @@ private class BryntumDashboardControllerTest {
 
         BryntumProjectType__c projectType = new BryntumProjectType__c(Name = 'Software', ExternalId__c = 'ptype-software');
         insert projectType;
-        BryntumProjectStatus__c status = new BryntumProjectStatus__c(Name = 'Active', ExternalId__c = 'pstatus-active', SortOrder__c = 2);
-        insert status;
 
-        BryntumProject__c project = new BryntumProject__c(Name = 'Customer Portal', ProjectType__c = projectType.Id, ProjectStatus__c = status.Id, Manager__c = resource.Id, StartDate__c = Date.newInstance(2026, 1, 5), StatusDate__c = Date.newInstance(2026, 1, 8), Budget__c = 10000, Calendar__c = calendar.Id);
+        BryntumProject__c project = new BryntumProject__c(Name = 'Customer Portal', ProjectType__c = projectType.Id, Status__c = 'Active', Manager__c = resource.Id, StartDate__c = Date.newInstance(2026, 1, 5), StatusDate__c = Date.newInstance(2026, 1, 8), Budget__c = 10000, Calendar__c = calendar.Id);
         insert project;
 
         BryntumTask__c phase = new BryntumTask__c(Name = 'Design', Project__c = project.Id, OrderIndex__c = 0, StartDate__c = DateTime.newInstanceGmt(2026, 1, 5), EndDate__c = DateTime.newInstanceGmt(2026, 1, 12), Duration__c = 5, DurationUnit__c = 'day', PercentDone__c = 50, Status__c = 'In Progress');
@@ -29,7 +27,7 @@ private class BryntumDashboardControllerTest {
         insert dependency;
 
         return new Map<String, SObject>{
-            'calendar' => calendar, 'resource' => resource, 'projectType' => projectType, 'status' => status, 'project' => project,
+            'calendar' => calendar, 'resource' => resource, 'projectType' => projectType, 'project' => project,
             'phase' => phase, 'first' => first, 'second' => second, 'assignment' => assignment, 'dependency' => dependency
         };
     }
@@ -54,10 +52,9 @@ private class BryntumDashboardControllerTest {
         Map<String, Object> projectRow = (Map<String, Object>) projects[0];
         System.assertEquals('Customer Portal', projectRow.get('name'));
         System.assertEquals('Software', projectRow.get('type'), 'The type name comes from the related record');
-        System.assertEquals(records.get('status').Id, projectRow.get('statusId'));
+        System.assertEquals('Active', projectRow.get('status'));
 
         System.assertEquals(1, ((List<Object>) data.get('projectTypes')).size());
-        System.assertEquals(1, ((List<Object>) data.get('projectStatuses')).size());
         System.assertEquals(1, ((List<Object>) data.get('managers')).size(), 'Project managers are offered as managers');
 
         List<Object> tasks = (List<Object>) ((Map<String, Object>) data.get('tasks')).get('rows');
@@ -65,7 +62,7 @@ private class BryntumDashboardControllerTest {
         Map<String, Object> projectNode = (Map<String, Object>) tasks[0];
         System.assertEquals(project.Id, projectNode.get('id'));
         System.assertEquals(true, projectNode.get('isProject'));
-        System.assertEquals(records.get('status').Id, projectNode.get('statusId'), 'The project node carries the fields the grid edits');
+        System.assertEquals('Active', projectNode.get('status'), 'The project node carries the fields the grid edits');
         System.assertEquals(10000, projectNode.get('budget'));
         System.assertEquals('2026-01-08', projectNode.get('statusDate'), 'The project node carries the status date of the progress line');
 
@@ -94,7 +91,9 @@ private class BryntumDashboardControllerTest {
 
         List<Object> calendars = (List<Object>) ((Map<String, Object>) data.get('calendars')).get('rows');
         System.assertEquals(1, calendars.size());
-        System.assertEquals(1, ((List<Object>) ((Map<String, Object>) calendars[0]).get('intervals')).size());
+        List<Object> intervals = (List<Object>) ((Map<String, Object>) calendars[0]).get('intervals');
+        System.assertEquals(1, intervals.size());
+        System.assertEquals(null, ((Map<String, Object>) intervals[0]).get('name'), 'A recurring interval is sent without its name');
 
         List<Object> resources = (List<Object>) ((Map<String, Object>) data.get('resources')).get('rows');
         System.assertEquals(1, resources.size());
@@ -109,7 +108,6 @@ private class BryntumDashboardControllerTest {
         Id resourceId = records.get('resource').Id;
 
         Map<String, Object> pack = new Map<String, Object>{
-            'requestId' => 1234,
             'tasks' => store(
                 new List<Object>{
                     new Map<String, Object>{ '$PhantomId' => '_generatedTask1', 'parentId' => phaseId, 'name' => 'Review', 'startDate' => '2026-01-12T08:00:00', 'duration' => 1, 'durationUnit' => 'day', 'percentDone' => 0, 'orderedParentIndex' => 2, 'status' => 'Not Started' },
@@ -117,7 +115,7 @@ private class BryntumDashboardControllerTest {
                 },
                 new List<Object>{
                     new Map<String, Object>{ 'id' => phaseId, 'name' => 'Design phase', 'percentDone' => 60, 'deadlineDate' => '2026-02-01T00:00:00Z' },
-                    new Map<String, Object>{ 'id' => projectId, 'name' => 'Portal', 'budget' => 12000, 'startDate' => '2026-01-06T00:00:00', 'endDate' => '2026-03-01T00:00:00', 'statusDate' => '2026-02-10T00:00:00+01:00' }
+                    new Map<String, Object>{ 'id' => projectId, 'name' => 'Portal', 'status' => 'On Hold', 'budget' => 12000, 'startDate' => '2026-01-06T00:00:00', 'endDate' => '2026-03-01T00:00:00', 'statusDate' => '2026-02-10T00:00:00+01:00' }
                 },
                 new List<Object>()
             ),
@@ -142,12 +140,17 @@ private class BryntumDashboardControllerTest {
         Map<String, Object> response = (Map<String, Object>) JSON.deserializeUntyped(BryntumDashboardController.saveChanges(JSON.serialize(pack)));
         Test.stopTest();
 
-        System.assertEquals(true, response.get('success'));
-        System.assertEquals(1234, response.get('requestId'), 'The request id is echoed');
-        List<Object> taskRows = (List<Object>) ((Map<String, Object>) response.get('tasks')).get('rows');
-        System.assertEquals(2, taskRows.size(), 'Every new task gets its id mapped');
+        Map<String, Object> savedTasks = (Map<String, Object>) response.get('tasks');
+        List<Object> taskRows = (List<Object>) savedTasks.get('added');
+        System.assertEquals(2, taskRows.size(), 'Every new task is returned with its id');
         Map<String, Object> reviewRow = (Map<String, Object>) taskRows[0];
         System.assertEquals('_generatedTask1', reviewRow.get('$PhantomId'));
+        System.assertEquals('Review', reviewRow.get('name'), 'The saved fields are returned');
+        System.assertEquals(projectId, reviewRow.get('projectId'), 'The project of a new task is returned');
+        System.assertEquals(false, reviewRow.containsKey('parentId'), 'The tree position is not returned');
+        System.assertEquals(reviewRow.get('id'), ((Map<String, Object>) ((List<Object>) ((Map<String, Object>) response.get('assignments')).get('added'))[0]).get('event'), 'References to new records are resolved');
+        System.assertEquals(2, ((List<Object>) savedTasks.get('updated')).size());
+        System.assertEquals(1, ((List<Object>) ((Map<String, Object>) response.get('dependencies')).get('removed')).size(), 'Removed rows are returned');
 
         BryntumTask__c review = [SELECT Id, Name, Project__c, Parent__c, OrderIndex__c, StartDate__c, Status__c FROM BryntumTask__c WHERE Id = :(Id) reviewRow.get('id')];
         System.assertEquals('Review', review.Name);
@@ -166,8 +169,9 @@ private class BryntumDashboardControllerTest {
         System.assertEquals(60, phase.PercentDone__c);
         System.assertEquals(DateTime.newInstanceGmt(2026, 2, 1), phase.Deadline__c);
 
-        BryntumProject__c project = [SELECT Name, Budget__c, StartDate__c, EndDate__c, StatusDate__c FROM BryntumProject__c WHERE Id = :projectId];
+        BryntumProject__c project = [SELECT Name, Status__c, Budget__c, StartDate__c, EndDate__c, StatusDate__c FROM BryntumProject__c WHERE Id = :projectId];
         System.assertEquals('Portal', project.Name, 'Updates of the project node go to the project record');
+        System.assertEquals('On Hold', project.Status__c);
         System.assertEquals(12000, project.Budget__c);
         System.assertEquals(Date.newInstance(2026, 1, 6), project.StartDate__c);
         System.assertEquals(Date.newInstance(2026, 3, 1), project.EndDate__c);

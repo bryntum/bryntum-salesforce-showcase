@@ -3,9 +3,10 @@
  * resources, assignments and dependencies. Projects become top level nodes of the task tree, their tasks are nested
  * under them with the parentId field.
  *
- * saveChanges() receives the sync package of the Bryntum project (a changeset per store with added, updated and
- * removed rows) and writes it to the custom objects. New records are identified by the $PhantomId Bryntum assigns,
- * the response maps every phantom id to the id of the inserted record so the client can adopt it.
+ * saveChanges() receives the changes of the Bryntum project (a changeset per store with added, updated and removed
+ * rows) and writes them to the custom objects. New records are identified by the $PhantomId Bryntum assigns. The
+ * response is a changeset in the same format with the rows that were saved: added rows carry the id of the inserted
+ * record, references to new records are resolved to their ids, so that the client can apply it to the project.
  */
 public with sharing class BryntumDashboardController {
     private static final Map<String, Integer> DEPENDENCY_TYPES = new Map<String, Integer>{
@@ -41,7 +42,6 @@ public with sharing class BryntumDashboardController {
             result.put('calendars', new Map<String, Object>{ 'rows' => loadCalendars() });
             result.put('projects', loadProjects());
             result.put('projectTypes', loadProjectTypes());
-            result.put('projectStatuses', loadProjectStatuses());
             result.put('accounts', loadAccounts());
             result.put('managers', loadManagers());
             result.put('tasks', new Map<String, Object>{ 'rows' => loadTasks() });
@@ -65,7 +65,9 @@ public with sharing class BryntumDashboardController {
                 for (BryntumCalendarInterval__c interval : calendar.Intervals__r) {
                     intervals.add(new Map<String, Object>{
                         'id' => interval.Id,
-                        'name' => interval.Name,
+                        // Salesforce requires a name on every interval record. Only one-off intervals (holidays) show
+                        // theirs in the timeline, a recurring one (weekend, lunch) would print it in every occurrence.
+                        'name' => interval.StartDate__c != null ? interval.Name : null,
                         'recurrentStartDate' => interval.RecurrentStartDate__c,
                         'recurrentEndDate' => interval.RecurrentEndDate__c,
                         'startDate' => interval.StartDate__c,
@@ -96,7 +98,7 @@ public with sharing class BryntumDashboardController {
         public List<Map<String, Object>> loadProjects() {
             List<Map<String, Object>> rows = new List<Map<String, Object>>();
             for (BryntumProject__c project : [
-                SELECT Id, Name, ProjectType__c, ProjectType__r.Name, ProjectStatus__c, ProjectStatus__r.Name, Manager__c, Manager__r.Name,
+                SELECT Id, Name, ProjectType__c, ProjectType__r.Name, Status__c, Manager__c, Manager__r.Name,
                     Account__c, Account__r.Name, StartDate__c, EndDate__c, StatusDate__c, Budget__c, Calendar__c, HoursPerDay__c,
                     DaysPerWeek__c, DaysPerMonth__c, Description__c
                 FROM BryntumProject__c
@@ -107,8 +109,7 @@ public with sharing class BryntumDashboardController {
                     'name' => project.Name,
                     'typeId' => project.ProjectType__c,
                     'type' => project.ProjectType__r?.Name,
-                    'statusId' => project.ProjectStatus__c,
-                    'status' => project.ProjectStatus__r?.Name,
+                    'status' => project.Status__c,
                     'managerId' => project.Manager__c,
                     'manager' => project.Manager__r?.Name,
                     'accountId' => project.Account__c,
@@ -135,14 +136,6 @@ public with sharing class BryntumDashboardController {
             return rows;
         }
 
-        public List<Map<String, Object>> loadProjectStatuses() {
-            List<Map<String, Object>> rows = new List<Map<String, Object>>();
-            for (BryntumProjectStatus__c status : [SELECT Id, Name, SortOrder__c, IsClosed__c FROM BryntumProjectStatus__c ORDER BY SortOrder__c, Name]) {
-                rows.add(new Map<String, Object>{ 'id' => status.Id, 'name' => status.Name, 'sortOrder' => status.SortOrder__c, 'isClosed' => status.IsClosed__c });
-            }
-            return rows;
-        }
-
         public List<Map<String, Object>> loadAccounts() {
             List<Map<String, Object>> rows = new List<Map<String, Object>>();
             for (Account account : [SELECT Id, Name FROM Account ORDER BY Name LIMIT 500]) {
@@ -165,8 +158,7 @@ public with sharing class BryntumDashboardController {
             Integer projectIndex = 0;
             // Projects are the top level nodes of the task tree
             for (BryntumProject__c project : [
-                SELECT Id, Name, ProjectStatus__r.Name, Calendar__c, ProjectType__c, ProjectStatus__c, Account__c, Manager__c, Budget__c,
-                    StatusDate__c
+                SELECT Id, Name, Status__c, Calendar__c, ProjectType__c, Account__c, Manager__c, Budget__c, StatusDate__c
                 FROM BryntumProject__c
                 ORDER BY StartDate__c, Name
             ]) {
@@ -175,9 +167,8 @@ public with sharing class BryntumDashboardController {
                     'name' => project.Name,
                     'projectId' => project.Id,
                     'isProject' => true,
-                    'status' => project.ProjectStatus__r?.Name,
+                    'status' => project.Status__c,
                     'typeId' => project.ProjectType__c,
-                    'statusId' => project.ProjectStatus__c,
                     'accountId' => project.Account__c,
                     'managerId' => project.Manager__c,
                     'budget' => project.Budget__c,
@@ -295,10 +286,7 @@ public with sharing class BryntumDashboardController {
     private without sharing class Writer {
         public String save(String changes) {
             Map<String, Object> pack = (Map<String, Object>) JSON.deserializeUntyped(changes);
-            Map<String, Object> response = new Map<String, Object>{ 'success' => true };
-            if (pack.containsKey('requestId')) {
-                response.put('requestId', pack.get('requestId'));
-            }
+            Map<String, Object> response = new Map<String, Object>();
             Savepoint savepoint = Database.setSavepoint();
             try {
                 Map<String, Id> ids = new Map<String, Id>();
@@ -349,12 +337,35 @@ public with sharing class BryntumDashboardController {
             return result;
         }
 
-        private Map<String, Object> phantomRows(List<Map<String, Object>> added, List<SObject> inserted) {
+        // The changeset of one store as saved: the added rows with the id of their record, the updated rows, and every
+        // reference to a new record (parent task, task, resource) resolved to the id it got. Applied to the Bryntum
+        // project, the rows adopt the ids and the saved fields are no longer pending.
+        private Map<String, Object> savedChangeset(Map<String, Object> changes, Map<String, Id> ids) {
+            return new Map<String, Object>{
+                'added' => savedRows(rows(changes, 'added'), ids),
+                'updated' => savedRows(rows(changes, 'updated'), ids),
+                'removed' => rows(changes, 'removed')
+            };
+        }
+
+        private List<Map<String, Object>> savedRows(List<Map<String, Object>> rows, Map<String, Id> ids) {
             List<Map<String, Object>> result = new List<Map<String, Object>>();
-            for (Integer i = 0; i < added.size(); i++) {
-                result.add(new Map<String, Object>{ BryntumDashboardController.PHANTOM_ID => added[i].get(BryntumDashboardController.PHANTOM_ID), 'id' => inserted[i].Id });
+            for (Map<String, Object> row : rows) {
+                Map<String, Object> saved = new Map<String, Object>();
+                for (String field : row.keySet()) {
+                    Object value = row.get(field);
+                    saved.put(field, field != BryntumDashboardController.PHANTOM_ID && value instanceof String && ids.containsKey((String) value) ? ids.get((String) value) : value);
+                }
+                if (row.containsKey(BryntumDashboardController.PHANTOM_ID)) {
+                    saved.put('id', ids.get(String.valueOf(row.get(BryntumDashboardController.PHANTOM_ID))));
+                }
+                // The position in the tree is not sent back, the client already has it and applying it would move the row
+                saved.remove('parentId');
+                saved.remove('orderedParentIndex');
+                saved.remove('$PhantomParentId');
+                result.add(saved);
             }
-            return new Map<String, Object>{ 'rows' => result };
+            return result;
         }
 
         // Resolves a Bryntum id that may be a phantom id of a record inserted earlier in the same package
@@ -484,7 +495,7 @@ public with sharing class BryntumDashboardController {
                 updates.add(resource);
             }
             update updates;
-            return phantomRows(added, inserts);
+            return savedChangeset(changes, ids);
         }
 
         private void removeResources(Set<Id> resourceIds) {
@@ -589,8 +600,8 @@ public with sharing class BryntumDashboardController {
             if (row.containsKey('typeId')) {
                 project.ProjectType__c = toId(row.get('typeId'));
             }
-            if (row.containsKey('statusId')) {
-                project.ProjectStatus__c = toId(row.get('statusId'));
+            if (row.containsKey('status')) {
+                project.Status__c = toText(row.get('status'));
             }
             if (row.containsKey('accountId')) {
                 project.Account__c = toId(row.get('accountId'));
@@ -687,7 +698,13 @@ public with sharing class BryntumDashboardController {
             }
             update taskUpdates;
             update projectUpdates;
-            return phantomRows(added, inserted);
+            Map<String, Object> saved = savedChangeset(changes, ids);
+            // A task created in the Gantt only knows its parent, the project it belongs to is derived here
+            List<Object> savedAdded = (List<Object>) saved.get('added');
+            for (Integer i = 0; i < inserted.size(); i++) {
+                ((Map<String, Object>) savedAdded[i]).put('projectId', inserted[i].Project__c);
+            }
+            return saved;
         }
 
         private void removeTasks(Set<Id> removedIds) {
@@ -759,7 +776,7 @@ public with sharing class BryntumDashboardController {
                 updates.add(assignment);
             }
             update updates;
-            return phantomRows(added, inserts);
+            return savedChangeset(changes, ids);
         }
 
         private void removeAssignments(Set<Id> assignmentIds) {
@@ -811,7 +828,7 @@ public with sharing class BryntumDashboardController {
                 updates.add(dependency);
             }
             update updates;
-            return phantomRows(added, inserts);
+            return savedChangeset(changes, ids);
         }
 
         private void removeDependencies(Set<Id> dependencyIds) {

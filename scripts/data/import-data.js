@@ -22,7 +22,6 @@ const steps = [
     ['BryntumCalendarInterval__c', 'ExternalId__c', 'calendar-intervals.csv'],
     ['BryntumResource__c', 'ExternalId__c', 'resources.csv'],
     ['BryntumProjectType__c', 'ExternalId__c', 'project-types.csv'],
-    ['BryntumProjectStatus__c', 'ExternalId__c', 'project-statuses.csv'],
     ['BryntumProject__c', 'ExternalId__c', 'projects.csv'],
     ['BryntumTask__c', 'ExternalId__c', 'tasks.csv'],
     ['BryntumTask__c', 'ExternalId__c', 'task-parents.csv'],

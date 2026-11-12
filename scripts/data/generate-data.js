@@ -252,13 +252,6 @@ function generateCalendars() {
     return { calendars, calendarParents, intervals };
 }
 
-const projectStatuses = [
-    { ExternalId__c : 'pstatus-planned', Name : 'Planned', SortOrder__c : 1, IsClosed__c : false },
-    { ExternalId__c : 'pstatus-active', Name : 'Active', SortOrder__c : 2, IsClosed__c : false },
-    { ExternalId__c : 'pstatus-on-hold', Name : 'On Hold', SortOrder__c : 3, IsClosed__c : false },
-    { ExternalId__c : 'pstatus-completed', Name : 'Completed', SortOrder__c : 4, IsClosed__c : true }
-];
-
 const projectTypeRows = projectTypes.map(projectType => ({
     ExternalId__c   : `ptype-${projectType.type.toLowerCase()}`,
     Name            : projectType.type,
@@ -513,7 +506,8 @@ function generateProjects(resources, accounts) {
             ExternalId__c                       : projectId,
             Name                                : name,
             'ProjectType__r.ExternalId__c'      : `ptype-${projectType.type.toLowerCase()}`,
-            'ProjectStatus__r.ExternalId__c'    : start > today ? 'pstatus-planned' : done ? 'pstatus-completed' : p === config.projects - 1 && config.projects > 3 ? 'pstatus-on-hold' : 'pstatus-active',
+            // Values of the restricted Status__c picklist
+            Status__c                           : start > today ? 'Planned' : done ? 'Completed' : p === config.projects - 1 && config.projects > 3 ? 'On Hold' : 'Active',
             'Manager__r.ExternalId__c'          : manager.ExternalId__c,
             'Account__r.Bryntum_External_Id__c' : account.Bryntum_External_Id__c,
             StartDate__c                        : formatDate(start),
@@ -679,7 +673,6 @@ function main() {
         'calendar-intervals.csv' : intervals,
         'resources.csv'          : resources,
         'project-types.csv'      : projectTypeRows,
-        'project-statuses.csv'   : projectStatuses,
         'projects.csv'           : projects,
         'tasks.csv'              : tasks.map(taskRow),
         // Parents are linked in a second pass, so that the parent records exist when the link is set
@@ -698,7 +691,6 @@ function main() {
         intervals    : intervals.length,
         resources    : resources.length,
         projectTypes : projectTypeRows.length,
-        statuses     : projectStatuses.length,
         projects     : projects.length,
         tasks        : tasks.length,
         leafTasks    : tasks.filter(t => t.leaf).length,

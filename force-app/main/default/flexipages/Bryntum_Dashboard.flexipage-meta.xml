@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>Portfolio page: an overview tab with the Salesforce dashboard built from reports on the Bryntum objects, and one tab each for the Bryntum projects grid, Gantt timeline and resource histogram</description>
+    <description>Portfolio page: an overview tab with KPI tiles and charts of the Bryntum portfolio, and one tab each for the Bryntum projects grid, Gantt timeline and resource histogram</description>
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
-                <componentInstanceProperties>
-                    <name>dashboardName</name>
-                    <value>Bryntum_Portfolio</value>
-                </componentInstanceProperties>
-                <componentName>desktopDashboards:embeddedDashboard</componentName>
-                <identifier>portfolio_dashboard</identifier>
+                <componentName>bryntum_overview</componentName>
+                <identifier>c_bryntum_overview</identifier>
             </componentInstance>
         </itemInstances>
         <name>facet_overview</name>

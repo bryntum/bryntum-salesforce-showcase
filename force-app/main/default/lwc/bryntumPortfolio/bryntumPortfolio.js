@@ -9,9 +9,11 @@ import saveChanges from '@salesforce/apex/BryntumDashboardController.saveChanges
  * The portfolio shared by the Bryntum dashboard components on the Bryntum Dashboard page. The page shows one
  * component per tab (projects grid, Gantt timeline, resource histogram), this module creates the Bryntum project
  * model once and hands the same instance to every component, so an edit in one tab is visible in the others and
- * every change is saved to Salesforce through one auto sync.
+ * every change is saved to Salesforce once.
  */
 
+// The values of the restricted Status__c picklists of the project and task objects
+export const PROJECT_STATUSES = ['Planned', 'Active', 'On Hold', 'Completed'];
 export const TASK_STATUSES = [
     'Not Started',
     'In Progress',
@@ -53,48 +55,104 @@ const STYLES = [
     '/fontawesome/css/solid.css'
 ];
 
+// Edits are collected for this long before they are sent to Salesforce as one changeset
+const SAVE_DELAY = 500;
+
 let portfolioPromise = null;
-const widgets = new Set();
 
 /**
  * Loads the Bryntum styles into the template of a component, every component needs its own copy
  */
 export function loadStyles(component) {
     return Promise.all(
-        STYLES.map((file) => loadStyle(component, GANTT + file))
+        STYLES.map((style) => loadStyle(component, GANTT + style))
     );
 }
 
-/**
- * Nests the flat task rows (linked with parentId) into a tree with children arrays
- */
 function buildTaskTree(rows) {
     const byId = new Map(rows.map((row) => [row.id, { ...row, children: [] }]));
     const roots = [];
     byId.forEach((node) => {
         const parent = node.parentId ? byId.get(node.parentId) : null;
+        delete node.parentId;
         if (parent) {
             parent.children.push(node);
         } else {
             roots.push(node);
         }
     });
-    const byIndex = (a, b) =>
-        (a.orderedParentIndex || 0) - (b.orderedParentIndex || 0);
-    byId.forEach((node) => {
-        node.children.sort(byIndex);
+    const finish = (node) => {
+        node.children.sort(
+            (a, b) => (a.orderedParentIndex || 0) - (b.orderedParentIndex || 0)
+        );
+        node.children.forEach(finish);
         if (!node.children.length) {
             delete node.children;
         }
-    });
-    return roots.sort(byIndex);
+    };
+    roots.forEach(finish);
+    return roots.sort(
+        (a, b) => (a.orderedParentIndex || 0) - (b.orderedParentIndex || 0)
+    );
 }
 
-function createPortfolio(data, onSyncFail, saveChangesEnabled) {
-    const { ProjectModel, TaskModel, ResourceModel, DateHelper } =
-        bryntum.gantt;
+/**
+ * Saves the edits to Salesforce. The project reports an edit in any of its stores with the hasChanges event, the
+ * edits are collected for a moment and sent to BryntumDashboardController.saveChanges as one changeset
+ * (project.changes, with a $PhantomId on every new record). Apex answers with the rows it saved: the ids of the
+ * inserted records, references resolved to those ids and the saved fields. Applying the answer with
+ * applyProjectChanges() turns the phantom ids into the real ones and clears the saved fields from the pending
+ * changes, so an edit made while the request was running stays pending and goes with the next save. A failed save
+ * keeps the changes, they are sent again with the next edit.
+ */
+class Saver {
+    constructor(project, onSaveFail) {
+        this.project = project;
+        this.onSaveFail = onSaveFail;
+        this.timer = null;
+        this.saving = false;
+        this.changedWhileSaving = false;
+        project.on({ hasChanges: () => this.schedule() });
+    }
 
-    // Extra fields that come from the Salesforce records. Project nodes also carry the project record fields.
+    schedule() {
+        clearTimeout(this.timer);
+        // eslint-disable-next-line @lwc/lwc/no-async-operation
+        this.timer = setTimeout(() => this.save(), SAVE_DELAY);
+    }
+
+    async save() {
+        const { project } = this;
+        if (this.saving) {
+            this.changedWhileSaving = true;
+            return;
+        }
+        const changes = project.changes;
+        if (!changes) {
+            return;
+        }
+        this.saving = true;
+        this.changedWhileSaving = false;
+        try {
+            const response = await saveChanges({
+                changes: JSON.stringify(changes)
+            });
+            await project.applyProjectChanges(JSON.parse(response));
+        } catch (error) {
+            this.onSaveFail(errorMessage(error));
+            this.changedWhileSaving = false;
+        } finally {
+            this.saving = false;
+        }
+        if (this.changedWhileSaving) {
+            this.schedule();
+        }
+    }
+}
+
+function createPortfolio(data, onSaveFail, saveChangesEnabled) {
+    const { ProjectModel, TaskModel, ResourceModel } = bryntum.gantt;
+
     class DashboardTask extends TaskModel {
         static get fields() {
             return [
@@ -105,7 +163,6 @@ function createPortfolio(data, onSyncFail, saveChangesEnabled) {
                 'complexity',
                 'plannedCost',
                 'typeId',
-                'statusId',
                 'accountId',
                 'managerId',
                 'budget',
@@ -128,53 +185,12 @@ function createPortfolio(data, onSyncFail, saveChangesEnabled) {
         }
     }
 
-    // The project's crud manager sends its sync package here instead of to a URL. The handlers expect a
-    // fetch-like response that can be read as text.
-    class DashboardProject extends ProjectModel {
-        sendRequest(request) {
-            const call =
-                request.type === 'sync'
-                    ? saveChanges({ changes: request.data })
-                    : getPortfolioData();
-            call.then(
-                (text) =>
-                    request.success.call(
-                        request.thisObj,
-                        {
-                            ok: true,
-                            status: 200,
-                            text: () => Promise.resolve(text)
-                        },
-                        {},
-                        request
-                    ),
-                (error) =>
-                    request.failure.call(
-                        request.thisObj,
-                        {
-                            ok: false,
-                            status: 500,
-                            text: () =>
-                                Promise.resolve(
-                                    JSON.stringify({
-                                        success: false,
-                                        message: errorMessage(error)
-                                    })
-                                )
-                        },
-                        {},
-                        request
-                    )
-            );
-            return { abortController: new AbortController() };
-        }
-    }
-
     const generalCalendar = data.calendars.rows.find(
         (calendar) => calendar.name === 'General'
     );
 
-    const project = new DashboardProject({
+    // The project has no transport of its own, the changes are sent to Apex by the Saver below
+    const project = new ProjectModel({
         taskModelClass: DashboardTask,
         resourceModelClass: DashboardResource,
         calendar: generalCalendar?.id,
@@ -187,38 +203,7 @@ function createPortfolio(data, onSyncFail, saveChangesEnabled) {
         tasks: buildTaskTree(data.tasks.rows),
         resources: data.resources.rows,
         assignments: data.assignments.rows,
-        dependencies: data.dependencies.rows,
-        // Changes are collected for a moment and then sent to Apex as one package
-        autoSyncTimeout: 500,
-        listeners: {
-            syncFail: ({ response, rawResponse }) =>
-                onSyncFail(
-                    response?.message || rawResponse?.message || 'Unknown error'
-                )
-        }
-    });
-
-    const statusNames = new Map(
-        data.projectStatuses.map((status) => [status.id, status.name])
-    );
-
-    const statusIds = new Map(
-        data.projectStatuses.map((status) => [status.name, status.id])
-    );
-
-    // A project node carries its status twice: the id for the grid lookup and the name for the Gantt column. Keep
-    // the two in step whichever one an editor changes.
-    project.taskStore.on({
-        update: ({ record, changes }) => {
-            if (!record.isProject) {
-                return;
-            }
-            if ('statusId' in changes) {
-                record.status = statusNames.get(record.statusId) || '';
-            } else if ('status' in changes && statusIds.has(record.status)) {
-                record.statusId = statusIds.get(record.status);
-            }
-        }
+        dependencies: data.dependencies.rows
     });
 
     const taskDates = data.tasks.rows.filter((task) => task.startDate);
@@ -232,20 +217,23 @@ function createPortfolio(data, onSyncFail, saveChangesEnabled) {
     const portfolio = {
         project,
         data,
-        statusNames,
-        projectStatusNames: data.projectStatuses.map((status) => status.name),
-        // The status date, set once the engine has scheduled the tasks, see below
-        today: DateHelper.clearTime(new Date()),
         firstDate,
         lastDate,
-        // Resolves once the engine has calculated the schedule. Whatever the engine adjusted while loading is not a
-        // user change, so the sync starts with a clean slate afterwards.
         saveChangesEnabled,
+        // The date the progress line, the overdue counts and the KPI tiles refer to, see initialStatusDate()
+        statusDate: null,
+        // The project the views are filtered to, see selectProject()
+        selectedProjectId: null,
+        // The first load: the engine schedules the loaded tasks, which also sets the constraints of the tasks and
+        // rolls the dates up to the parent nodes. That is not a user edit, so the result is accepted as the saved
+        // state before the saving starts, and the status date can only be derived from the scheduled dates.
         ready: project.commitAsync().then(() => {
-            portfolio.today = initialStatusDate(project);
+            portfolio.statusDate = initialStatusDate(project);
             project.acceptChanges();
             // With saving disabled the edits stay in the browser, for public demos
-            project.autoSync = saveChangesEnabled;
+            if (saveChangesEnabled) {
+                portfolio.saver = new Saver(project, onSaveFail);
+            }
         })
     };
     return portfolio;
@@ -254,9 +242,9 @@ function createPortfolio(data, onSyncFail, saveChangesEnabled) {
 /**
  * Returns the shared portfolio, creating it on the first call. The component passed loads the Bryntum script, the
  * static resource is only fetched once by the platform. The options of the first caller apply to the whole page:
- * saveChanges (default true) switches the auto sync to Salesforce on or off.
+ * saveChanges (default true) switches the saving to Salesforce on or off.
  */
-export function getPortfolio(component, onSyncFail, options = {}) {
+export function getPortfolio(component, onSaveFail, options = {}) {
     if (!portfolioPromise) {
         portfolioPromise = Promise.all([
             // Resolves to null when the org has no key, the component then runs in trial mode
@@ -276,7 +264,7 @@ export function getPortfolio(component, onSyncFail, options = {}) {
             }
             return createPortfolio(
                 JSON.parse(data),
-                onSyncFail,
+                onSaveFail,
                 options.saveChanges !== false
             );
         });
@@ -327,28 +315,20 @@ function initialStatusDate(project) {
  */
 export function setStatusDate(portfolio, date) {
     const { DateHelper } = bryntum.gantt;
-    portfolio.today = DateHelper.clearTime(date);
+    portfolio.statusDate = DateHelper.clearTime(date);
     portfolio.project.taskStore.allRecords
         .filter((task) => task.isProject)
-        .forEach((node) => (node.statusDate = portfolio.today));
-}
-
-/**
- * The widgets currently shown on the page, so that a view can reach the others (the Gantt deselects the grid)
- */
-export function registerWidget(widget) {
-    widgets.add(widget);
-    return () => widgets.delete(widget);
-}
-
-export function findWidget(predicate) {
-    return [...widgets].find(predicate);
+        .forEach((node) => (node.statusDate = portfolio.statusDate));
 }
 
 /**
  * Shows the tasks and the resources of one project in every view, or everything when no project is selected
  */
-export function selectProject(portfolio, projectId) {
+export function selectProject(portfolio, projectId = null) {
+    if (portfolio.selectedProjectId === projectId) {
+        return;
+    }
+    portfolio.selectedProjectId = projectId;
     const { taskStore, resourceStore } = portfolio.project;
     if (projectId) {
         taskStore.filter({

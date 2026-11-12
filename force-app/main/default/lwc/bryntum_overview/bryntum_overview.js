@@ -3,7 +3,9 @@ import {
     getPortfolio,
     childrenOf,
     currencyFormat,
-    errorMessage
+    errorMessage,
+    PROJECT_STATUSES,
+    TASK_STATUSES
 } from 'c/bryntumPortfolio';
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -102,7 +104,7 @@ export default class Bryntum_overview extends LightningElement {
     }
 
     refresh() {
-        const { project, statusNames, today } = this.portfolio;
+        const { project, statusDate } = this.portfolio;
         if (project.isDestroyed) {
             return;
         }
@@ -145,17 +147,17 @@ export default class Bryntum_overview extends LightningElement {
             this.breakdown(
                 'projectStatus',
                 'Projects by status',
-                projects.map((node) => ({
-                    status: statusNames.get(node.statusId)
-                })),
-                'status'
+                projects,
+                'status',
+                PROJECT_STATUSES
             ),
-            this.breakdown('taskStatus', 'Tasks by status', leaves, 'status', [
-                'Not Started',
-                'In Progress',
-                'Late',
-                'Completed'
-            ]),
+            this.breakdown(
+                'taskStatus',
+                'Tasks by status',
+                leaves,
+                'status',
+                TASK_STATUSES
+            ),
             this.breakdown(
                 'taskPriority',
                 'Tasks by priority',
@@ -184,14 +186,14 @@ export default class Bryntum_overview extends LightningElement {
             leaves,
             resources,
             plannedCostOf,
-            today,
+            statusDate,
             money
         );
     }
 
-    updateKpis(projects, leaves, resources, plannedCostOf, today, money) {
-        const { project, statusNames } = this.portfolio;
-        const windowStart = today.getTime();
+    updateKpis(projects, leaves, resources, plannedCostOf, statusDate, money) {
+        const { project } = this.portfolio;
+        const windowStart = statusDate.getTime();
         const windowEnd = windowStart + 30 * DAY;
         const allocation = new Map();
         project.assignmentStore.allRecords.forEach((assignment) => {
@@ -236,7 +238,9 @@ export default class Bryntum_overview extends LightningElement {
         );
         const overdue = leaves.filter(
             (task) =>
-                task.endDate && task.endDate < today && task.percentDone < 100
+                task.endDate &&
+                task.endDate < statusDate &&
+                task.percentDone < 100
         ).length;
         const inProgress = leaves.filter(
             (task) => task.status === 'In Progress'
@@ -246,9 +250,8 @@ export default class Bryntum_overview extends LightningElement {
             {
                 key: 'projects',
                 label: 'Active projects',
-                value: projects.filter(
-                    (node) => statusNames.get(node.statusId) === 'Active'
-                ).length,
+                value: projects.filter((node) => node.status === 'Active')
+                    .length,
                 hint: `${projects.length} projects in total`
             },
             {

@@ -62,10 +62,5 @@
     <tabs>BryntumSchedulerDragFromGrid</tabs>
     <tabs>SchedulerUnplannedGridDemo</tabs>
     <tabs>GridTempDemo</tabs>
-    <tabs>BryntumProject__c</tabs>
-    <tabs>BryntumTask__c</tabs>
-    <tabs>BryntumResource__c</tabs>
-    <tabs>BryntumProjectType__c</tabs>
-    <tabs>BryntumProjectStatus__c</tabs>
     <uiType>Lightning</uiType>
 </CustomApplication>

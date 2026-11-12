@@ -3,7 +3,6 @@
 delete [SELECT Id FROM BryntumDependency__c];
 delete [SELECT Id FROM BryntumProject__c];
 delete [SELECT Id FROM BryntumProjectType__c];
-delete [SELECT Id FROM BryntumProjectStatus__c];
 delete [SELECT Id FROM BryntumResource__c];
 delete [SELECT Id FROM BryntumCalendar__c];
 delete [SELECT Id FROM Account WHERE Bryntum_External_Id__c != null];
