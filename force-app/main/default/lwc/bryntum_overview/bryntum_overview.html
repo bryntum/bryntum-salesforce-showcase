@@ -1,0 +1,66 @@
+<template>
+    <div class="overview">
+        <template if:true={error}>
+            <div class="error">{error}</div>
+        </template>
+        <div class="kpis">
+            <template for:each={kpis} for:item="kpi">
+                <div key={kpi.key} class={kpi.cls}>
+                    <div class="kpi-value">{kpi.value}</div>
+                    <div class="kpi-label">{kpi.label}</div>
+                    <div class="kpi-hint">{kpi.hint}</div>
+                </div>
+            </template>
+        </div>
+        <div class="cards">
+            <div class="card wide">
+                <h3>Budget vs planned cost by project</h3>
+                <template for:each={projectBars} for:item="row">
+                    <div key={row.id} class="bar-row">
+                        <div class="bar-name" title={row.name}>{row.name}</div>
+                        <div class="bar-track">
+                            <div class="bar budget" style={row.budgetStyle}></div>
+                            <div class={row.costClass} style={row.costStyle}></div>
+                        </div>
+                        <div class="bar-values">{row.values}</div>
+                    </div>
+                </template>
+                <div class="legend">
+                    <span class="legend-item"><span class="swatch budget-swatch"></span>Budget</span>
+                    <span class="legend-item"><span class="swatch cost-swatch"></span>Planned cost</span>
+                    <span class="legend-item"><span class="swatch over-swatch"></span>Over budget</span>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Task completion</h3>
+                <div class="ring">
+                    <lightning-progress-ring value={completion} size="large" variant="base-autocomplete"></lightning-progress-ring>
+                    <div>
+                        <div class="ring-value">{completion}%</div>
+                        <div class="ring-hint">{completionText}</div>
+                    </div>
+                </div>
+            </div>
+            <template for:each={breakdowns} for:item="group">
+                <div key={group.key} class="card">
+                    <h3>{group.title}</h3>
+                    <div class="stack" title={group.total}>
+                        <template for:each={group.segments} for:item="segment">
+                            <div key={segment.name} class="segment" style={segment.style} title={segment.title}></div>
+                        </template>
+                    </div>
+                    <ul class="legend-list">
+                        <template for:each={group.segments} for:item="segment">
+                            <li key={segment.name}>
+                                <span class="swatch" style={segment.swatch}></span>
+                                <span class="legend-name">{segment.name}</span>
+                                <span class="legend-count">{segment.count}</span>
+                                <span class="legend-percent">{segment.percent}%</span>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>64.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Bryntum Portfolio Workspace</masterLabel>
+    <description>Overview, projects grid, Gantt timeline and resource histogram of the Bryntum portfolio with a button bar to switch between them, editable, with settings to make it read only or to keep edits in the browser</description>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+        <target>lightning__AppPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default">
+            <property name="readOnly" type="Boolean" label="Read only" default="false" description="No editing in the Bryntum views"/>
+            <property name="disableSave" type="Boolean" label="Don't save changes to Salesforce" default="false" description="Edits stay in the browser and are lost on reload, for public demos"/>
+        </targetConfig>
+        <targetConfig targets="lightning__AppPage">
+            <property name="readOnly" type="Boolean" label="Read only" default="false" description="No editing in the Bryntum views"/>
+            <property name="disableSave" type="Boolean" label="Don't save changes to Salesforce" default="false" description="Edits stay in the browser and are lost on reload, for public demos"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

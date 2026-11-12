@@ -4,6 +4,13 @@
     <containerType>Network</containerType>
     <label>Default Navigation</label>
     <navigationMenuItem>
+        <label>Dashboard</label>
+        <position>0</position>
+        <publiclyAvailable>true</publiclyAvailable>
+        <target>/</target>
+        <type>InternalLink</type>
+    </navigationMenuItem>
+    <navigationMenuItem>
         <label>Grid</label>
         <position>1</position>
         <publiclyAvailable>true</publiclyAvailable>

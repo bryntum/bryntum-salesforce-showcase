@@ -12,13 +12,14 @@ module.exports = {
     // Folder for the generated CSV files, relative to the project root
     outputDir : 'data/generated',
 
-    // Reference date for progress and statuses. Tasks that end before this date are completed, tasks that start after
-    // it are not started. Use a fixed date to keep the dataset stable over time, or null for the current date.
+    // Reference date for progress and statuses: tasks that end before this date are completed, tasks that start after
+    // it are not started. Use a fixed date to keep the dataset stable over time, or null for the current date. The
+    // dashboard does not read it, it derives its status date from the loaded tasks (see c/bryntumPortfolio).
     today : '2026-11-06',
 
     // Projects start between `monthsBeforeToday` months before and `monthsAfterToday` months after `today`
-    monthsBeforeToday : 7,
-    monthsAfterToday  : 3,
+    monthsBeforeToday : 5,
+    monthsAfterToday  : 5,
 
     // Number of accounts, projects are spread over them
     accounts : 8,

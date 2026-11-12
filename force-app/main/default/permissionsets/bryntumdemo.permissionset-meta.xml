@@ -204,6 +204,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>BryntumProject__c.StatusDate__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>BryntumResource__c.Calendar__c</field>
         <readable>true</readable>
     </fieldPermissions>

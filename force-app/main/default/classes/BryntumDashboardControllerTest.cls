@@ -14,7 +14,7 @@ private class BryntumDashboardControllerTest {
         BryntumProjectStatus__c status = new BryntumProjectStatus__c(Name = 'Active', ExternalId__c = 'pstatus-active', SortOrder__c = 2);
         insert status;
 
-        BryntumProject__c project = new BryntumProject__c(Name = 'Customer Portal', ProjectType__c = projectType.Id, ProjectStatus__c = status.Id, Manager__c = resource.Id, StartDate__c = Date.newInstance(2026, 1, 5), Budget__c = 10000, Calendar__c = calendar.Id);
+        BryntumProject__c project = new BryntumProject__c(Name = 'Customer Portal', ProjectType__c = projectType.Id, ProjectStatus__c = status.Id, Manager__c = resource.Id, StartDate__c = Date.newInstance(2026, 1, 5), StatusDate__c = Date.newInstance(2026, 1, 8), Budget__c = 10000, Calendar__c = calendar.Id);
         insert project;
 
         BryntumTask__c phase = new BryntumTask__c(Name = 'Design', Project__c = project.Id, OrderIndex__c = 0, StartDate__c = DateTime.newInstanceGmt(2026, 1, 5), EndDate__c = DateTime.newInstanceGmt(2026, 1, 12), Duration__c = 5, DurationUnit__c = 'day', PercentDone__c = 50, Status__c = 'In Progress');
@@ -67,6 +67,7 @@ private class BryntumDashboardControllerTest {
         System.assertEquals(true, projectNode.get('isProject'));
         System.assertEquals(records.get('status').Id, projectNode.get('statusId'), 'The project node carries the fields the grid edits');
         System.assertEquals(10000, projectNode.get('budget'));
+        System.assertEquals('2026-01-08', projectNode.get('statusDate'), 'The project node carries the status date of the progress line');
 
         Map<String, Object> phaseRow;
         Map<String, Object> wireframes;
@@ -116,7 +117,7 @@ private class BryntumDashboardControllerTest {
                 },
                 new List<Object>{
                     new Map<String, Object>{ 'id' => phaseId, 'name' => 'Design phase', 'percentDone' => 60, 'deadlineDate' => '2026-02-01T00:00:00Z' },
-                    new Map<String, Object>{ 'id' => projectId, 'name' => 'Portal', 'budget' => 12000, 'startDate' => '2026-01-06T00:00:00', 'endDate' => '2026-03-01T00:00:00' }
+                    new Map<String, Object>{ 'id' => projectId, 'name' => 'Portal', 'budget' => 12000, 'startDate' => '2026-01-06T00:00:00', 'endDate' => '2026-03-01T00:00:00', 'statusDate' => '2026-02-10T00:00:00+01:00' }
                 },
                 new List<Object>()
             ),
@@ -165,11 +166,12 @@ private class BryntumDashboardControllerTest {
         System.assertEquals(60, phase.PercentDone__c);
         System.assertEquals(DateTime.newInstanceGmt(2026, 2, 1), phase.Deadline__c);
 
-        BryntumProject__c project = [SELECT Name, Budget__c, StartDate__c, EndDate__c FROM BryntumProject__c WHERE Id = :projectId];
+        BryntumProject__c project = [SELECT Name, Budget__c, StartDate__c, EndDate__c, StatusDate__c FROM BryntumProject__c WHERE Id = :projectId];
         System.assertEquals('Portal', project.Name, 'Updates of the project node go to the project record');
         System.assertEquals(12000, project.Budget__c);
         System.assertEquals(Date.newInstance(2026, 1, 6), project.StartDate__c);
         System.assertEquals(Date.newInstance(2026, 3, 1), project.EndDate__c);
+        System.assertEquals(Date.newInstance(2026, 2, 10), project.StatusDate__c, 'The status date takes the calendar date of the local time sent');
 
         BryntumAssignment__c assignment = [SELECT Task__c, Resource__c, Units__c FROM BryntumAssignment__c WHERE Task__c = :review.Id];
         System.assertEquals(resourceId, assignment.Resource__c);

@@ -7,6 +7,8 @@
 }
 
 .bryntum-root-element {
+    /* The Bryntum widgets size their text relative to this */
+    font-size: 14px;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -47,4 +49,9 @@
 .dashboard-over-budget {
     color: #ba0517;
     font-weight: 600;
+}
+
+/* The histogram bars are drawn on an SVG that must not clip its content */
+svg.b-histogram-canvas {
+    overflow: visible;
 }

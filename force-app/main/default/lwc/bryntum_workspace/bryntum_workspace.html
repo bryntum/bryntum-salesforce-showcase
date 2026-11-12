@@ -1,0 +1,41 @@
+<template>
+    <div class="workspace">
+        <div class="views">
+            <lightning-button-group>
+                <template for:each={viewButtons} for:item="button">
+                    <lightning-button
+                        key={button.name}
+                        label={button.label}
+                        variant={button.variant}
+                        data-view={button.name}
+                        onclick={handleViewClick}
+                    ></lightning-button>
+                </template>
+            </lightning-button-group>
+        </div>
+        <template if:true={isOverview}>
+            <c-bryntum_overview></c-bryntum_overview>
+        </template>
+        <template if:true={isProjects}>
+            <c-bryntum_dashboard
+                view="projects"
+                read-only={readOnly}
+                disable-save={disableSave}
+            ></c-bryntum_dashboard>
+        </template>
+        <template if:true={isTimeline}>
+            <c-bryntum_dashboard
+                view="timeline"
+                read-only={readOnly}
+                disable-save={disableSave}
+            ></c-bryntum_dashboard>
+        </template>
+        <template if:true={isResources}>
+            <c-bryntum_dashboard
+                view="resources"
+                read-only={readOnly}
+                disable-save={disableSave}
+            ></c-bryntum_dashboard>
+        </template>
+    </div>
+</template>

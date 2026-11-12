@@ -13,9 +13,13 @@
     <targetConfigs>
         <targetConfig targets="lightning__AppPage">
             <property name="view" type="String" label="View" datasource="projects,timeline,resources" default="projects" description="projects: grid of the project records, timeline: Gantt chart of all tasks, resources: resource histogram"/>
+            <property name="readOnly" type="Boolean" label="Read only" default="false" description="No editing in the view"/>
+            <property name="disableSave" type="Boolean" label="Don't save changes to Salesforce" default="false" description="Edits stay in the browser and are lost on reload, for public demos"/>
         </targetConfig>
         <targetConfig targets="lightningCommunity__Default">
             <property name="view" type="String" label="View" datasource="projects,timeline,resources" default="projects" description="projects: grid of the project records, timeline: Gantt chart of all tasks, resources: resource histogram"/>
+            <property name="readOnly" type="Boolean" label="Read only" default="false" description="No editing in the view"/>
+            <property name="disableSave" type="Boolean" label="Don't save changes to Salesforce" default="false" description="Edits stay in the browser and are lost on reload, for public demos"/>
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

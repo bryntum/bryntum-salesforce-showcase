@@ -7,6 +7,7 @@ import {
     registerWidget,
     findWidget,
     selectProject,
+    setStatusDate,
     TASK_STATUSES,
     TASK_PRIORITIES,
     DEPARTMENTS,
@@ -26,6 +27,10 @@ import {
 export default class Bryntum_dashboard extends LightningElement {
     // projects | timeline | resources
     @api view = 'projects';
+    // No editing at all
+    @api readOnly = false;
+    // Editing stays in the browser, nothing is written to Salesforce. For public demos.
+    @api disableSave = false;
     loading = true;
 
     renderedCallback() {
@@ -36,8 +41,14 @@ export default class Bryntum_dashboard extends LightningElement {
 
         Promise.all([
             loadStyles(this),
-            getPortfolio(this, (message) =>
-                this.toast('Could not save the changes to Salesforce', message)
+            getPortfolio(
+                this,
+                (message) =>
+                    this.toast(
+                        'Could not save the changes to Salesforce',
+                        message
+                    ),
+                { saveChanges: !this.disableSave }
             )
         ])
             .then(([, portfolio]) => {
@@ -85,6 +96,9 @@ export default class Bryntum_dashboard extends LightningElement {
     afterReady() {
         const { widget, portfolio } = this;
         if (this.view === 'timeline') {
+            // The status date is only known once the engine has scheduled the tasks
+            widget.features.progressLine.statusDate = portfolio.today;
+            widget.widgetMap.statusDate.value = portfolio.today;
             widget.scrollToDate(portfolio.today, { block: 'center' });
         } else if (this.view === 'projects') {
             widget.refreshRows();
@@ -134,7 +148,7 @@ export default class Bryntum_dashboard extends LightningElement {
      */
     createGrid(root) {
         const { Grid } = bryntum.gantt;
-        const { project, data, statusNames, today } = this.portfolio;
+        const { project, data, statusNames } = this.portfolio;
         const projectStore = project.taskStore.chain(
             (record) => record.isProject
         );
@@ -147,7 +161,7 @@ export default class Bryntum_dashboard extends LightningElement {
             leavesOf(node).filter(
                 (task) =>
                     !task.isProject &&
-                    task.endDate < today &&
+                    task.endDate < this.portfolio.today &&
                     task.percentDone < 100
             ).length;
 
@@ -155,6 +169,7 @@ export default class Bryntum_dashboard extends LightningElement {
             appendTo: root,
             cls: 'dashboard-projects',
             flex: '1 1 0',
+            readOnly: this.readOnly,
             rowHeight: 36,
             store: projectStore,
             selectionMode: { row: true, multiSelect: false },
@@ -262,12 +277,16 @@ export default class Bryntum_dashboard extends LightningElement {
 
     createGantt(root) {
         const { Gantt, DateHelper } = bryntum.gantt;
-        const { project, today, firstDate, lastDate } = this.portfolio;
+        const { project, today, firstDate, lastDate, projectStatusNames } =
+            this.portfolio;
+        const portfolio = this.portfolio;
+        // The engine has not run yet, the progress line and the picker get the real status date in afterReady()
 
         const gantt = new Gantt({
             appendTo: root,
             flex: 1,
             project,
+            readOnly: this.readOnly,
             dependencyIdField: 'sequenceNumber',
             // A fixed width for the columns leaves room for the timeline
             subGridConfigs: { locked: { width: 620 } },
@@ -302,12 +321,26 @@ export default class Bryntum_dashboard extends LightningElement {
             ],
             features: {
                 baselines: false,
+                // Keeps the shading of the weekends, without printing their name in every one of them
+                nonWorkingTime: { bodyRenderer: () => '' },
                 criticalPaths: { disabled: true },
                 progressLine: { statusDate: today },
                 timelineChart: { disabled: true },
                 rollups: true,
                 filter: true,
                 projectLines: false
+            },
+            listeners: {
+                // Project nodes carry a project status, tasks a task status: the status combo lists the values
+                // that apply to the row being edited, so the cell never holds a value outside its list
+                beforeCellEditStart: ({ editorContext }) => {
+                    const { column, record, editor } = editorContext;
+                    if (column.field === 'status') {
+                        editor.items = record.isProject
+                            ? projectStatusNames
+                            : TASK_STATUSES;
+                    }
+                }
             },
             tbar: [
                 {
@@ -323,11 +356,25 @@ export default class Bryntum_dashboard extends LightningElement {
                     }
                 },
                 {
-                    type: 'button',
-                    text: 'Today',
-                    icon: 'fa fa-calendar-day',
-                    onClick: () =>
-                        gantt.scrollToDate(today, { block: 'center' })
+                    type: 'datefield',
+                    ref: 'statusDate',
+                    label: 'Status date',
+                    tooltip: 'The date the progress line is drawn at',
+                    width: 250,
+                    value: today,
+                    editable: false,
+                    onChange: ({ value, userAction }) => {
+                        // The value is also set from code once the engine has run, only a pick by the user is saved
+                        if (!value || !userAction) {
+                            return;
+                        }
+                        setStatusDate(portfolio, value);
+                        gantt.features.progressLine.statusDate =
+                            portfolio.today;
+                        gantt.scrollToDate(portfolio.today, {
+                            block: 'center'
+                        });
+                    }
                 },
                 {
                     type: 'button',
@@ -383,11 +430,12 @@ export default class Bryntum_dashboard extends LightningElement {
             appendTo: root,
             flex: 1,
             project,
+            readOnly: this.readOnly,
             subGridConfigs: { locked: { width: 420 } },
             startDate: DateHelper.add(firstDate, -7, 'day'),
             endDate: DateHelper.add(lastDate, 14, 'day'),
             viewPreset: 'weekAndDayLetter',
-            rowHeight: 40,
+            rowHeight: 60,
             showBarTip: true,
             showMaxEffort: true,
             columns: [
@@ -407,6 +455,7 @@ export default class Bryntum_dashboard extends LightningElement {
             ],
             features: {
                 group: 'department',
+                nonWorkingTime: { bodyRenderer: () => '' },
                 scheduleTooltip: false
             }
         });

@@ -90,7 +90,7 @@ function buildTaskTree(rows) {
     return roots.sort(byIndex);
 }
 
-function createPortfolio(data, onSyncFail) {
+function createPortfolio(data, onSyncFail, saveChangesEnabled) {
     const { ProjectModel, TaskModel, ResourceModel, DateHelper } =
         bryntum.gantt;
 
@@ -108,7 +108,9 @@ function createPortfolio(data, onSyncFail) {
                 'statusId',
                 'accountId',
                 'managerId',
-                'budget'
+                'budget',
+                // A date without time, serialized as the calendar date so that no time zone shifts it
+                { name: 'statusDate', type: 'date', format: 'YYYY-MM-DD' }
             ];
         }
     }
@@ -200,11 +202,21 @@ function createPortfolio(data, onSyncFail) {
         data.projectStatuses.map((status) => [status.id, status.name])
     );
 
-    // The Gantt shows the status name of a project node, keep it in step with the status chosen in the grid
+    const statusIds = new Map(
+        data.projectStatuses.map((status) => [status.name, status.id])
+    );
+
+    // A project node carries its status twice: the id for the grid lookup and the name for the Gantt column. Keep
+    // the two in step whichever one an editor changes.
     project.taskStore.on({
         update: ({ record, changes }) => {
-            if (record.isProject && 'statusId' in changes) {
+            if (!record.isProject) {
+                return;
+            }
+            if ('statusId' in changes) {
                 record.status = statusNames.get(record.statusId) || '';
+            } else if ('status' in changes && statusIds.has(record.status)) {
+                record.statusId = statusIds.get(record.status);
             }
         }
     });
@@ -221,14 +233,19 @@ function createPortfolio(data, onSyncFail) {
         project,
         data,
         statusNames,
+        projectStatusNames: data.projectStatuses.map((status) => status.name),
+        // The status date, set once the engine has scheduled the tasks, see below
         today: DateHelper.clearTime(new Date()),
         firstDate,
         lastDate,
         // Resolves once the engine has calculated the schedule. Whatever the engine adjusted while loading is not a
         // user change, so the sync starts with a clean slate afterwards.
+        saveChangesEnabled,
         ready: project.commitAsync().then(() => {
+            portfolio.today = initialStatusDate(project);
             project.acceptChanges();
-            project.autoSync = true;
+            // With saving disabled the edits stay in the browser, for public demos
+            project.autoSync = saveChangesEnabled;
         })
     };
     return portfolio;
@@ -236,9 +253,10 @@ function createPortfolio(data, onSyncFail) {
 
 /**
  * Returns the shared portfolio, creating it on the first call. The component passed loads the Bryntum script, the
- * static resource is only fetched once by the platform.
+ * static resource is only fetched once by the platform. The options of the first caller apply to the whole page:
+ * saveChanges (default true) switches the auto sync to Salesforce on or off.
  */
-export function getPortfolio(component, onSyncFail) {
+export function getPortfolio(component, onSyncFail, options = {}) {
     if (!portfolioPromise) {
         portfolioPromise = Promise.all([
             // Resolves to null when the org has no key, the component then runs in trial mode
@@ -256,7 +274,11 @@ export function getPortfolio(component, onSyncFail) {
                     'No Bryntum license key found in the org (Bryntum_License__c), running in trial mode'
                 );
             }
-            return createPortfolio(JSON.parse(data), onSyncFail);
+            return createPortfolio(
+                JSON.parse(data),
+                onSyncFail,
+                options.saveChanges !== false
+            );
         });
         portfolioPromise.catch(() => {
             // Let the next component try again
@@ -264,6 +286,51 @@ export function getPortfolio(component, onSyncFail) {
         });
     }
     return portfolioPromise;
+}
+
+/**
+ * The status date the dashboard starts with: the progress line of the Gantt, the overdue counts and the KPI tiles
+ * refer to it. A status date saved on the project records (with the picker in the Gantt toolbar) wins. Without one,
+ * the middle of the first project (the first top level node of the task tree) is used, rounded to the start of the
+ * day.
+ *
+ * The fallback only exists because the showcase runs on a generated dataset whose dates are spread around a
+ * reference date. A real application would use the current date, or a fixed status date stored with the project.
+ */
+function initialStatusDate(project) {
+    const { DateHelper } = bryntum.gantt;
+    const stored = project.taskStore.allRecords
+        .filter((task) => task.isProject && task.statusDate)
+        .map((task) => DateHelper.clearTime(task.statusDate))
+        .filter((date) => date && !isNaN(date));
+    if (stored.length) {
+        return new Date(Math.max(...stored.map((date) => date.getTime())));
+    }
+    const firstProject = project.taskStore.rootNode.children?.find(
+        (task) => task.startDate && task.endDate
+    );
+    if (firstProject) {
+        return DateHelper.clearTime(
+            new Date(
+                (firstProject.startDate.getTime() +
+                    firstProject.endDate.getTime()) /
+                    2
+            )
+        );
+    }
+    return DateHelper.clearTime(new Date());
+}
+
+/**
+ * Moves the status date: the progress line, the overdue counts and the KPI tiles follow it, and the project records
+ * store it so that it survives a reload
+ */
+export function setStatusDate(portfolio, date) {
+    const { DateHelper } = bryntum.gantt;
+    portfolio.today = DateHelper.clearTime(date);
+    portfolio.project.taskStore.allRecords
+        .filter((task) => task.isProject)
+        .forEach((node) => (node.statusDate = portfolio.today));
 }
 
 /**
