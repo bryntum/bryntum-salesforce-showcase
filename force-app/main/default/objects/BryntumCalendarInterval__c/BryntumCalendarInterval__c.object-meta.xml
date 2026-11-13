@@ -3,8 +3,9 @@
     <label>Bryntum Calendar Interval</label>
     <pluralLabel>Bryntum Calendar Intervals</pluralLabel>
     <nameField>
-        <label>Interval Name</label>
-        <type>Text</type>
+        <displayFormat>INT-{0000}</displayFormat>
+        <label>Interval Number</label>
+        <type>AutoNumber</type>
     </nameField>
     <deploymentStatus>Deployed</deploymentStatus>
     <sharingModel>ControlledByParent</sharingModel>

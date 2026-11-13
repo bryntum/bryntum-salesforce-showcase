@@ -49,6 +49,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>BryntumCalendarInterval__c.Label__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>BryntumCalendarInterval__c.RecurrentEndDate__c</field>
         <readable>true</readable>
     </fieldPermissions>

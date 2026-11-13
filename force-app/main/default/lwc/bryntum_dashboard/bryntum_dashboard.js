@@ -92,8 +92,6 @@ export default class Bryntum_dashboard extends LightningElement {
     }
 
     destroyWidget() {
-        this.detachFilter?.();
-        this.detachFilter = null;
         this.widget?.destroy();
         this.widget = null;
     }
@@ -266,15 +264,6 @@ export default class Bryntum_dashboard extends LightningElement {
                 portfolio.selectedProjectId
             );
         }
-        // "All projects" in the Gantt toolbar removes the project filter, the selection follows it
-        this.detachFilter = project.taskStore.on({
-            filter: () => {
-                if (!portfolio.selectedProjectId) {
-                    grid.deselectAll();
-                }
-            },
-            thisObj: this
-        });
         return grid;
     }
 

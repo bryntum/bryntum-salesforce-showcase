@@ -240,14 +240,14 @@ function generateCalendars() {
     // Parent calendars are linked in a second pass, after all calendars exist
     const calendarParents = [{ ExternalId__c : 'cal-business', 'Parent__r.ExternalId__c' : 'cal-general' }];
     const intervals = [
-        { ExternalId__c : 'int-weekend', Name : 'Weekend', 'Calendar__r.ExternalId__c' : 'cal-general', RecurrentStartDate__c : 'on Sat', RecurrentEndDate__c : 'on Mon', StartDate__c : '', EndDate__c : '', IsWorking__c : false },
-        { ExternalId__c : 'int-lunch', Name : 'Lunch', 'Calendar__r.ExternalId__c' : 'cal-business', RecurrentStartDate__c : 'every weekday at 12:00', RecurrentEndDate__c : 'every weekday at 13:00', StartDate__c : '', EndDate__c : '', IsWorking__c : false },
-        { ExternalId__c : 'int-evening', Name : 'Evening', 'Calendar__r.ExternalId__c' : 'cal-business', RecurrentStartDate__c : 'every weekday at 17:00', RecurrentEndDate__c : 'every weekday at 08:00', StartDate__c : '', EndDate__c : '', IsWorking__c : false },
-        { ExternalId__c : 'int-sunday', Name : 'Sunday', 'Calendar__r.ExternalId__c' : 'cal-six-day', RecurrentStartDate__c : 'on Sun', RecurrentEndDate__c : 'on Mon', StartDate__c : '', EndDate__c : '', IsWorking__c : false }
+        { ExternalId__c : 'int-weekend', Label__c : '', 'Calendar__r.ExternalId__c' : 'cal-general', RecurrentStartDate__c : 'on Sat', RecurrentEndDate__c : 'on Mon', StartDate__c : '', EndDate__c : '', IsWorking__c : false },
+        { ExternalId__c : 'int-lunch', Label__c : '', 'Calendar__r.ExternalId__c' : 'cal-business', RecurrentStartDate__c : 'every weekday at 12:00', RecurrentEndDate__c : 'every weekday at 13:00', StartDate__c : '', EndDate__c : '', IsWorking__c : false },
+        { ExternalId__c : 'int-evening', Label__c : '', 'Calendar__r.ExternalId__c' : 'cal-business', RecurrentStartDate__c : 'every weekday at 17:00', RecurrentEndDate__c : 'every weekday at 08:00', StartDate__c : '', EndDate__c : '', IsWorking__c : false },
+        { ExternalId__c : 'int-sunday', Label__c : '', 'Calendar__r.ExternalId__c' : 'cal-six-day', RecurrentStartDate__c : 'on Sun', RecurrentEndDate__c : 'on Mon', StartDate__c : '', EndDate__c : '', IsWorking__c : false }
     ];
     const year = today.getUTCFullYear();
     [['Christmas', `${year}-12-24`, `${year}-12-27`], ['New Year', `${year + 1}-01-01`, `${year + 1}-01-02`], ['Midsummer', `${year}-06-19`, `${year}-06-20`]].forEach(([name, start, end], i) => {
-        intervals.push({ ExternalId__c : `int-holiday-${i + 1}`, Name : name, 'Calendar__r.ExternalId__c' : 'cal-general', RecurrentStartDate__c : '', RecurrentEndDate__c : '', StartDate__c : formatDateTime(parseDate(start)), EndDate__c : formatDateTime(parseDate(end)), IsWorking__c : false });
+        intervals.push({ ExternalId__c : `int-holiday-${i + 1}`, Label__c : name, 'Calendar__r.ExternalId__c' : 'cal-general', RecurrentStartDate__c : '', RecurrentEndDate__c : '', StartDate__c : formatDateTime(parseDate(start)), EndDate__c : formatDateTime(parseDate(end)), IsWorking__c : false });
     });
     return { calendars, calendarParents, intervals };
 }

@@ -56,7 +56,7 @@ public with sharing class BryntumDashboardController {
             List<Map<String, Object>> roots = new List<Map<String, Object>>();
             List<BryntumCalendar__c> calendars = [
                 SELECT Id, Name, Parent__c, UnspecifiedTimeIsWorking__c,
-                    (SELECT Id, Name, RecurrentStartDate__c, RecurrentEndDate__c, StartDate__c, EndDate__c, IsWorking__c FROM Intervals__r ORDER BY Name)
+                    (SELECT Id, Label__c, RecurrentStartDate__c, RecurrentEndDate__c, StartDate__c, EndDate__c, IsWorking__c FROM Intervals__r ORDER BY Name)
                 FROM BryntumCalendar__c
                 ORDER BY Name
             ];
@@ -65,9 +65,8 @@ public with sharing class BryntumDashboardController {
                 for (BryntumCalendarInterval__c interval : calendar.Intervals__r) {
                     intervals.add(new Map<String, Object>{
                         'id' => interval.Id,
-                        // Salesforce requires a name on every interval record. Only one-off intervals (holidays) show
-                        // theirs in the timeline, a recurring one (weekend, lunch) would print it in every occurrence.
-                        'name' => interval.StartDate__c != null ? interval.Name : null,
+                        // The label is optional, the timeline prints it in every occurrence of the interval
+                        'name' => interval.Label__c == null ? '' : interval.Label__c,
                         'recurrentStartDate' => interval.RecurrentStartDate__c,
                         'recurrentEndDate' => interval.RecurrentEndDate__c,
                         'startDate' => interval.StartDate__c,

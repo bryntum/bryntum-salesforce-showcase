@@ -4,7 +4,7 @@ private class BryntumDashboardControllerTest {
     private static Map<String, SObject> createPortfolio() {
         BryntumCalendar__c calendar = new BryntumCalendar__c(Name = 'General', ExternalId__c = 'cal-general');
         insert calendar;
-        insert new BryntumCalendarInterval__c(Name = 'Weekend', Calendar__c = calendar.Id, RecurrentStartDate__c = 'on Sat', RecurrentEndDate__c = 'on Mon', IsWorking__c = false);
+        insert new BryntumCalendarInterval__c(Calendar__c = calendar.Id, RecurrentStartDate__c = 'on Sat', RecurrentEndDate__c = 'on Mon', IsWorking__c = false);
 
         BryntumResource__c resource = new BryntumResource__c(Name = 'Alice Andersson', Role__c = 'Project Manager', Department__c = 'Engineering', HourlyRate__c = 80, MaxUnits__c = 100);
         insert resource;
@@ -93,7 +93,7 @@ private class BryntumDashboardControllerTest {
         System.assertEquals(1, calendars.size());
         List<Object> intervals = (List<Object>) ((Map<String, Object>) calendars[0]).get('intervals');
         System.assertEquals(1, intervals.size());
-        System.assertEquals(null, ((Map<String, Object>) intervals[0]).get('name'), 'A recurring interval is sent without its name');
+        System.assertEquals('', ((Map<String, Object>) intervals[0]).get('name'), 'An interval without a label is sent with an empty name');
 
         List<Object> resources = (List<Object>) ((Map<String, Object>) data.get('resources')).get('rows');
         System.assertEquals(1, resources.size());
