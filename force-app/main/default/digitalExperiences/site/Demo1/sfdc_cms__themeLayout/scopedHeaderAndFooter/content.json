@@ -91,7 +91,7 @@
                     "menuHorizontalAlignment" : "left",
                     "navigationMenuEditor" : "Default_Navigation",
                     "overrideTextStyle" : false,
-                    "showHomeLink" : true,
+                    "showHomeLink" : false,
                     "showParentMenuIcon" : true,
                     "spaceBetweenMenuItems" : "30px",
                     "textActiveColor" : "rgb(255, 255, 255)",
@@ -131,7 +131,7 @@
                     "modalSubmenuTextStyle" : "body-regular",
                     "modalTextDecorationOverride" : "",
                     "modalTextStyle" : "body-regular",
-                    "showHomeLink" : true
+                    "showHomeLink" : false
                   },
                   "definition" : "community_navigation:customizableNavigationHamburgerMenuContainer",
                   "id" : "1513e510-74ef-466c-906f-9e1445d5a5d3",

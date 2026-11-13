@@ -53,13 +53,14 @@
     <navType>Standard</navType>
     <setupExperience>all</setupExperience>
     <!-- <tabs>standard-home</tabs> -->
+    <tabs>BryntumDashboard</tabs>
     <tabs>BryntumGrid</tabs>
     <tabs>BryntumScheduler</tabs>
-    <tabs>BryntumSchedulerDragFromGrid</tabs>
     <tabs>BryntumGantt</tabs>
     <tabs>BryntumCalendar</tabs>
     <tabs>BryntumTaskBoard</tabs>
-    <tabs>GridTempDemo</tabs>
+    <tabs>BryntumSchedulerDragFromGrid</tabs>
     <tabs>SchedulerUnplannedGridDemo</tabs>
+    <tabs>GridTempDemo</tabs>
     <uiType>Lightning</uiType>
 </CustomApplication>

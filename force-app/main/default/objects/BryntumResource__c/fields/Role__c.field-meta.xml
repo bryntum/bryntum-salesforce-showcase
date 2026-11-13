@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Role__c</fullName>
+    <label>Role</label>
+    <type>Picklist</type>
+    <required>false</required>
+    <externalId>false</externalId>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Project Manager</fullName>
+                <default>false</default>
+                <label>Project Manager</label>
+            </value>
+            <value>
+                <fullName>Software Architect</fullName>
+                <default>false</default>
+                <label>Software Architect</label>
+            </value>
+            <value>
+                <fullName>Developer</fullName>
+                <default>false</default>
+                <label>Developer</label>
+            </value>
+            <value>
+                <fullName>QA Engineer</fullName>
+                <default>false</default>
+                <label>QA Engineer</label>
+            </value>
+            <value>
+                <fullName>UX Designer</fullName>
+                <default>false</default>
+                <label>UX Designer</label>
+            </value>
+            <value>
+                <fullName>DevOps Engineer</fullName>
+                <default>false</default>
+                <label>DevOps Engineer</label>
+            </value>
+            <value>
+                <fullName>Business Analyst</fullName>
+                <default>false</default>
+                <label>Business Analyst</label>
+            </value>
+            <value>
+                <fullName>Site Supervisor</fullName>
+                <default>false</default>
+                <label>Site Supervisor</label>
+            </value>
+            <value>
+                <fullName>Civil Engineer</fullName>
+                <default>false</default>
+                <label>Civil Engineer</label>
+            </value>
+            <value>
+                <fullName>Electrician</fullName>
+                <default>false</default>
+                <label>Electrician</label>
+            </value>
+            <value>
+                <fullName>Plumber</fullName>
+                <default>false</default>
+                <label>Plumber</label>
+            </value>
+            <value>
+                <fullName>Carpenter</fullName>
+                <default>false</default>
+                <label>Carpenter</label>
+            </value>
+            <value>
+                <fullName>Crane Operator</fullName>
+                <default>false</default>
+                <label>Crane Operator</label>
+            </value>
+            <value>
+                <fullName>Safety Inspector</fullName>
+                <default>false</default>
+                <label>Safety Inspector</label>
+            </value>
+            <value>
+                <fullName>Marketing Specialist</fullName>
+                <default>false</default>
+                <label>Marketing Specialist</label>
+            </value>
+            <value>
+                <fullName>Copywriter</fullName>
+                <default>false</default>
+                <label>Copywriter</label>
+            </value>
+            <value>
+                <fullName>Graphic Designer</fullName>
+                <default>false</default>
+                <label>Graphic Designer</label>
+            </value>
+            <value>
+                <fullName>Video Producer</fullName>
+                <default>false</default>
+                <label>Video Producer</label>
+            </value>
+            <value>
+                <fullName>Media Planner</fullName>
+                <default>false</default>
+                <label>Media Planner</label>
+            </value>
+            <value>
+                <fullName>Web Developer</fullName>
+                <default>false</default>
+                <label>Web Developer</label>
+            </value>
+            <value>
+                <fullName>Data Analyst</fullName>
+                <default>false</default>
+                <label>Data Analyst</label>
+            </value>
+            <value>
+                <fullName>Network Engineer</fullName>
+                <default>false</default>
+                <label>Network Engineer</label>
+            </value>
+            <value>
+                <fullName>System Administrator</fullName>
+                <default>false</default>
+                <label>System Administrator</label>
+            </value>
+            <value>
+                <fullName>Security Engineer</fullName>
+                <default>false</default>
+                <label>Security Engineer</label>
+            </value>
+            <value>
+                <fullName>Database Administrator</fullName>
+                <default>false</default>
+                <label>Database Administrator</label>
+            </value>
+            <value>
+                <fullName>Cloud Engineer</fullName>
+                <default>false</default>
+                <label>Cloud Engineer</label>
+            </value>
+            <value>
+                <fullName>Support Technician</fullName>
+                <default>false</default>
+                <label>Support Technician</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

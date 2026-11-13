@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Label__c</fullName>
+    <label>Label</label>
+    <description>Optional, shown in the timeline in every occurrence of the interval (holidays). Leave empty for recurring intervals such as weekends.</description>
+    <type>Text</type>
+    <length>80</length>
+    <required>false</required>
+    <externalId>false</externalId>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Project__c</fullName>
+    <label>Project</label>
+    <type>MasterDetail</type>
+    <referenceTo>BryntumProject__c</referenceTo>
+    <relationshipLabel>Tasks</relationshipLabel>
+    <relationshipName>Tasks</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>true</reparentableMasterDetail>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+    <externalId>false</externalId>
+</CustomField>

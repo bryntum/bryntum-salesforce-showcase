@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>StatusDate__c</fullName>
+    <label>Status Date</label>
+    <description>The date the progress of the project is reported for. The Gantt draws its progress line at this date.</description>
+    <type>Date</type>
+    <required>false</required>
+    <externalId>false</externalId>
+    <trackTrending>false</trackTrending>
+</CustomField>

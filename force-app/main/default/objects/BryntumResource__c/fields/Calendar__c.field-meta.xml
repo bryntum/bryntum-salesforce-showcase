@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Calendar__c</fullName>
+    <label>Calendar</label>
+    <type>Lookup</type>
+    <referenceTo>BryntumCalendar__c</referenceTo>
+    <relationshipLabel>Resources</relationshipLabel>
+    <relationshipName>Resources</relationshipName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <required>false</required>
+    <externalId>false</externalId>
+</CustomField>

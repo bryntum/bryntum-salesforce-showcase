@@ -1,0 +1,8 @@
+<template>
+    <div class="dashboard">
+        <template if:true={loading}>
+            <lightning-spinner alternative-text="Loading the portfolio" size="medium"></lightning-spinner>
+        </template>
+        <div class="bryntum-root-element" lwc:dom="manual"></div>
+    </div>
+</template>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Lag__c</fullName>
+    <label>Lag</label>
+    <type>Number</type>
+    <precision>10</precision>
+    <scale>2</scale>
+    <required>false</required>
+    <externalId>false</externalId>
+    <defaultValue>0</defaultValue>
+    <unique>false</unique>
+</CustomField>

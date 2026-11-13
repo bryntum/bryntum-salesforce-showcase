@@ -1,0 +1,57 @@
+.dashboard {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    min-height: 720px;
+}
+
+.bryntum-root-element {
+    /* The Bryntum widgets size their text relative to this */
+    font-size: 14px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.b-float-root {
+    z-index: 100;
+}
+
+.dashboard-status {
+    display: inline-block;
+    padding: 0.1em 0.6em;
+    border-radius: 1em;
+    font-size: 0.85em;
+    color: #fff;
+    background: #747474;
+}
+
+.dashboard-status-active,
+.dashboard-status-completed {
+    background: #2e844a;
+}
+
+.dashboard-status-planned,
+.dashboard-status-in-progress {
+    background: #0176d3;
+}
+
+.dashboard-status-on-hold {
+    background: #dd7a01;
+}
+
+.dashboard-status-late {
+    background: #ba0517;
+}
+
+.dashboard-over-budget {
+    color: #ba0517;
+    font-weight: 600;
+}
+
+/* The histogram bars are drawn on an SVG that must not clip its content */
+svg.b-histogram-canvas {
+    overflow: visible;
+}

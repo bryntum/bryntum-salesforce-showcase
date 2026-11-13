@@ -14,9 +14,17 @@
     "prettier:verify": "prettier --list-different \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
     "postinstall": "husky install",
     "precommit": "lint-staged",
+    "data:generate": "node scripts/data/generate-data.js",
+    "data:import": "node scripts/data/import-data.js",
+    "data:clean": "sf apex run --file scripts/apex/clean-bryntum-data.apex",
     "create-static-resources": "npx bryntum-grid-salesforce && npx bryntum-scheduler-salesforce && npx bryntum-gantt-salesforce && npx bryntum-calendar-salesforce && npx bryntum-taskboard-salesforce"
   },
   "devDependencies": {
+    "@bryntum/calendar-salesforce-enterprise": "8.0.0",
+    "@bryntum/gantt-salesforce-enterprise": "8.0.0",
+    "@bryntum/grid-salesforce-enterprise": "8.0.0",
+    "@bryntum/scheduler-salesforce-enterprise": "8.0.0",
+    "@bryntum/taskboard-salesforce-enterprise": "8.0.0",
     "@lwc/eslint-plugin-lwc": "^2.0.0",
     "@prettier/plugin-xml": "^2.0.1",
     "@salesforce/eslint-config-lwc": "^3.2.3",
@@ -29,12 +37,7 @@
     "husky": "^7.0.4",
     "lint-staged": "^12.3.7",
     "prettier": "^3.9.6",
-    "prettier-plugin-apex": "^2.3.0",
-    "@bryntum/grid-salesforce-enterprise": "8.0.0",
-    "@bryntum/scheduler-salesforce-enterprise": "8.0.0",
-    "@bryntum/gantt-salesforce-enterprise": "8.0.0",
-    "@bryntum/calendar-salesforce-enterprise": "8.0.0",
-    "@bryntum/taskboard-salesforce-enterprise": "8.0.0"
+    "prettier-plugin-apex": "^2.3.0"
   },
   "lint-staged": {
     "**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}": [

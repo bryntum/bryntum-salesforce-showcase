@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ConstraintType__c</fullName>
+    <label>Constraint Type</label>
+    <type>Picklist</type>
+    <required>false</required>
+    <externalId>false</externalId>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>muststarton</fullName>
+                <default>false</default>
+                <label>muststarton</label>
+            </value>
+            <value>
+                <fullName>mustfinishon</fullName>
+                <default>false</default>
+                <label>mustfinishon</label>
+            </value>
+            <value>
+                <fullName>startnoearlierthan</fullName>
+                <default>false</default>
+                <label>startnoearlierthan</label>
+            </value>
+            <value>
+                <fullName>startnolaterthan</fullName>
+                <default>false</default>
+                <label>startnolaterthan</label>
+            </value>
+            <value>
+                <fullName>finishnoearlierthan</fullName>
+                <default>false</default>
+                <label>finishnoearlierthan</label>
+            </value>
+            <value>
+                <fullName>finishnolaterthan</fullName>
+                <default>false</default>
+                <label>finishnolaterthan</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

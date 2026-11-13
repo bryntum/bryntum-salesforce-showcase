@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>64.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Bryntum Dashboard View</masterLabel>
+    <description>One view of the Bryntum portfolio: projects grid, Gantt timeline or resource histogram, sharing one project model with the other views on the page</description>
+    <targets>
+        <target>lightning__AppPage</target>
+        <target>lightning__Tab</target>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__AppPage">
+            <property name="view" type="String" label="View" datasource="projects,timeline,resources" default="projects" description="projects: grid of the project records, timeline: Gantt chart of all tasks, resources: resource histogram"/>
+            <property name="readOnly" type="Boolean" label="Read only" default="false" description="No editing in the view"/>
+            <property name="disableSave" type="Boolean" label="Don't save changes to Salesforce" default="false" description="Edits stay in the browser and are lost on reload, for public demos"/>
+        </targetConfig>
+        <targetConfig targets="lightningCommunity__Default">
+            <property name="view" type="String" label="View" datasource="projects,timeline,resources" default="projects" description="projects: grid of the project records, timeline: Gantt chart of all tasks, resources: resource histogram"/>
+            <property name="readOnly" type="Boolean" label="Read only" default="false" description="No editing in the view"/>
+            <property name="disableSave" type="Boolean" label="Don't save changes to Salesforce" default="false" description="Edits stay in the browser and are lost on reload, for public demos"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>
